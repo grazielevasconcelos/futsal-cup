@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE_DESCRIPTION, SITE_NAME, withBase } from '../lib/site';
+---
+
+<BaseLayout title={SITE_NAME} description={SITE_DESCRIPTION} activeNav="inicio">
+  <section class="page">
+    <h1>{SITE_NAME}</h1>
+    <p class="lead">
+      Acompanhe a competição: jogos, classificação, times, estatísticas e fase final.
+    </p>
+
+    <nav aria-label="Seções da competição">
+      <ul class="card-grid">
+        <li>
+          <a class="card" href={withBase('/jogos/')}>
+            <span class="card__title">Jogos</span>
+            <span class="card__text">Calendário, resultados e detalhes das partidas.</span>
+          </a>
+        </li>
+        <li>
+          <a class="card" href={withBase('/classificacao/')}>
+            <span class="card__title">Classificação</span>
+            <span class="card__text">Posições, pontos e critérios de desempate.</span>
+          </a>
+        </li>
+        <li>
+          <a class="card" href={withBase('/times/')}>
+            <span class="card__title">Times</span>
+            <span class="card__text">Os três times, elencos e estatísticas coletivas.</span>
+          </a>
+        </li>
+        <li>
+          <a class="card" href={withBase('/estatisticas/')}>
+            <span class="card__title">Estatísticas</span>
+            <span class="card__text">Artilharia, assistências, cartões e gols contra.</span>
+          </a>
+        </li>
+        <li>
+          <a class="card" href={withBase('/fase-final/')}>
+            <span class="card__title">Fase final</span>
+            <span class="card__text">Final única, amistoso informativo e pódio.</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </section>
+</BaseLayout>

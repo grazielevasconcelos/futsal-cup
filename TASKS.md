@@ -13,13 +13,14 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 
 ## 1. Fundação
 
-- [ ] Criar `package.json` conforme a SPEC §12.1 e commitar `package-lock.json`.
-- [ ] Configurar Astro 7, TypeScript 6, `astro.config.mjs` e `tsconfig.json`.
-- [ ] Configurar Vitest, Playwright e `@axe-core/playwright`.
-- [ ] Criar `src/styles/tokens.css` com aliases semânticos e sem nomes de marca/fontes proprietárias.
-- [ ] Criar layout global, skip link, navegação com 6 links e rodapé.
-- [ ] Criar metadados, canonical, Open Graph sem imagem e favicon.
-- [ ] Garantir que `airbnb-design-design.md` e `airbnb-design-tokens.css` não vão para o `dist/`.
+- [x] Criar `package.json` conforme a SPEC §12.1.
+- [ ] Commitar `package-lock.json` junto com a fatia.
+- [x] Configurar Astro 7, TypeScript 6, `astro.config.mjs` e `tsconfig.json`.
+- [x] Configurar Vitest, Playwright e `@axe-core/playwright`.
+- [x] Criar `src/styles/tokens.css` com aliases semânticos e sem nomes de marca/fontes proprietárias.
+- [x] Criar layout global, skip link, navegação com 6 links e rodapé.
+- [x] Criar metadados, canonical, Open Graph sem imagem e favicon.
+- [x] Garantir que `airbnb-design-design.md` e `airbnb-design-tokens.css` não vão para o `dist/`.
 
 ## 2. Dados e validação
 
@@ -84,7 +85,7 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 
 ## 7. Publicação
 
-- [ ] Configurar GitHub Actions com permissões mínimas.
+- [x] Configurar GitHub Actions com permissões mínimas.
 - [ ] Habilitar GitHub Pages em Settings → Pages → Source: GitHub Actions.
 - [ ] Validar o deploy em `https://grazielevasconcelos.github.io/futsal-cup/`.
 - [ ] Verificar hard refresh após o deploy.

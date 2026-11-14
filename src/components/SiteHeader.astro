@@ -1,0 +1,28 @@
+---
+import NavList from './NavList.astro';
+import { SITE_NAME, withBase } from '../lib/site';
+import type { NavKey } from '../lib/site';
+
+interface Props {
+  activeNav?: NavKey | undefined;
+}
+
+const { activeNav } = Astro.props;
+---
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="site-title" href={withBase('/')}>{SITE_NAME}</a>
+
+    <nav class="primary-nav" aria-label="Principal">
+      <NavList activeNav={activeNav} />
+    </nav>
+
+    <details class="menu-mobile">
+      <summary>Menu</summary>
+      <nav aria-label="Principal (menu móvel)">
+        <NavList activeNav={activeNav} />
+      </nav>
+    </details>
+  </div>
+</header>

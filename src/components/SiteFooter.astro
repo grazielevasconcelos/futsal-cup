@@ -1,0 +1,12 @@
+---
+import { SITE_NAME, formatBuildTimestamp, getBuildDate, withBase } from '../lib/site';
+
+const updatedAt = formatBuildTimestamp(getBuildDate());
+---
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <p><a href={withBase('/')}>{SITE_NAME}</a></p>
+    <p>Atualizado em {updatedAt} (horário de Brasília).</p>
+  </div>
+</footer>

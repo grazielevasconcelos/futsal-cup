@@ -2360,7 +2360,7 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: 'npm run preview -- --host 127.0.0.1 --port 4321',
+    command: 'npm run preview -- --host 127.0.0.1 --port 4321 --ignore-lock',
     url: 'http://127.0.0.1:4321/futsal-cup/',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
@@ -2373,6 +2373,7 @@ export default defineConfig({
 ```
 
 - CI instala apenas Chromium: `npx playwright install --with-deps chromium`.
+- `--ignore-lock` mantém o preview em primeiro plano em ambientes que detectam agentes; o Playwright encerra o processo ao final.
 - Safari/Firefox/Edge são verificados no checklist manual (Apêndice D).
 - O `webServer` exige `dist/` construído; o CI roda `npm run build` antes.
 - axe é executado em todas as rotas principais; falhas `serious`/`critical` bloqueiam.

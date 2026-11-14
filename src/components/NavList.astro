@@ -1,0 +1,25 @@
+---
+import { NAV_ITEMS } from '../lib/site';
+import type { NavKey } from '../lib/site';
+
+interface Props {
+  activeNav?: NavKey | undefined;
+}
+
+const { activeNav } = Astro.props;
+---
+
+<ul class="nav-list">
+  {
+    NAV_ITEMS.map((item) => (
+      <li>
+        <a
+          href={item.href}
+          aria-current={activeNav === item.key ? 'page' : undefined}
+        >
+          {item.label}
+        </a>
+      </li>
+    ))
+  }
+</ul>

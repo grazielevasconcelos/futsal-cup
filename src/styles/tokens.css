@@ -1,0 +1,79 @@
+/*
+ * Tokens do projeto.
+ *
+ * Valores adaptados da referência visual interna documentada na SPEC §11.2.
+ * Não importe a referência original: ela permanece fora do build.
+ * Componentes devem consumir os aliases semânticos abaixo.
+ */
+
+:root {
+  /* Cor */
+  --color-text: #222222;
+  --color-text-muted: #717171;
+  --color-surface: #ffffff;
+  --color-surface-subtle: #f7f7f7;
+  --color-border: #dddddd;
+  --color-accent: #ff5a5f;
+  --color-accent-strong: #e61e4d;
+  --color-on-accent: #222222;
+  --color-focus: #222222;
+
+  /* Tipografia */
+  --font-family-body: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --text-display-size: 48px;
+  --text-display-line: 56px;
+  --text-heading-1-size: 32px;
+  --text-heading-1-line: 36px;
+  --text-heading-2-size: 22px;
+  --text-heading-2-line: 26px;
+  --text-body-size: 16px;
+  --text-body-line: 24px;
+  --text-small-size: 14px;
+  --text-small-line: 18px;
+
+  /* Espaçamento */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 32px;
+  --space-5: 48px;
+  --space-6: 64px;
+
+  /* Forma e elevação */
+  --radius-small: 8px;
+  --radius-card: 12px;
+  --radius-pill: 9999px;
+  --shadow-card: 0 6px 16px rgba(0, 0, 0, 0.12);
+  --shadow-floating: 0 3px 12px rgba(0, 0, 0, 0.15);
+
+  /* Movimento */
+  --motion-default: 250ms cubic-bezier(0.2, 0, 0, 1);
+
+  /* Tokens técnicos */
+  --page-gutter: var(--space-2);
+  --content-max: 72rem;
+  --measure: 68ch;
+  --tap-target: 44px;
+  --border-width: 1px;
+  --focus-width: 3px;
+  --focus-offset: 2px;
+  --table-min-width: 48rem;
+  --letter-spacing-badge: 0.04em;
+  --site-title-max: 24ch;
+  --underline-width: 2px;
+  --underline-width-hover: 3px;
+  --underline-offset: 0.16em;
+  --z-skip-link: 10;
+  --gradient-accent: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-strong) 100%);
+}
+
+@media (min-width: 48em) {
+  :root {
+    --page-gutter: var(--space-4);
+  }
+}

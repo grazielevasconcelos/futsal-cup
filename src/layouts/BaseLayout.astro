@@ -1,0 +1,54 @@
+---
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import { SITE_NAME, withBase } from '../lib/site';
+import type { NavKey } from '../lib/site';
+import '../styles/tokens.css';
+import '../styles/base.css';
+
+interface Props {
+  title?: string | undefined;
+  description: string;
+  activeNav?: NavKey | undefined;
+  noindex?: boolean | undefined;
+}
+
+const { title, description, activeNav, noindex = false } = Astro.props;
+
+const pageTitle = !title || title === SITE_NAME ? SITE_NAME : `${title} — ${SITE_NAME}`;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light" />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
+
+    {
+      !noindex && (
+        <>
+          <link rel="canonical" href={canonicalUrl} />
+          <meta property="og:type" content="website" />
+          <meta property="og:site_name" content={SITE_NAME} />
+          <meta property="og:title" content={pageTitle} />
+          <meta property="og:description" content={description} />
+          <meta property="og:url" content={canonicalUrl} />
+        </>
+      )
+    }
+  </head>
+  <body>
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+    <SiteHeader activeNav={activeNav} />
+    <main id="conteudo" tabindex="-1">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>
