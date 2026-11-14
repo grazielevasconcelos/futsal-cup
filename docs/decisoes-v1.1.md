@@ -115,6 +115,5 @@
 
 ## 12. Pendências
 
-- Aprovação formal do PRD (§18) pela organização, desenvolvimento e revisão final.
 - Definição de horários, nomes dos times, local exato e detalhes do amistoso.
 - Implementação do MVP conforme `PLAN.md` e `TASKS.md`.

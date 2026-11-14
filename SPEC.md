@@ -6,7 +6,7 @@
 **Fonte de produto:** `PRD.md` v1.1 + `AGENTS.md` v1.1  
 **Registro de decisões:** `docs/decisoes-v1.1.md` (reconstrução documentada)
 
-Esta é a especificação técnica normativa do site. Ela está subordinada ao `PRD.md` (produto) e ao `AGENTS.md` (restrições do repositório). Em caso de conflito, prevalecem o PRD e o AGENTS; as interpretações e emendas estão registradas na §15. O alinhamento do PRD/AGENTS com a v1.1 foi aplicado; a aprovação formal do PRD (§18) permanece pendente. `PLAN.md` e `TASKS.md` são documentos de execução subordinados a esta SPEC.
+Esta é a especificação técnica normativa do site. Ela está subordinada ao `PRD.md` (produto) e ao `AGENTS.md` (restrições do repositório). Em caso de conflito, prevalecem o PRD e o AGENTS; as interpretações e emendas estão registradas na §15. O alinhamento do PRD/AGENTS com a v1.1 foi aplicado e a aprovação formal do PRD (§18) está registrada. `PLAN.md` e `TASKS.md` são documentos de execução subordinados a esta SPEC.
 
 > **Mudança de formato na v1.1 (12/11/2026):** a edição 2026 passa a ter **3 times fixos** (`ta`, `tb`, `tc`), **6 partidas classificatórias em turno e returno** e **final única** entre 1º e 2º. O 3º lugar é o 3º da classificação; **não há disputa de 3º x 4º nem 4º lugar**. O **amistoso do 3º colocado** é um metadado informativo (`friendly`), não uma partida. O confronto direto passa a considerar os **dois jogos** entre os times empatados. As emendas estão na §15 e foram refletidas no PRD v1.1 e no AGENTS v1.1.
 
@@ -1289,8 +1289,9 @@ buildTeamStats(competition):
           senão:
             stats[time].shootoutLosses += 1
 
-    para cada jogadora da partida:
-      resumo = cardSummary(partida.events, player.id)
+    para cada jogadora em elencoDaPartida(times):   // home + away; inclui leftAt != null
+      timeDaJogadora = time cujo elenco (team.players) contém jogadora.id   // elenco, não evento
+      resumo = cardSummary(partida.events, jogadora.id)
       stats[timeDaJogadora].yellow += resumo.yellow
       stats[timeDaJogadora].red += resumo.red
       stats[timeDaJogadora].disciplinaryPoints += resumo.points
@@ -1303,6 +1304,8 @@ buildTeamStats(competition):
 
 - `buildTeamStats` usa apenas partidas oficiais `group` + `final`; o amistoso (`friendly`) não entra.
 - O placar do W.O. já é 1x0 em `deriveScore`; ele conta como vitória/derrota e entra em GP/GC/SG. Cartões de W.O. contam, exceto `no_show` (que não tem eventos).
+- `timeDaJogadora` é resolvido pelo **elenco** (`team.players`), não pelo evento: eventos de cartão não carregam `teamId`. A busca considera apenas os dois participantes da partida (`times.homeTeamId` e `times.awayTeamId`); `VAL-006` garante que a jogadora não está em dois times e `VAL-019` garante que todo evento referencia jogadora de um dos dois elencos, então a resolução retorna exatamente um time; zero times é erro de invariante.
+- `elencoDaPartida(times)` é a união dos elencos dos dois participantes, incluindo jogadoras com `leftAt != null`: cartões registrados enquanto a jogadora era elegível continuam contando para o time, mesmo que ela tenha saído depois.
 - Em final decidida nos pênaltis, o tempo normal empatado conta como empate para os dois times; `shootoutWins`/`shootoutLosses` registram a campanha separadamente. O shootout não altera `goalsFor`, `goalsAgainst` nem `goalDifference`.
 - `shootoutWins`/`shootoutLosses` são 0 para times que não disputaram shootout; não existe “shootout draw”.
 - A classificação continua usando apenas as 6 partidas de grupo (`buildStandings`); `buildTeamStats` é para a página do time e não altera posições.
@@ -2730,11 +2733,11 @@ npm run verify
 | 23 | Estatísticas coletivas | `buildTeamStats` agrega grupo + final; V/E/D pelo tempo normal; final decidida nos pênaltis conta como empate; `shootoutWins`/`shootoutLosses` separados; shootout fora de GP/GC/SG; amistoso fora. | Decisão de produto de 12/11/2026. | PRD v1.1 §10.4/§10.6 e AGENTS v1.1 atualizados; teste TST-115. |
 | 24 | Simetria dos confrontos | Cada par tem um jogo em casa para cada time; `g4` é `tb x ta`. | Correção de consistência do calendário v1.1. | PRD v1.1 §7.8, AGENTS v1.1 §Calendário e Apêndice A atualizados; teste TST-116. |
 
-As emendas 1–24 foram refletidas no `PRD.md` v1.1 e no `AGENTS.md` v1.1. A coluna “Aplicação na v1.1” registra onde cada emenda foi aplicada; a aprovação formal do PRD (§18) continua pendente e não foi presumida. As referências ao “briefing” nas emendas 1–17 são ao briefing original da v1.1, que não está versionado; `docs/decisoes-v1.1.md` é a reconstrução documentada e não normativa.
+As emendas 1–24 foram refletidas no `PRD.md` v1.1 e no `AGENTS.md` v1.1. A coluna “Aplicação na v1.1” registra onde cada emenda foi aplicada; a aprovação formal do PRD (§18) está registrada no próprio PRD. As referências ao “briefing” nas emendas 1–17 são ao briefing original da v1.1, que não está versionado; `docs/decisoes-v1.1.md` é a reconstrução documentada e não normativa.
 
 ### 15.2 Alinhamento aplicado ao PRD, AGENTS e README
 
-O alinhamento abaixo foi aplicado nesta entrega. A aprovação formal do PRD (§18) permanece pendente e não foi presumida; o commit `docs` é o registro final e só deve ser declarado concluído depois de existir.
+O alinhamento abaixo foi aplicado nesta entrega. A aprovação formal do PRD (§18) está registrada no próprio PRD; o commit `docs` é o registro final e só deve ser declarado concluído depois de existir.
 
 **PRD.md v1.1**
 

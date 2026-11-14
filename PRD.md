@@ -2,11 +2,11 @@
 
 **Versão:** 1.1  
 **Data:** 12/11/2026  
-**Status:** Proposto  
+**Status:** Aceito  
 **Responsável:** Organização da Copa  
 **Público-alvo:** organização, desenvolvimento e jogadoras
 
-> **Nota da v1.1:** esta versão incorpora as decisões de produto de 12/11/2026 registradas em `docs/decisoes-v1.1.md` e detalhadas na `SPEC.md`. A aprovação formal da §18 permanece pendente.
+> **Nota da v1.1:** esta versão incorpora as decisões de produto de 12/11/2026 registradas em `docs/decisoes-v1.1.md` e detalhadas na `SPEC.md`. A aprovação formal da §18 está registrada neste documento.
 
 ---
 
@@ -661,6 +661,6 @@ Estas questões não bloqueiam o MVP e podem ser resolvidas pela organização d
 
 ## 18. Aprovação
 
-- [ ] Organização da Copa
-- [ ] Desenvolvimento
-- [ ] Revisão final do PRD
+- [x] Organização da Copa
+- [x] Desenvolvimento
+- [x] Revisão final do PRD

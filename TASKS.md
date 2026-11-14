@@ -9,7 +9,7 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 - [x] Atualizar `SPEC.md` para v1.2 (g4 `tb x ta`, `buildTeamStats`, TST-115/116, §15/§17).
 - [x] Criar `docs/decisoes-v1.1.md` como reconstrução documentada.
 - [x] Criar `PLAN.md` e `TASKS.md`.
-- [ ] Aprovar formalmente o PRD v1.1 (§18).
+- [x] Aprovar formalmente o PRD v1.1 (§18).
 
 ## 1. Fundação
 
