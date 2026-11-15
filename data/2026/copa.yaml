@@ -1,0 +1,329 @@
+# Fonte pública da Copa de Futsal Feminino Vila Mariana 2026.
+# Privacidade: apenas apelido, posição, time e estatísticas.
+# O mapeamento p-XXX -> pessoa fica FORA do repositório.
+# Não inclua nome completo, foto, contato, camisa ou data de nascimento.
+
+edition: 2026
+timezone: "America/Sao_Paulo"
+
+teams:
+  - id: "ta"
+    name: "Time A"
+    abbreviation: "TA"
+    players:
+      - id: "p-001"
+        nickname: "Ana"
+        position: "goleira"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-002"
+        nickname: "Bia"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-003"
+        nickname: "Carla"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-004"
+        nickname: "Dani"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-005"
+        nickname: "Eva"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-006"
+        nickname: "Fabi"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-007"
+        nickname: "Gabi"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: "2026-11-25T00:00:00-03:00"
+      - id: "p-008"
+        nickname: "Nana"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+
+  - id: "tb"
+    name: "Time B"
+    abbreviation: "TB"
+    players:
+      - id: "p-009"
+        nickname: "Helo"
+        position: "goleira"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-010"
+        nickname: "Isa"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-011"
+        nickname: "Joana"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-012"
+        nickname: "Kiki"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-013"
+        nickname: "Lila"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-014"
+        nickname: "Mari"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-015"
+        nickname: "Nanda"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+
+  - id: "tc"
+    name: "Time C"
+    abbreviation: "TC"
+    players:
+      - id: "p-016"
+        nickname: "Olívia"
+        position: "goleira"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-017"
+        nickname: "Paula"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-018"
+        nickname: "Rafa"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-019"
+        nickname: "Sara"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-020"
+        nickname: "Tati"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-021"
+        nickname: "Ula"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+      - id: "p-022"
+        nickname: "Vivi"
+        position: "linha"
+        joinedAt: "2026-11-10T00:00:00-03:00"
+        leftAt: null
+
+matches:
+  - id: "g1"
+    stage: "group"
+    round: 1
+    homeTeamId: "ta"
+    awayTeamId: "tb"
+    date: "2026-11-24"
+    startsAt: "2026-11-24T19:00:00-03:00"
+    venue: "Vila Mariana, São Paulo"
+    status: "finished"
+    walkover: null
+    shootout: null
+    events:
+      - type: "yellow"
+        playerId: "p-009"
+        minute: 8
+      - type: "goal"
+        playerId: "p-002"
+        assistPlayerId: "p-007"
+        minute: 12
+        penalty: false
+
+  - id: "g2"
+    stage: "group"
+    round: 1
+    homeTeamId: "tb"
+    awayTeamId: "tc"
+    date: "2026-11-24"
+    startsAt: "2026-11-24T20:30:00-03:00"
+    venue: "Vila Mariana, São Paulo"
+    status: "finished"
+    walkover:
+      winnerTeamId: "tc"
+      reason: "no_show"
+      note: "TB não compareceu."
+    shootout: null
+    events: []
+    # W.O. 0x1 para TC na ordem mandante/visitante; sem gols ou assistências.
+
+  - id: "g3"
+    stage: "group"
+    round: 2
+    homeTeamId: "ta"
+    awayTeamId: "tc"
+    date: "2026-11-26"
+    startsAt: "2026-11-26T19:00:00-03:00"
+    venue: "Vila Mariana, São Paulo"
+    status: "finished"
+    walkover: null
+    shootout: null
+    events:
+      - type: "yellow"
+        playerId: "p-005"
+        minute: 9
+      - type: "yellow"
+        playerId: "p-016"
+        minute: 14
+      - type: "goal"
+        playerId: "p-003"
+        assistPlayerId: "p-002"
+        minute: 18
+        penalty: false
+      - type: "yellow"
+        playerId: "p-016"
+        minute: 22
+        # 2º amarelo -> vermelho derivado; p-016 suspensa em g5.
+
+  - id: "g4"
+    stage: "group"
+    round: 2
+    homeTeamId: "tb"
+    awayTeamId: "ta"
+    date: "2026-11-26"
+    startsAt: "2026-11-26T20:30:00-03:00"
+    venue: "Vila Mariana, São Paulo"
+    status: "finished"
+    walkover: null
+    shootout: null
+    events:
+      - type: "ownGoal"
+        playerId: "p-005"
+        minute: 11
+        # Gol contra de TA; o gol é creditado a TB.
+      - type: "goal"
+        playerId: "p-004"
+        assistPlayerId: "p-006"
+        minute: 19
+        penalty: false
+
+  - id: "g5"
+    stage: "group"
+    round: 3
+    homeTeamId: "tc"
+    awayTeamId: "ta"
+    date: "2026-12-01"
+    startsAt: "2026-12-01T19:00:00-03:00"
+    venue: "Vila Mariana, São Paulo"
+    status: "finished"
+    walkover: null
+    shootout: null
+    events:
+      - type: "goal"
+        playerId: "p-017"
+        assistPlayerId: "p-018"
+        minute: 7
+        penalty: false
+      - type: "goal"
+        playerId: "p-004"
+        assistPlayerId: "p-002"
+        minute: 13
+        penalty: false
+      - type: "goal"
+        playerId: "p-018"
+        assistPlayerId: "p-017"
+        minute: 20
+        penalty: false
+      - type: "goal"
+        playerId: "p-019"
+        assistPlayerId: "p-020"
+        minute: 27
+        penalty: false
+    # p-016 (TC) está suspensa por 2º amarelo em g3 e não tem eventos aqui.
+
+  - id: "g6"
+    stage: "group"
+    round: 3
+    homeTeamId: "tc"
+    awayTeamId: "tb"
+    date: "2026-12-01"
+    startsAt: "2026-12-01T20:30:00-03:00"
+    venue: "Vila Mariana, São Paulo"
+    status: "finished"
+    walkover: null
+    shootout: null
+    events:
+      - type: "goal"
+        playerId: "p-020"
+        assistPlayerId: "p-021"
+        minute: 9
+        penalty: false
+      - type: "yellow"
+        playerId: "p-021"
+        minute: 14
+      - type: "goal"
+        playerId: "p-012"
+        assistPlayerId: "p-013"
+        minute: 18
+        penalty: false
+      - type: "red"
+        playerId: "p-014"
+        minute: 24
+        # Vermelho direto; TB não tem próxima partida.
+
+  - id: "final"
+    stage: "final"
+    round: null
+    date: "2026-12-03"
+    startsAt: "2026-12-03T20:30:00-03:00"
+    venue: "Vila Mariana, São Paulo"
+    status: "finished"
+    walkover: null
+    shootout:
+      home: 4
+      away: 3
+    events:
+      - type: "goal"
+        playerId: "p-017"
+        assistPlayerId: "p-018"
+        minute: 10
+        penalty: false
+      - type: "yellow"
+        playerId: "p-019"
+        minute: 12
+      - type: "goal"
+        playerId: "p-002"
+        assistPlayerId: null
+        minute: 17
+        penalty: true
+      - type: "yellow"
+        playerId: "p-006"
+        minute: 21
+      # 1x1 no tempo normal; TC venceu nos pênaltis por 4x3.
+
+finalists:
+  final: ["tc", "ta"]
+
+drawOrder: null
+
+friendly:
+  date: "2026-12-03"
+  startsAt: "2026-12-03T18:30:00-03:00"
+  venue: "Vila Mariana, São Paulo"
+  note: "Amistoso do 3º colocado contra um time convidado. Não vale pontos e não altera a competição."
+
+notices: []

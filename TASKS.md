@@ -14,7 +14,7 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 ## 1. Fundação
 
 - [x] Criar `package.json` conforme a SPEC §12.1.
-- [ ] Commitar `package-lock.json` junto com a fatia.
+- [x] Commitar `package-lock.json` junto com a fatia.
 - [x] Configurar Astro 7, TypeScript 6, `astro.config.mjs` e `tsconfig.json`.
 - [x] Configurar Vitest, Playwright e `@axe-core/playwright`.
 - [x] Criar `src/styles/tokens.css` com aliases semânticos e sem nomes de marca/fontes proprietárias.
@@ -24,14 +24,14 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 
 ## 2. Dados e validação
 
-- [ ] Implementar schema Zod do envelope, times, jogadoras, partidas, eventos, `finalists`, `drawOrder`, `friendly` e `notices`.
-- [ ] Implementar leitura de `data/2026/copa.yaml` com mensagens de erro claras.
-- [ ] Implementar validação semântica e agregação de erros (`VAL-*`).
-- [ ] Implementar avisos não bloqueantes (`VAL-W*`).
-- [ ] Implementar `npm run validate` com resumo em Markdown e exit code correto.
-- [ ] Criar fixture válido com 3 times, `g1`…`g6`, final e amistoso.
-- [ ] Criar fixtures inválidos para cada regra bloqueante.
-- [ ] Validar `g4` como `tb x ta` e simetria dos confrontos.
+- [x] Implementar schema Zod do envelope, times, jogadoras, partidas, eventos, `finalists`, `drawOrder`, `friendly` e `notices`.
+- [x] Implementar leitura de `data/2026/copa.yaml` com mensagens de erro claras.
+- [x] Implementar validação semântica e agregação de erros (`VAL-*`).
+- [x] Implementar avisos não bloqueantes (`VAL-W*`).
+- [x] Implementar `npm run validate` com resumo em Markdown e exit code correto.
+- [x] Criar fixture válido com 3 times, `g1`…`g6`, final e amistoso.
+- [x] Criar fixtures/factories inválidos para cada regra bloqueante.
+- [x] Validar `g4` como `tb x ta` e simetria dos confrontos.
 
 ## 3. Domínio
 
@@ -77,7 +77,7 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 - [ ] TST-028…TST-038: gols, assistências, pênaltis e estatísticas individuais.
 - [ ] TST-115: estatísticas coletivas com shootout.
 - [ ] TST-039…TST-048: elenco e elegibilidade.
-- [ ] TST-049…TST-065, TST-107, TST-109 e TST-116: validação, schema, fase final e simetria.
+- [x] TST-049…TST-065, TST-107, TST-109 e TST-116: validação, schema, fase final e simetria.
 - [ ] TST-066…TST-083 e TST-106/108/113/114: interface e estados.
 - [ ] TST-084…TST-094: build, segurança e determinismo.
 - [ ] TST-095…TST-104: acessibilidade e layout.
