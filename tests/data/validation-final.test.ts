@@ -44,8 +44,10 @@ describe('validação semântica da fase final', () => {
   it('VAL-017: bloqueia finalistas divergentes da classificação', () => {
     const data = validData();
     data.finalists = { final: ['ta', 'tc'] };
-    const errorCodes = codes(validateCompetition(data));
-    expect(errorCodes).toContain('VAL-017');
+    const result = validateCompetition(data);
+    const problem = result.errors.find((item) => item.code === 'VAL-017');
+    expect(problem?.message).toContain('Antigos');
+    expect(problem?.message).toContain('Novos');
   });
 
   it('VAL-017: bloqueia finalists nulo com grupo completo', () => {
