@@ -1,0 +1,213 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Score from '../../components/Score.astro';
+import StatusBadge from '../../components/StatusBadge.astro';
+import { loadCompetition } from '../../lib/data/load';
+import { suspendedFor } from '../../lib/domain/discipline';
+import { isMatchPast } from '../../lib/domain/home';
+import { buildPlayerTeamMap, buildTeamMap } from '../../lib/domain/players';
+import { resolveMatchTeams } from '../../lib/domain/score';
+import { formatDate, formatDateHeading, formatTime } from '../../lib/format/date';
+import { buildEventViews } from '../../lib/format/events';
+import { formatStage, walkoverReasonLabel } from '../../lib/format/match';
+import { getBuildDate, withBase } from '../../lib/site';
+
+export function getStaticPaths() {
+  const competition = loadCompetition();
+  return competition.matches.map((match) => ({ params: { matchId: match.id } }));
+}
+
+const competition = loadCompetition();
+const now = getBuildDate();
+const match = competition.matches.find((item) => item.id === Astro.params.matchId);
+
+if (match === undefined) {
+  throw new Error(`Partida não encontrada: ${Astro.params.matchId ?? 'sem id'}`);
+}
+
+const teams = buildTeamMap(competition);
+const playerTeams = buildPlayerTeamMap(competition);
+
+const resolved =
+  match.stage === 'group'
+    ? { homeTeamId: match.homeTeamId, awayTeamId: match.awayTeamId }
+    : competition.finalists === null
+      ? null
+      : resolveMatchTeams(match, competition.finalists);
+
+const homeTeam = resolved === null ? undefined : teams.get(resolved.homeTeamId);
+const awayTeam = resolved === null ? undefined : teams.get(resolved.awayTeamId);
+const homeName = homeTeam?.name ?? 'A definir';
+const awayName = awayTeam?.name ?? 'A definir';
+
+const title =
+  match.stage === 'final'
+    ? `Final — ${formatDate(match.date)}`
+    : `${homeName} x ${awayName} — ${formatDate(match.date)}`;
+
+const status = match.status;
+const pendingResult = status === 'scheduled' && isMatchPast(match, now);
+const eventViews =
+  status === 'finished' && resolved !== null
+    ? buildEventViews(match, competition.finalists, playerTeams, teams)
+    : [];
+
+const suspensionIds = suspendedFor(match, competition);
+const absences =
+  resolved === null
+    ? []
+    : [resolved.homeTeamId, resolved.awayTeamId].flatMap((teamId) => {
+        const team = teams.get(teamId);
+        if (team === undefined) return [];
+        const players = [...suspensionIds]
+          .filter((playerId) => playerTeams.get(playerId)?.team.id === teamId)
+          .map((playerId) => playerTeams.get(playerId)?.player.nickname)
+          .filter((nickname): nickname is string => nickname !== undefined);
+        return [{ team, players }];
+      });
+
+const time = match.startsAt === null ? 'Horário a definir' : formatTime(match.startsAt);
+const venue = match.venue ?? 'Local a definir';
+---
+
+<BaseLayout
+  title={title}
+  description={`Detalhes da partida ${match.stage === 'final' ? 'final' : `da ${formatStage(match).toLowerCase()}`} da Copa de Futsal Feminino Vila Mariana 2026, com placar, eventos e desfalques.`}
+  activeNav="jogos"
+  notices={competition.notices}
+>
+  <div class="page">
+    <p class="meta"><a href={withBase('/jogos/')}>Todos os jogos</a></p>
+
+    <div class="page-header">
+      <p class="badge-list">
+        <span class="badge">{formatStage(match)}</span>
+        <StatusBadge match={match} now={now} />
+      </p>
+      <h1>{resolved === null ? 'Confrontos a definir' : `${homeName} x ${awayName}`}</h1>
+      <p class="meta">
+        {formatDateHeading(match.date)} · {time} · {venue}
+      </p>
+
+      {
+        status === 'finished' && (
+          <Score
+            match={match}
+            finalists={competition.finalists}
+            homeName={homeName}
+            awayName={awayName}
+            playerTeams={playerTeams}
+            size="large"
+          />
+        )
+      }
+    </div>
+
+    {
+      resolved === null && (
+        <section class="section" aria-labelledby="final-a-definir">
+          <h2 id="final-a-definir">Final a definir</h2>
+          <p>
+            A final será disputada entre o 1º e o 2º colocados da fase classificatória,
+            depois das seis partidas de grupo.
+          </p>
+          <p><a href={withBase('/classificacao/')}>Acompanhar a classificação</a></p>
+        </section>
+      )
+    }
+
+    {
+      status === 'postponed' && (
+        <section class="section" aria-labelledby="partida-adiada">
+          <h2 id="partida-adiada">Partida adiada</h2>
+          <p>Nova data e horário serão publicados quando a organização confirmar.</p>
+        </section>
+      )
+    }
+
+    {
+      status === 'scheduled' && (
+        <section class="section" aria-labelledby="partida-agendada">
+          <h2 id="partida-agendada">
+            {pendingResult ? 'Resultado pendente' : 'Partida ainda não realizada'}
+          </h2>
+          <p>
+            {pendingResult
+              ? 'A data já passou e o resultado será publicado quando a organização registrar os eventos.'
+              : 'O placar e os eventos serão publicados depois da partida.'}
+          </p>
+        </section>
+      )
+    }
+
+    {
+      status === 'finished' && match.walkover !== null && (
+        <section class="section" aria-labelledby="wo">
+          <h2 id="wo">Vitória por W.O. — {walkoverReasonLabel(match.walkover.reason)}</h2>
+          {match.walkover.note !== null && <p>{match.walkover.note}</p>}
+          {eventViews.length === 0 && <p>Sem eventos registrados.</p>}
+        </section>
+      )
+    }
+
+    {
+      status === 'finished' && eventViews.length > 0 && (
+        <section class="section" aria-labelledby="eventos">
+          <h2 id="eventos">Eventos</h2>
+          <ol class="event-list">
+            {eventViews.map((event) => (
+              <li class="event">
+                <p class="event__minute">{event.minute}</p>
+                <p class="event__description">{event.description}</p>
+                {event.tags.length > 0 && (
+                  <ul class="tag-list">
+                    {event.tags.map((tag) => (
+                      <li class="tag">{tag}</li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )
+    }
+
+    {
+      absences.length > 0 && (
+        <section class="section" aria-labelledby="desfalques">
+          <h2 id="desfalques">Desfalques por suspensão</h2>
+          {absences.map(({ team, players }) => (
+            <div>
+              <h3>{team.name}</h3>
+              {players.length === 0 ? (
+                <p>Nenhum desfalque por suspensão.</p>
+              ) : (
+                <ul>
+                  {players.map((nickname) => (
+                    <li>{nickname}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </section>
+      )
+    }
+
+    <section class="section" aria-labelledby="navegar">
+      <h2 id="navegar">Continuar</h2>
+      <ul>
+        <li><a href={withBase('/jogos/')}>Todos os jogos</a></li>
+        <li><a href={withBase('/classificacao/')}>Classificação</a></li>
+        {resolved !== null && (
+          <li>
+            <a href={withBase(`/times/${resolved.homeTeamId}/`)}>{homeName}</a>
+            {' e '}
+            <a href={withBase(`/times/${resolved.awayTeamId}/`)}>{awayName}</a>
+          </li>
+        )}
+      </ul>
+    </section>
+  </div>
+</BaseLayout>
