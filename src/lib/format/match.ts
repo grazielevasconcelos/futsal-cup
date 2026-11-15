@@ -70,3 +70,8 @@ export function formatStatus(match: Match, now: Date): string {
   if (isMatchPast(match, now)) return 'Resultado pendente';
   return 'Agendada';
 }
+
+export function formatStage(match: Match): string {
+  if (match.stage === 'final') return 'Final';
+  return `Rodada ${match.round}`;
+}
