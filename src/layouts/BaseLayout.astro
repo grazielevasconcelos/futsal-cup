@@ -1,19 +1,23 @@
 ---
+import NoticeBanner from '../components/NoticeBanner.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
+import type { Notice } from '../lib/domain/types';
 import { SITE_NAME, withBase } from '../lib/site';
 import type { NavKey } from '../lib/site';
 import '../styles/tokens.css';
 import '../styles/base.css';
+import '../styles/components.css';
 
 interface Props {
   title?: string | undefined;
   description: string;
   activeNav?: NavKey | undefined;
   noindex?: boolean | undefined;
+  notices?: readonly Notice[] | undefined;
 }
 
-const { title, description, activeNav, noindex = false } = Astro.props;
+const { title, description, activeNav, noindex = false, notices = [] } = Astro.props;
 
 const pageTitle = !title || title === SITE_NAME ? SITE_NAME : `${title} — ${SITE_NAME}`;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
@@ -46,6 +50,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
   <body>
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
     <SiteHeader activeNav={activeNav} />
+    <NoticeBanner notices={notices} />
     <main id="conteudo" tabindex="-1">
       <slot />
     </main>

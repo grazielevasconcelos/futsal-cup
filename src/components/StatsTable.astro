@@ -1,0 +1,93 @@
+---
+interface Column {
+  readonly key: string;
+  readonly label: string;
+  readonly abbr?: string;
+  readonly numeric?: boolean;
+}
+
+interface Row {
+  readonly cells: readonly (string | number)[];
+}
+
+interface Props {
+  caption: string;
+  columns: readonly Column[];
+  rows: readonly Row[];
+  emptyMessage: string;
+  labelledBy: string;
+  rowHeaderIndex?: number;
+}
+
+const {
+  caption,
+  columns,
+  rows,
+  emptyMessage,
+  labelledBy,
+  rowHeaderIndex = 1,
+} = Astro.props;
+
+const hintId = `${labelledBy}-hint`;
+---
+
+{
+  rows.length === 0 ? (
+    <p class="empty-state">{emptyMessage}</p>
+  ) : (
+    <>
+      <p class="table-scroll__hint" id={hintId}>
+        Deslize horizontalmente para ver todas as colunas.
+      </p>
+      <div
+        class="table-scroll"
+        role="region"
+        aria-labelledby={labelledBy}
+        aria-describedby={hintId}
+        tabindex="0"
+      >
+        <table class="data-table">
+          <caption>{caption}</caption>
+          <thead>
+            <tr>
+              {columns.map((column) => (
+                <th
+                  scope="col"
+                  class:list={[{ 'data-table__numeric': column.numeric === true }]}
+                >
+                  {column.abbr === undefined ? (
+                    column.label
+                  ) : (
+                    <abbr title={column.label}>{column.abbr}</abbr>
+                  )}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr>
+                {row.cells.map((cell, index) =>
+                  index === rowHeaderIndex ? (
+                    <th scope="row">{cell}</th>
+                  ) : (
+                    <td
+                      class:list={[
+                        {
+                          'data-table__numeric':
+                            columns[index]?.numeric === true && index !== rowHeaderIndex,
+                        },
+                      ]}
+                    >
+                      {cell}
+                    </td>
+                  ),
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  )
+}

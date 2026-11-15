@@ -1,15 +1,58 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import MatchCard from '../../components/MatchCard.astro';
+import { loadCompetition } from '../../lib/data/load';
+import { canonicalOrder } from '../../lib/domain/order';
+import type { Match } from '../../lib/domain/types';
+import { formatDateHeading } from '../../lib/format/date';
+import { getBuildDate, withBase } from '../../lib/site';
+
+const competition = loadCompetition();
+const now = getBuildDate();
+
+const matches = competition.matches.slice().sort((a, b) => {
+  if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+  return canonicalOrder(a.id) - canonicalOrder(b.id);
+});
+
+const days = new Map<string, Match[]>();
+for (const match of matches) {
+  const list = days.get(match.date);
+  if (list === undefined) days.set(match.date, [match]);
+  else list.push(match);
+}
 ---
 
 <BaseLayout
   title="Jogos"
-  description="Calendário, resultados e detalhes das sete partidas oficiais da Copa de Futsal Feminino Vila Mariana 2026."
+  description="Calendário completo das sete partidas oficiais da Copa de Futsal Feminino Vila Mariana 2026, com datas, horários e resultados."
   activeNav="jogos"
+  notices={competition.notices}
 >
-  <section class="page">
-    <h1>Jogos</h1>
-    <p class="lead">Calendário, resultados e detalhes das partidas oficiais.</p>
-    <p>A programação e os resultados serão publicados aqui a partir da fonte oficial da competição.</p>
-  </section>
+  <div class="page">
+    <div class="page-header">
+      <h1>Jogos</h1>
+      <p class="lead">As sete partidas oficiais: seis da fase classificatória e a final.</p>
+    </div>
+
+    {
+      [...days.entries()].map(([date, dayMatches]) => (
+        <section class="section" aria-labelledby={`dia-${date}`}>
+          <h2 id={`dia-${date}`}>{formatDateHeading(date)}</h2>
+          <ul class="card-grid">
+            {dayMatches.map((match) => (
+              <li>
+                <MatchCard match={match} competition={competition} now={now} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+
+    <p class="meta">
+      O amistoso do 3º colocado é informativo e aparece apenas na página da
+      <a href={withBase('/fase-final/')}>Fase final</a>.
+    </p>
+  </div>
 </BaseLayout>

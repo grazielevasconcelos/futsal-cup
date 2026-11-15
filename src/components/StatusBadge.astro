@@ -1,0 +1,14 @@
+---
+import { formatStatus } from '../lib/format/match';
+import type { Match } from '../lib/domain/types';
+
+interface Props {
+  match: Match;
+  now: Date;
+}
+
+const { match, now } = Astro.props;
+const label = formatStatus(match, now);
+---
+
+<span class="badge">{label}</span>

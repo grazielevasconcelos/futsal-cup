@@ -1,0 +1,82 @@
+---
+import type { StandingRow, Team, TeamId } from '../lib/domain/types';
+
+interface Props {
+  rows: readonly StandingRow[];
+  teams: ReadonlyMap<TeamId, Team>;
+  provisional: boolean;
+  caption: string;
+  labelledBy: string;
+}
+
+const { rows, teams, provisional, caption, labelledBy } = Astro.props;
+const hintId = `${labelledBy}-hint`;
+---
+
+{
+  provisional && <p class="badge-list"><span class="badge">Classificação provisória</span></p>
+}
+
+<p class="table-scroll__hint" id={hintId}>
+  Deslize horizontalmente para ver todas as colunas.
+</p>
+
+<div
+  class="table-scroll"
+  role="region"
+  aria-labelledby={labelledBy}
+  aria-describedby={hintId}
+  tabindex="0"
+>
+  <table class="data-table data-table--wide">
+    <caption>{caption}</caption>
+    <thead>
+      <tr>
+        <th scope="col">Posição</th>
+        <th scope="col">Time</th>
+        <th scope="col" class="data-table__numeric">Pontos</th>
+        <th scope="col" class="data-table__numeric">Jogos</th>
+        <th scope="col" class="data-table__numeric"><abbr title="Vitórias">V</abbr></th>
+        <th scope="col" class="data-table__numeric"><abbr title="Empates">E</abbr></th>
+        <th scope="col" class="data-table__numeric"><abbr title="Derrotas">D</abbr></th>
+        <th scope="col" class="data-table__numeric"><abbr title="Gols pró">GP</abbr></th>
+        <th scope="col" class="data-table__numeric"><abbr title="Gols contra">GC</abbr></th>
+        <th scope="col" class="data-table__numeric"><abbr title="Saldo de gols">SG</abbr></th>
+        <th scope="col" class="data-table__numeric"><abbr title="Cartões amarelos">CA</abbr></th>
+        <th scope="col" class="data-table__numeric"><abbr title="Cartões vermelhos">CV</abbr></th>
+        <th scope="col" class="data-table__numeric"><abbr title="Pontos disciplinares">PD</abbr></th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((row) => {
+          const team = teams.get(row.teamId);
+          return (
+            <tr>
+              <td>{row.position}º</td>
+              <th scope="row">
+                {team?.name ?? row.teamId}
+                {row.decidedByDraw && (
+                  <span class="badge">
+                    Sorteio<span class="visually-hidden">: posição definida por sorteio</span>
+                  </span>
+                )}
+              </th>
+              <td class="data-table__numeric">{row.points}</td>
+              <td class="data-table__numeric">{row.played}</td>
+              <td class="data-table__numeric">{row.wins}</td>
+              <td class="data-table__numeric">{row.draws}</td>
+              <td class="data-table__numeric">{row.losses}</td>
+              <td class="data-table__numeric">{row.goalsFor}</td>
+              <td class="data-table__numeric">{row.goalsAgainst}</td>
+              <td class="data-table__numeric">{row.goalDifference}</td>
+              <td class="data-table__numeric">{row.yellow}</td>
+              <td class="data-table__numeric">{row.red}</td>
+              <td class="data-table__numeric">{row.disciplinaryPoints}</td>
+            </tr>
+          );
+        })
+      }
+    </tbody>
+  </table>
+</div>

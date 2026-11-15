@@ -1,0 +1,78 @@
+---
+import { compareText } from '../lib/data/text';
+import type { Player, PlayerId, PlayerStats } from '../lib/domain/types';
+import { positionLabel } from '../lib/format/suspension';
+
+interface Props {
+  players: readonly Player[];
+  stats: ReadonlyMap<PlayerId, PlayerStats>;
+  suspensionLabels: ReadonlyMap<PlayerId, string>;
+  caption: string;
+  labelledBy: string;
+  mode: 'active' | 'history';
+}
+
+const { players, stats, suspensionLabels, caption, labelledBy, mode } = Astro.props;
+const hintId = `${labelledBy}-hint`;
+const ordered = players.slice().sort((a, b) => compareText(a.nickname, b.nickname));
+---
+
+{
+  ordered.length === 0 ? (
+    <p class="empty-state">Nenhuma atleta no elenco ativo.</p>
+  ) : (
+    <>
+      <p class="table-scroll__hint" id={hintId}>
+        Deslize horizontalmente para ver todas as colunas.
+      </p>
+      <div
+        class="table-scroll"
+        role="region"
+        aria-labelledby={labelledBy}
+        aria-describedby={hintId}
+        tabindex="0"
+      >
+        <table class="data-table data-table--wide">
+          <caption>{caption}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Atleta</th>
+              <th scope="col">Posição</th>
+              <th scope="col" class="data-table__numeric">Gols</th>
+              <th scope="col" class="data-table__numeric">Assistências</th>
+              <th scope="col" class="data-table__numeric">Amarelos</th>
+              <th scope="col" class="data-table__numeric">Vermelhos</th>
+              <th scope="col" class="data-table__numeric">Pontos disciplinares</th>
+              {mode === 'active' && <th scope="col">Suspensão</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {ordered.map((player) => {
+              const item = stats.get(player.id);
+              const inactive = item?.active === false || player.leftAt !== null;
+              return (
+                <tr>
+                  <th scope="row">
+                    {player.nickname}
+                    {(mode === 'history' || inactive) && (
+                      <span class="player-note">fora do elenco ativo</span>
+                    )}
+                  </th>
+                  <td>{positionLabel(player.position)}</td>
+                  <td class="data-table__numeric">{item?.goals ?? 0}</td>
+                  <td class="data-table__numeric">{item?.assists ?? 0}</td>
+                  <td class="data-table__numeric">{item?.yellow ?? 0}</td>
+                  <td class="data-table__numeric">{item?.red ?? 0}</td>
+                  <td class="data-table__numeric">{item?.disciplinaryPoints ?? 0}</td>
+                  {mode === 'active' && (
+                    <td>{suspensionLabels.get(player.id) ?? 'Sem suspensão'}</td>
+                  )}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
+  )
+}

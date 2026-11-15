@@ -1,0 +1,28 @@
+---
+import type { Finalists, Match, PlayerTeamMap } from '../lib/domain/types';
+import { formatScore, formatScoreAccessible } from '../lib/format/match';
+
+interface Props {
+  match: Match;
+  finalists: Finalists | null;
+  homeName: string;
+  awayName: string;
+  playerTeams: PlayerTeamMap;
+  size?: 'default' | 'large';
+}
+
+const { match, finalists, homeName, awayName, playerTeams, size = 'default' } = Astro.props;
+const visual = formatScore(match, finalists, playerTeams);
+const accessible = formatScoreAccessible(
+  match,
+  finalists,
+  homeName,
+  awayName,
+  playerTeams,
+);
+---
+
+<p class:list={['score', { 'score--large': size === 'large' }]}>
+  <span class="visually-hidden">{accessible}</span>
+  <span aria-hidden="true">{visual}</span>
+</p>

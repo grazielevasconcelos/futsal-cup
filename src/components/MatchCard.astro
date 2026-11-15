@@ -1,0 +1,73 @@
+---
+import type { Competition, Match } from '../lib/domain/types';
+import { buildPlayerTeamMap, buildTeamMap } from '../lib/domain/players';
+import { resolveMatchTeams } from '../lib/domain/score';
+import { formatDate, formatTime } from '../lib/format/date';
+import {
+  formatStage,
+  walkoverReasonLabel,
+} from '../lib/format/match';
+import { withBase } from '../lib/site';
+import Score from './Score.astro';
+import StatusBadge from './StatusBadge.astro';
+
+interface Props {
+  match: Match;
+  competition: Competition;
+  now: Date;
+  showStage?: boolean;
+}
+
+const { match, competition, now, showStage = true } = Astro.props;
+
+const teams = buildTeamMap(competition);
+const playerTeams = buildPlayerTeamMap(competition);
+
+const resolved =
+  match.stage === 'group'
+    ? { homeTeamId: match.homeTeamId, awayTeamId: match.awayTeamId }
+    : competition.finalists === null
+      ? null
+      : resolveMatchTeams(match, competition.finalists);
+
+const homeName = resolved === null ? 'A definir' : teams.get(resolved.homeTeamId)?.name ?? 'A definir';
+const awayName = resolved === null ? 'A definir' : teams.get(resolved.awayTeamId)?.name ?? 'A definir';
+const title = resolved === null ? 'Confrontos a definir' : `${homeName} x ${awayName}`;
+const href = withBase(`/jogos/${match.id}/`);
+const time = match.startsAt === null ? 'Horário a definir' : formatTime(match.startsAt);
+const venue = match.venue ?? 'Local a definir';
+---
+
+<article class="card match-card">
+  <p class="match-card__top">
+    {showStage && <span class="match-card__stage">{formatStage(match)}</span>}
+    <StatusBadge match={match} now={now} />
+  </p>
+
+  <h3 class="match-card__title"><a href={href}>{title}</a></h3>
+
+  <p class="match-card__meta">
+    <time datetime={match.date}>{formatDate(match.date)}</time> · {time} · {venue}
+  </p>
+
+  {
+    match.status === 'finished' && (
+      <Score
+        match={match}
+        finalists={competition.finalists}
+        homeName={homeName}
+        awayName={awayName}
+        playerTeams={playerTeams}
+      />
+    )
+  }
+
+  {
+    match.walkover !== null && (
+      <p class="match-card__extra">
+        W.O. — {walkoverReasonLabel(match.walkover.reason)}
+        {match.walkover.note === null ? '' : `: ${match.walkover.note}`}
+      </p>
+    )
+  }
+</article>

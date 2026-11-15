@@ -1,0 +1,27 @@
+---
+import { formatDate } from '../lib/format/date';
+import type { Notice } from '../lib/domain/types';
+
+interface Props {
+  notices: readonly Notice[];
+}
+
+const { notices } = Astro.props;
+---
+
+{
+  notices.length > 0 && (
+    <aside class="notice-banner" aria-labelledby="avisos-title">
+      <div class="notice-banner__inner">
+        <p class="notice-banner__title" id="avisos-title">Avisos</p>
+        <ul class="notice-banner__list">
+          {notices.map((notice) => (
+            <li>
+              <time datetime={notice.date}>{formatDate(notice.date)}</time> — {notice.message}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </aside>
+  )
+}

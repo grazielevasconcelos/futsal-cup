@@ -1,0 +1,24 @@
+---
+import type { FriendlyCard } from '../lib/domain/types';
+import { formatDate, formatTime } from '../lib/format/date';
+
+interface Props {
+  friendly: FriendlyCard;
+}
+
+const { friendly } = Astro.props;
+---
+
+<article class="card friendly-card" aria-labelledby="amistoso-title">
+  <p class="badge-list">
+    <span class="badge">Informativo — não é partida oficial</span>
+  </p>
+  <p class="friendly-card__title" id="amistoso-title">{friendly.title}</p>
+  <p class="match-card__meta">
+    <time datetime={friendly.date}>{formatDate(friendly.date)}</time> · {formatTime(friendly.startsAt)} · {friendly.venue}
+  </p>
+  <p>{friendly.note}</p>
+  <p class="match-card__extra">
+    Não altera classificação, estatísticas, suspensões ou pódio.
+  </p>
+</article>
