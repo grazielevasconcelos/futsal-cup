@@ -35,16 +35,16 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 
 ## 3. Domínio
 
-- [ ] Implementar `deriveScore` e `resolveMatchTeams`.
-- [ ] Implementar `buildStandings` e `rankTeams` com grupos de desempate.
-- [ ] Implementar confronto direto de dois jogos: pontos agregados, saldo agregado, ambos `finished` e W.O. 1x0.
-- [ ] Implementar pontos disciplinares e segundo amarelo (3 pontos).
-- [ ] Implementar `buildSuspensions` e bloqueio de eventos de suspensa.
-- [ ] Implementar `buildPlayerStats` (gols, assistências, gols contra, cartões).
-- [ ] Implementar `buildTeamStats` (grupo + final, V/E/D no tempo normal, `shootoutWins`/`shootoutLosses`, GP/GC/SG sem shootout, amistoso fora).
-- [ ] Implementar `buildFinalists`, `buildPodium` e validação de correção após a final.
-- [ ] Implementar `buildNextMatch`, últimos resultados e estados da Início.
-- [ ] Implementar `formatScore` e `formatScoreAccessible` (incluindo W.O. e shootout).
+- [x] Implementar `deriveScore` e `resolveMatchTeams`.
+- [x] Implementar `buildStandings` e `rankTeams` com grupos de desempate.
+- [x] Implementar confronto direto de dois jogos: pontos agregados, saldo agregado, ambos `finished` e W.O. 1x0.
+- [x] Implementar pontos disciplinares e segundo amarelo (3 pontos).
+- [x] Implementar `buildSuspensions` e bloqueio de eventos de suspensa.
+- [x] Implementar `buildPlayerStats` (gols, assistências, gols contra, cartões).
+- [x] Implementar `buildTeamStats` (grupo + final, V/E/D no tempo normal, `shootoutWins`/`shootoutLosses`, GP/GC/SG sem shootout, amistoso fora).
+- [x] Implementar `buildFinalists`, `buildPodium` e validação de correção após a final.
+- [x] Implementar `buildNextMatch`, últimos resultados e estados da Início.
+- [x] Implementar `formatScore` e `formatScoreAccessible` (incluindo W.O. e shootout).
 
 ## 4. Páginas
 
@@ -71,11 +71,12 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 
 ## 6. Testes
 
-- [ ] TST-001…TST-016: classificação, desempate e W.O.
-- [ ] TST-105 e TST-110: empate provisório e W.O. no confronto direto.
-- [ ] TST-017…TST-027 e TST-112: cartões e suspensão.
-- [ ] TST-028…TST-038: gols, assistências, pênaltis e estatísticas individuais.
-- [ ] TST-115: estatísticas coletivas com shootout.
+- [x] TST-001…TST-009 e TST-011…TST-016: classificação, desempate e W.O.
+- [x] TST-010: critério “menos gols contra” é redundante quando SG e GP empatam (GC = GP − SG); omitido com justificativa.
+- [x] TST-105 e TST-110: empate provisório e W.O. no confronto direto.
+- [x] TST-017…TST-027 e TST-112: cartões e suspensão.
+- [x] TST-028…TST-038: gols, assistências, pênaltis e estatísticas individuais.
+- [x] TST-115: estatísticas coletivas com shootout.
 - [ ] TST-039…TST-048: elenco e elegibilidade.
 - [x] TST-049…TST-065, TST-107, TST-109 e TST-116: validação, schema, fase final e simetria.
 - [ ] TST-066…TST-083 e TST-106/108/113/114: interface e estados.
