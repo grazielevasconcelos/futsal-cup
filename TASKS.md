@@ -48,15 +48,15 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 
 ## 4. Páginas
 
-- [ ] Início: quatro estados, próximo jogo, últimos resultados, resumo e destaques.
-- [ ] Jogos: lista por data com 7 partidas oficiais; amistoso fora da lista.
-- [ ] Detalhe da partida: gols, assistências, cartões, W.O., shootout e desfalques.
-- [ ] Classificação: 13 colunas, provisória, badge “Sorteio” e explicação dos critérios.
-- [ ] Times: 3 cards, elenco ativo, badge <5, suspensão, histórico e estatísticas coletivas.
-- [ ] Estatísticas: artilharia, assistências, cartões e gols contra.
-- [ ] Fase final: “a definir”, card do amistoso antes da final e pódio de 3.
-- [ ] 404 e navegação sem Regulamento.
-- [ ] Nenhum card, rota ou link de 3º lugar.
+- [x] Início: quatro estados, próximo jogo, últimos resultados, resumo e destaques.
+- [x] Jogos: lista por data com 7 partidas oficiais; amistoso fora da lista.
+- [x] Detalhe da partida: gols, assistências, cartões, W.O., shootout e desfalques.
+- [x] Classificação: 13 colunas, provisória, badge “Sorteio” e explicação dos critérios.
+- [x] Times: 3 cards, elenco ativo, badge <5, suspensão, histórico e estatísticas coletivas.
+- [x] Estatísticas: artilharia, assistências, cartões e gols contra.
+- [x] Fase final: “a definir”, card do amistoso antes da final e pódio de 3.
+- [x] 404 e navegação sem Regulamento.
+- [x] Nenhum card, rota ou link de 3º lugar.
 
 ## 5. Acessibilidade e design
 
