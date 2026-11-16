@@ -160,8 +160,9 @@ test.describe('qualidade e acessibilidade', () => {
     await tabUntilFocused(page, '.table-scroll');
     const before = await region.evaluate((element) => element.scrollLeft);
     await page.keyboard.press('ArrowRight');
-    const after = await region.evaluate((element) => element.scrollLeft);
-    expect(after).toBeGreaterThan(before);
+    await expect
+      .poll(() => region.evaluate((element) => element.scrollLeft))
+      .toBeGreaterThan(before);
   });
 
   test.describe('com movimento reduzido', () => {
