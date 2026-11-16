@@ -69,6 +69,11 @@ if (fontFiles.length > 0) {
   fail(`Arquivo de fonte encontrado em dist/: ${fontFiles.join(', ')}`);
 }
 
+const photoFiles = relativeFiles.filter((file) => /\.(?:png|jpe?g|gif|webp|avif)$/i.test(file));
+if (photoFiles.length > 0) {
+  fail(`Imagem raster encontrada em dist/: ${photoFiles.join(', ')}`);
+}
+
 const forbiddenPaths = relativeFiles.filter((file) =>
   /regulamento|jogos\/terceiro|times\/td/i.test(file),
 );
@@ -160,6 +165,10 @@ for (const file of htmlFiles) {
 
   if (playerIdPattern.test(html)) {
     fail(`ID de jogadora encontrado em dist/${relativePath}`);
+  }
+
+  if (/\b(?:mailto|tel):/i.test(html)) {
+    fail(`Link de contato pessoal encontrado em dist/${relativePath}`);
   }
 }
 
