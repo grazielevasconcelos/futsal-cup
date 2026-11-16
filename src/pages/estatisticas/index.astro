@@ -1,15 +1,161 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import StatsTable from '../../components/StatsTable.astro';
+import { loadCompetition } from '../../lib/data/load';
+import { buildTeamMap } from '../../lib/domain/players';
+import {
+  buildPlayerStats,
+  buildTeamStats,
+  rankAssists,
+  rankOwnGoals,
+  rankPlayerCards,
+  rankTeamCards,
+  rankTopScorers,
+} from '../../lib/domain/stats';
+import type { PlayerStats, TeamId } from '../../lib/domain/types';
+
+const competition = loadCompetition();
+const teams = buildTeamMap(competition);
+const playerStats = buildPlayerStats(competition);
+const teamStats = buildTeamStats(competition);
+
+const scorers = rankTopScorers(playerStats, teams);
+const assists = rankAssists(playerStats, teams);
+const playerCards = rankPlayerCards(playerStats, teams);
+const teamCards = rankTeamCards(teamStats, teams);
+const ownGoals = rankOwnGoals(playerStats, teams);
+
+function teamName(teamId: TeamId): string {
+  return teams.get(teamId)?.name ?? '';
+}
+
+function playerLabel(item: PlayerStats): string {
+  return item.active ? item.nickname : `${item.nickname} (fora do elenco ativo)`;
+}
+
+const positionColumn = { key: 'position', label: 'Posição', numeric: true } as const;
+const playerColumn = { key: 'player', label: 'Atleta' } as const;
+const teamColumn = { key: 'team', label: 'Time' } as const;
 ---
 
 <BaseLayout
   title="Estatísticas"
-  description="Artilharia, assistências, cartões e gols contra da Copa de Futsal Feminino Vila Mariana 2026."
+  description="Artilharia, assistências, cartões e gols contra da Copa de Futsal Feminino Vila Mariana 2026, calculados a partir dos eventos registrados."
   activeNav="estatisticas"
+  notices={competition.notices}
 >
-  <section class="page">
-    <h1>Estatísticas</h1>
-    <p class="lead">Artilharia, assistências, cartões e gols contra.</p>
-    <p>As estatísticas serão calculadas a partir dos eventos registrados nas partidas.</p>
-  </section>
+  <div class="page">
+    <div class="page-header">
+      <h1>Estatísticas</h1>
+      <p class="lead">
+        Artilharia, assistências, cartões e gols contra das partidas oficiais da edição.
+      </p>
+    </div>
+
+    <section class="section" aria-labelledby="artilharia">
+      <h2 id="artilharia">Artilharia</h2>
+      <StatsTable
+        caption="Artilharia — Copa de Futsal Feminino Vila Mariana 2026"
+        columns={[
+          positionColumn,
+          playerColumn,
+          teamColumn,
+          { key: 'goals', label: 'Gols', numeric: true },
+          { key: 'assists', label: 'Assistências', numeric: true },
+        ]}
+        rows={scorers.map((item, index) => ({
+          cells: [index + 1, playerLabel(item), teamName(item.teamId), item.goals, item.assists],
+        }))}
+        emptyMessage="Ainda não há gols registrados."
+        labelledBy="artilharia"
+      />
+      <p class="meta">
+        Inclui pênaltis do tempo normal; não inclui a disputa de pênaltis.
+      </p>
+    </section>
+
+    <section class="section" aria-labelledby="assistencias">
+      <h2 id="assistencias">Assistências</h2>
+      <StatsTable
+        caption="Assistências — Copa de Futsal Feminino Vila Mariana 2026"
+        columns={[
+          positionColumn,
+          playerColumn,
+          teamColumn,
+          { key: 'assists', label: 'Assistências', numeric: true },
+          { key: 'goals', label: 'Gols', numeric: true },
+        ]}
+        rows={assists.map((item, index) => ({
+          cells: [index + 1, playerLabel(item), teamName(item.teamId), item.assists, item.goals],
+        }))}
+        emptyMessage="Ainda não há assistências registradas."
+        labelledBy="assistencias"
+      />
+    </section>
+
+    <section class="section" aria-labelledby="cartoes-jogadoras">
+      <h2 id="cartoes-jogadoras">Cartões por jogadora</h2>
+      <StatsTable
+        caption="Cartões por jogadora — Copa de Futsal Feminino Vila Mariana 2026"
+        columns={[
+          positionColumn,
+          playerColumn,
+          teamColumn,
+          { key: 'yellow', label: 'Amarelos', numeric: true },
+          { key: 'red', label: 'Vermelhos', numeric: true },
+          { key: 'disciplinary', label: 'Pontos disciplinares', numeric: true },
+        ]}
+        rows={playerCards.map((item, index) => ({
+          cells: [
+            index + 1,
+            playerLabel(item),
+            teamName(item.teamId),
+            item.yellow,
+            item.red,
+            item.disciplinaryPoints,
+          ],
+        }))}
+        emptyMessage="Ainda não há cartões registrados."
+        labelledBy="cartoes-jogadoras"
+      />
+      <p class="meta">
+        Vermelhos incluem o segundo amarelo. Pontos disciplinares: amarelo 1, vermelho 2,
+        segundo amarelo 3 no total; menor é melhor.
+      </p>
+    </section>
+
+    <section class="section" aria-labelledby="cartoes-times">
+      <h2 id="cartoes-times">Cartões por time</h2>
+      <StatsTable
+        caption="Cartões por time — Copa de Futsal Feminino Vila Mariana 2026"
+        columns={[
+          teamColumn,
+          { key: 'yellow', label: 'Amarelos', numeric: true },
+          { key: 'red', label: 'Vermelhos', numeric: true },
+          { key: 'disciplinary', label: 'Pontos disciplinares', numeric: true },
+        ]}
+        rows={teamCards.map((item) => ({
+          cells: [teamName(item.teamId), item.yellow, item.red, item.disciplinaryPoints],
+        }))}
+        rowHeaderIndex={0}
+        emptyMessage="Ainda não há cartões registrados."
+        labelledBy="cartoes-times"
+      />
+    </section>
+
+    <section class="section" aria-labelledby="gols-contra">
+      <h2 id="gols-contra">Gols contra</h2>
+      <StatsTable
+        caption="Gols contra — Copa de Futsal Feminino Vila Mariana 2026"
+        columns={[playerColumn, teamColumn, { key: 'ownGoals', label: 'Gols contra', numeric: true }]}
+        rows={ownGoals.map((item) => ({
+          cells: [playerLabel(item), teamName(item.teamId), item.ownGoals],
+        }))}
+        rowHeaderIndex={0}
+        emptyMessage="Ainda não há gols contra registrados."
+        labelledBy="gols-contra"
+      />
+      <p class="meta">Não entram na artilharia.</p>
+    </section>
+  </div>
 </BaseLayout>
