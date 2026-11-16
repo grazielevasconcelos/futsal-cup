@@ -41,6 +41,10 @@ const requiredFiles = [
   'times/index.html',
   'estatisticas/index.html',
   'fase-final/index.html',
+  ...['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'final'].map(
+    (matchId) => `jogos/${matchId}/index.html`,
+  ),
+  ...['ta', 'tb', 'tc'].map((teamId) => `times/${teamId}/index.html`),
 ];
 
 for (const file of requiredFiles) {
@@ -64,9 +68,11 @@ if (fontFiles.length > 0) {
   fail(`Arquivo de fonte encontrado em dist/: ${fontFiles.join(', ')}`);
 }
 
-const forbiddenPaths = relativeFiles.filter((file) => /regulamento/i.test(file));
+const forbiddenPaths = relativeFiles.filter((file) =>
+  /regulamento|jogos\/terceiro|times\/td/i.test(file),
+);
 if (forbiddenPaths.length > 0) {
-  fail(`Rota de Regulamento encontrada em dist/: ${forbiddenPaths.join(', ')}`);
+  fail(`Rota proibida encontrada em dist/: ${forbiddenPaths.join(', ')}`);
 }
 
 for (const file of htmlFiles) {
