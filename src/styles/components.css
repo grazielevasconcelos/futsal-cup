@@ -290,6 +290,13 @@ th .badge {
   line-height: var(--text-small-line);
 }
 
+.home-champion {
+  margin: 0;
+  font-size: var(--text-heading-1-size);
+  line-height: var(--text-heading-1-line);
+  font-weight: var(--font-weight-bold);
+}
+
 .event-list {
   margin: var(--space-2) 0 0;
   padding: 0;

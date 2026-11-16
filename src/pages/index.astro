@@ -1,48 +1,367 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { SITE_DESCRIPTION, SITE_NAME, withBase } from '../lib/site';
+import EmptyState from '../components/EmptyState.astro';
+import MatchCard from '../components/MatchCard.astro';
+import PodiumList from '../components/PodiumList.astro';
+import StandingsTable from '../components/StandingsTable.astro';
+import { loadCompetition } from '../lib/data/load';
+import { buildPodium } from '../lib/domain/finalists';
+import {
+  getHomeState,
+  getLastResults,
+  getNextRoundMatches,
+  getPendingMatches,
+} from '../lib/domain/home';
+import { canonicalOrder } from '../lib/domain/order';
+import { buildTeamMap } from '../lib/domain/players';
+import { rankTeams } from '../lib/domain/standings';
+import {
+  buildPlayerStats,
+  rankAssists,
+  rankTopScorers,
+} from '../lib/domain/stats';
+import type { PlayerStats } from '../lib/domain/types';
+import { formatDate, formatDateHeading } from '../lib/format/date';
+import { getBuildDate, SITE_DESCRIPTION, SITE_NAME, withBase } from '../lib/site';
+
+const competition = loadCompetition();
+const now = getBuildDate();
+const state = getHomeState(competition, now);
+
+const teams = buildTeamMap(competition);
+const ranking = rankTeams(competition);
+const playerStats = buildPlayerStats(competition);
+
+const groupMatches = competition.matches.filter((match) => match.stage === 'group');
+const firstDate = groupMatches.reduce<string | null>(
+  (earliest, match) => (earliest === null || match.date < earliest ? match.date : earliest),
+  null,
+);
+const firstRound =
+  firstDate === null
+    ? []
+    : groupMatches
+        .filter((match) => match.date === firstDate)
+        .sort((a, b) => canonicalOrder(a.id) - canonicalOrder(b.id));
+
+const nextRound = state === 'duringGroup' ? getNextRoundMatches(competition, now) : [];
+const pending = state === 'duringGroup' ? getPendingMatches(competition, now) : [];
+const postponed = competition.matches.filter((match) => match.status === 'postponed');
+const lastResults =
+  state === 'duringGroup' || state === 'groupComplete' ? getLastResults(competition) : [];
+
+const finalMatch = competition.matches.find((match) => match.id === 'final');
+const podium = state === 'afterFinal' ? buildPodium(competition) : null;
+const championName =
+  podium === null || podium.champion === null
+    ? null
+    : teams.get(podium.champion)?.name ?? null;
+
+const scorers = rankTopScorers(playerStats, teams);
+const assists = rankAssists(playerStats, teams);
+
+function leaderNote(
+  items: readonly PlayerStats[],
+  metric: (item: PlayerStats) => number,
+): string | null {
+  const first = items[0];
+  if (first === undefined) return null;
+
+  const tied = items.filter((item) => metric(item) === metric(first));
+  if (tied.length <= 1) return null;
+
+  const names = tied.slice(1, 4).map((item) => item.nickname);
+  const remaining = tied.length - 1 - names.length;
+  return `Empate na liderança: ${names.join(', ')}${remaining > 0 ? ` e mais ${remaining}` : ''}`;
+}
+
+const topScorer = scorers[0];
+const assistLeader = assists[0];
+
+const standingsCaption =
+  'Classificação da fase classificatória — Copa de Futsal Feminino Vila Mariana 2026';
 ---
 
-<BaseLayout title={SITE_NAME} description={SITE_DESCRIPTION} activeNav="inicio">
-  <section class="page">
-    <h1>{SITE_NAME}</h1>
-    <p class="lead">
-      Acompanhe a competição: jogos, classificação, times, estatísticas e fase final.
-    </p>
+<BaseLayout
+  title={SITE_NAME}
+  description={SITE_DESCRIPTION}
+  activeNav="inicio"
+  notices={competition.notices}
+>
+  <div class="page">
+    <div class="page-header">
+      <h1>{SITE_NAME}</h1>
+      <p class="lead">
+        Acompanhe a competição: jogos, classificação, times, estatísticas e fase final.
+      </p>
+    </div>
 
-    <nav aria-label="Seções da competição">
-      <ul class="card-grid">
-        <li>
-          <a class="card" href={withBase('/jogos/')}>
-            <span class="card__title">Jogos</span>
-            <span class="card__text">Calendário, resultados e detalhes das partidas.</span>
-          </a>
-        </li>
-        <li>
-          <a class="card" href={withBase('/classificacao/')}>
-            <span class="card__title">Classificação</span>
-            <span class="card__text">Posições, pontos e critérios de desempate.</span>
-          </a>
-        </li>
-        <li>
-          <a class="card" href={withBase('/times/')}>
-            <span class="card__title">Times</span>
-            <span class="card__text">Os três times, elencos e estatísticas coletivas.</span>
-          </a>
-        </li>
-        <li>
-          <a class="card" href={withBase('/estatisticas/')}>
-            <span class="card__title">Estatísticas</span>
-            <span class="card__text">Artilharia, assistências, cartões e gols contra.</span>
-          </a>
-        </li>
-        <li>
-          <a class="card" href={withBase('/fase-final/')}>
-            <span class="card__title">Fase final</span>
-            <span class="card__text">Final única, amistoso informativo e pódio.</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
-  </section>
+    {
+      state === 'beforeCup' && (
+        <>
+          <section class="section" aria-labelledby="primeira-rodada">
+            <h2 id="primeira-rodada">
+              Primeira rodada{firstDate === null ? '' : ` — ${formatDate(firstDate)}`}
+            </h2>
+            {firstRound.length === 0 ? (
+              <EmptyState
+                title="Calendário a definir"
+                description="A primeira rodada será publicada quando a organização confirmar as datas."
+              />
+            ) : (
+              <ul class="card-grid">
+                {firstRound.map((match) => (
+                  <li>
+                    <MatchCard match={match} competition={competition} now={now} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section class="section" aria-labelledby="atalhos">
+            <h2 id="atalhos">Atalhos</h2>
+            <ul>
+              <li><a href={withBase('/jogos/')}>Jogos</a></li>
+              <li><a href={withBase('/times/')}>Times</a></li>
+              <li><a href={withBase('/classificacao/')}>Classificação</a></li>
+            </ul>
+          </section>
+
+          <section class="section" aria-labelledby="classificacao">
+            <h2 id="classificacao">Classificação</h2>
+            <StandingsTable
+              rows={ranking.rows}
+              teams={teams}
+              provisional
+              caption={standingsCaption}
+              labelledBy="classificacao"
+            />
+            <p class="meta">Classificação provisória — nenhuma partida encerrada.</p>
+          </section>
+        </>
+      )
+    }
+
+    {
+      state === 'duringGroup' && (
+        <>
+          <section class="section" aria-labelledby="proxima-rodada">
+            <h2 id="proxima-rodada">Próxima rodada</h2>
+            {nextRound.length > 0 ? (
+              <>
+                <p class="meta">{formatDateHeading(nextRound[0]?.date ?? '')}</p>
+                <ul class="card-grid">
+                  {nextRound.map((match) => (
+                    <li>
+                      <MatchCard match={match} competition={competition} now={now} />
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <EmptyState
+                title={
+                  postponed.length > 0 ? 'Agenda em atualização' : 'Próxima rodada a definir'
+                }
+                description={
+                  postponed.length > 0
+                    ? 'Há partidas adiadas e a organização ainda não confirmou a nova data.'
+                    : 'A organização ainda não divulgou a próxima data de jogos.'
+                }
+              />
+            )}
+          </section>
+
+          {pending.length > 0 && (
+            <section class="section" aria-labelledby="resultado-pendente">
+              <h2 id="resultado-pendente">Resultado pendente</h2>
+              <p class="meta">
+                Partidas com data já passada e resultado ainda não registrado.
+              </p>
+              <ul class="card-grid">
+                {pending.map((match) => (
+                  <li>
+                    <MatchCard match={match} competition={competition} now={now} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {lastResults.length > 0 && (
+            <section class="section" aria-labelledby="ultimos-resultados">
+              <h2 id="ultimos-resultados">Últimos resultados</h2>
+              <ul class="card-grid">
+                {lastResults.map((match) => (
+                  <li>
+                    <MatchCard match={match} competition={competition} now={now} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          <section class="section" aria-labelledby="resumo-classificacao">
+            <h2 id="resumo-classificacao">Classificação</h2>
+            <p class="badge-list">
+              <span class="badge">Classificação provisória</span>
+            </p>
+            <div
+              class="table-scroll"
+              role="region"
+              aria-labelledby="resumo-classificacao"
+              tabindex="0"
+            >
+              <table class="data-table">
+                <caption>Resumo da classificação da fase classificatória</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Posição</th>
+                    <th scope="col">Time</th>
+                    <th scope="col" class="data-table__numeric">Pontos</th>
+                    <th scope="col" class="data-table__numeric">Jogos</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ranking.rows.map((row) => (
+                    <tr>
+                      <td>{row.position}º</td>
+                      <th scope="row">{teams.get(row.teamId)?.name ?? row.teamId}</th>
+                      <td class="data-table__numeric">{row.points}</td>
+                      <td class="data-table__numeric">{row.played}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p class="meta">
+              <a href={withBase('/classificacao/')}>Ver classificação completa</a>
+            </p>
+          </section>
+
+          {(topScorer !== undefined || assistLeader !== undefined) && (
+            <section class="section" aria-labelledby="destaques">
+              <h2 id="destaques">Destaques individuais</h2>
+              {topScorer !== undefined && (
+                <div>
+                  <h3>Artilharia</h3>
+                  <p>
+                    {topScorer.nickname} ({teams.get(topScorer.teamId)?.name ?? topScorer.teamId})
+                    — {topScorer.goals} gols
+                  </p>
+                  {leaderNote(scorers, (item) => item.goals) !== null && (
+                    <p class="meta">{leaderNote(scorers, (item) => item.goals)}</p>
+                  )}
+                </div>
+              )}
+              {assistLeader !== undefined && (
+                <div>
+                  <h3>Assistências</h3>
+                  <p>
+                    {assistLeader.nickname} (
+                    {teams.get(assistLeader.teamId)?.name ?? assistLeader.teamId}) —{' '}
+                    {assistLeader.assists} assistências
+                  </p>
+                  {leaderNote(assists, (item) => item.assists) !== null && (
+                    <p class="meta">{leaderNote(assists, (item) => item.assists)}</p>
+                  )}
+                </div>
+              )}
+              <p class="meta">
+                <a href={withBase('/estatisticas/')}>Ver todas as estatísticas</a>
+              </p>
+            </section>
+          )}
+        </>
+      )
+    }
+
+    {
+      state === 'groupComplete' && (
+        <>
+          <section class="section" aria-labelledby="final">
+            <h2 id="final">Final</h2>
+            {finalMatch === undefined ? (
+              <p class="empty-state">A final ainda não está cadastrada na fonte oficial.</p>
+            ) : (
+              <MatchCard
+                match={finalMatch}
+                competition={competition}
+                now={now}
+                showStage={false}
+              />
+            )}
+            <p class="meta">
+              <a href={withBase('/fase-final/')}>Ver a fase final</a>
+            </p>
+          </section>
+
+          {lastResults.length > 0 && (
+            <section class="section" aria-labelledby="ultimos-resultados">
+              <h2 id="ultimos-resultados">Últimos resultados</h2>
+              <ul class="card-grid">
+                {lastResults.map((match) => (
+                  <li>
+                    <MatchCard match={match} competition={competition} now={now} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          <section class="section" aria-labelledby="classificacao-final">
+            <h2 id="classificacao-final">Classificação final da fase classificatória</h2>
+            <StandingsTable
+              rows={ranking.rows}
+              teams={teams}
+              provisional={false}
+              caption={standingsCaption}
+              labelledBy="classificacao-final"
+            />
+            <p class="meta">
+              A 3ª colocada da classificação está definida. A final não altera esta tabela.
+            </p>
+          </section>
+        </>
+      )
+    }
+
+    {
+      state === 'afterFinal' && (
+        <>
+          <section class="section" aria-labelledby="campea">
+            <h2 id="campea">Campeã</h2>
+            <p class="home-champion">
+              Campeã: {championName ?? 'a definir'}
+            </p>
+          </section>
+
+          {podium !== null && podium.champion !== null && (
+            <section class="section" aria-labelledby="podio">
+              <h2 id="podio">Pódio</h2>
+              <PodiumList podium={podium} teams={teams} />
+            </section>
+          )}
+
+          <section class="section" aria-labelledby="resultado-final">
+            <h2 id="resultado-final">Resultado da final</h2>
+            {finalMatch === undefined ? (
+              <p class="empty-state">A final ainda não está cadastrada na fonte oficial.</p>
+            ) : (
+              <MatchCard
+                match={finalMatch}
+                competition={competition}
+                now={now}
+                showStage={false}
+              />
+            )}
+            <p class="meta">
+              <a href={withBase('/fase-final/')}>Ver a fase final</a>
+            </p>
+          </section>
+        </>
+      )
+    }
+  </div>
 </BaseLayout>
