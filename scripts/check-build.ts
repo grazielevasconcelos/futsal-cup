@@ -6,6 +6,7 @@ const distDirectory = 'dist';
 const errors: string[] = [];
 const forbiddenTerms = ['sesc', 'airbnb', '@font-face'];
 const proprietaryFontPattern = /font-family\s*:[^;}]*(?:cereal|circular)/i;
+const playerIdPattern = /\bp-\d{3}\b/;
 
 function fail(message: string): void {
   errors.push(message);
@@ -155,6 +156,10 @@ for (const file of htmlFiles) {
 
   if (proprietaryFontPattern.test(html)) {
     fail(`Fonte proprietária encontrada em dist/${relativePath}`);
+  }
+
+  if (playerIdPattern.test(html)) {
+    fail(`ID de jogadora encontrado em dist/${relativePath}`);
   }
 }
 
