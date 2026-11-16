@@ -75,6 +75,9 @@ if (forbiddenPaths.length > 0) {
   fail(`Rota proibida encontrada em dist/: ${forbiddenPaths.join(', ')}`);
 }
 
+const titles = new Map<string, string>();
+const descriptions = new Map<string, string>();
+
 for (const file of htmlFiles) {
   const relativePath = relative(distDirectory, file);
   const html = readFileSync(file, 'utf8');
@@ -86,6 +89,54 @@ for (const file of htmlFiles) {
 
   if (!html.includes('lang="pt-BR"')) {
     fail(`Idioma pt-BR ausente em dist/${relativePath}`);
+  }
+
+  const title = /<title>([^<]*)<\/title>/.exec(html)?.[1];
+  if (title === undefined) {
+    fail(`Título ausente em dist/${relativePath}`);
+  } else {
+    const previous = titles.get(title);
+    if (previous !== undefined) {
+      fail(`Título duplicado em dist/${previous} e dist/${relativePath}: ${title}`);
+    } else {
+      titles.set(title, relativePath);
+    }
+  }
+
+  const description = /<meta name="description" content="([^"]*)"/.exec(html)?.[1];
+  if (description === undefined) {
+    fail(`Descrição ausente em dist/${relativePath}`);
+  } else {
+    const length = [...description].length;
+    if (length < 50 || length > 160) {
+      fail(`Descrição fora de 50..160 caracteres em dist/${relativePath}: ${length}`);
+    }
+
+    const previous = descriptions.get(description);
+    if (previous !== undefined) {
+      fail(`Descrição duplicada em dist/${previous} e dist/${relativePath}`);
+    } else {
+      descriptions.set(description, relativePath);
+    }
+  }
+
+  if (relativePath !== '404.html') {
+    for (const marker of [
+      'rel="canonical"',
+      'property="og:title"',
+      'property="og:description"',
+      'property="og:url"',
+      'property="og:type"',
+      'property="og:site_name"',
+    ]) {
+      if (!html.includes(marker)) {
+        fail(`Metadado ${marker} ausente em dist/${relativePath}`);
+      }
+    }
+
+    if (html.includes('property="og:image"')) {
+      fail(`Open Graph com imagem não é permitido em dist/${relativePath}`);
+    }
   }
 
   if (/regulamento/i.test(html)) {
