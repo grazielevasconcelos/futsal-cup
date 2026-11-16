@@ -60,14 +60,15 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 
 ## 5. Acessibilidade e design
 
-- [ ] Aplicar tokens de cor, tipografia, espaço, raio, sombra e movimento.
-- [ ] Validar contraste WCAG AA dos pares usados.
-- [ ] Garantir foco visível, teclado, skip link e menu `<details>`.
-- [ ] Tabelas com `caption`, `th` e `scope`; rolagem acessível em tabelas largas.
-- [ ] 320px sem overflow horizontal da página.
-- [ ] Respeitar `prefers-reduced-motion`.
-- [ ] Não transmitir estado apenas por cor.
-- [ ] Verificar zoom 200% e leitor de tela.
+- [x] Aplicar tokens de cor, tipografia, espaço, raio, sombra e movimento.
+- [x] Validar contraste WCAG AA dos pares usados.
+- [x] Garantir foco visível, teclado, skip link e menu `<details>`.
+- [x] Tabelas com `caption`, `th` e `scope`; rolagem acessível em tabelas largas.
+- [x] 320px sem overflow horizontal da página.
+- [x] Respeitar `prefers-reduced-motion`.
+- [x] Não transmitir estado apenas por cor.
+- [x] Verificar zoom 200% (teste automatizado em viewport de 640px).
+- [ ] Verificar com leitor de tela (NVDA/VoiceOver).
 
 ## 6. Testes
 
@@ -80,9 +81,10 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 - [ ] TST-039…TST-048: elenco e elegibilidade.
 - [x] TST-049…TST-065, TST-107, TST-109 e TST-116: validação, schema, fase final e simetria.
 - [ ] TST-066…TST-083 e TST-106/108/113/114: interface e estados.
-- [ ] TST-084…TST-094: build, segurança e determinismo.
-- [ ] TST-095…TST-104: acessibilidade e layout.
-- [ ] `npm run verify` completo.
+- [x] TST-084…TST-094: build, segurança e determinismo.
+- [x] TST-095…TST-103: acessibilidade e layout automatizados (axe, foco, teclado, 320px, tabela rolável, reduced motion, sem cor exclusiva, semântica e zoom 200%).
+- [ ] TST-104: leitores de tela (NVDA/VoiceOver), verificação manual.
+- [x] `npm run verify` completo.
 
 ## 7. Publicação
 
@@ -90,8 +92,8 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 - [ ] Habilitar GitHub Pages em Settings → Pages → Source: GitHub Actions.
 - [ ] Validar o deploy em `https://grazielevasconcelos.github.io/futsal-cup/`.
 - [ ] Verificar hard refresh após o deploy.
-- [ ] Documentar rollback por commit.
-- [ ] Confirmar ausência de segredos, analytics e chamadas externas.
+- [x] Documentar rollback por commit.
+- [x] Confirmar ausência de segredos, analytics e chamadas externas.
 
 ## 8. Antes da primeira partida
 

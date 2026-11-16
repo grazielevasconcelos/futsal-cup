@@ -78,11 +78,25 @@ A validação bloqueia a publicação quando há erro de schema, confronto invá
 
 ## Publicação
 
+O GitHub Pages é habilitado uma única vez em **Settings → Pages → Source: GitHub Actions**.
+
 1. Edite `data/2026/copa.yaml`.
 2. Rode `npm run validate` e corrija os erros.
 3. Faça commit em `main` seguindo Conventional Commits.
 4. O GitHub Actions roda validação, testes, build e E2E; se tudo passar, publica no GitHub Pages.
 5. Se a validação falhar, o site anterior permanece no ar.
+6. Após o deploy, faça hard refresh (Ctrl+F5 / Cmd+Shift+R) se o HTML antigo estiver em cache.
+
+### Rollback
+
+Para desfazer uma publicação problemática, reverta o commit e envie para `main`:
+
+```bash
+git revert <commit>
+git push origin main
+```
+
+O CI valida e republica a versão anterior. Não é necessário mexer no ambiente do Pages.
 
 ## Documentação
 
