@@ -68,11 +68,16 @@ const absences =
 
 const time = match.startsAt === null ? 'Horário a definir' : formatTime(match.startsAt);
 const venue = match.venue ?? 'Local a definir';
+
+const description =
+  resolved === null
+    ? `Final da Copa de Futsal Feminino Vila Mariana 2026 em ${formatDate(match.date)}: confrontos a definir, placar e eventos.`
+    : `${homeName} x ${awayName} em ${formatDate(match.date)}: placar, eventos e desfalques da Copa de Futsal Feminino Vila Mariana 2026.`;
 ---
 
 <BaseLayout
   title={title}
-  description={`Detalhes da partida ${match.stage === 'final' ? 'final' : `da ${formatStage(match).toLowerCase()}`} da Copa de Futsal Feminino Vila Mariana 2026, com placar, eventos e desfalques.`}
+  description={description}
   activeNav="jogos"
   notices={competition.notices}
 >
