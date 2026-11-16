@@ -1,0 +1,40 @@
+---
+import type { TeamStats } from '../lib/domain/types';
+
+interface Props {
+  stats: TeamStats;
+}
+
+const { stats } = Astro.props;
+---
+
+<dl class="stat-list">
+  <div>
+    <dt>Jogos</dt>
+    <dd>{stats.played}</dd>
+  </div>
+  <div>
+    <dt>V / E / D <span class="visually-hidden">no tempo normal</span></dt>
+    <dd>{stats.wins} / {stats.draws} / {stats.losses}</dd>
+  </div>
+  <div>
+    <dt>Pênaltis (V / D)</dt>
+    <dd>{stats.shootoutWins} / {stats.shootoutLosses}</dd>
+  </div>
+  <div>
+    <dt>Gols pró / contra</dt>
+    <dd>{stats.goalsFor} / {stats.goalsAgainst}</dd>
+  </div>
+  <div>
+    <dt>Saldo de gols</dt>
+    <dd>{stats.goalDifference}</dd>
+  </div>
+  <div>
+    <dt>Cartões (A / V)</dt>
+    <dd>{stats.yellow} / {stats.red}</dd>
+  </div>
+  <div>
+    <dt>Pontos disciplinares</dt>
+    <dd>{stats.disciplinaryPoints}</dd>
+  </div>
+</dl>

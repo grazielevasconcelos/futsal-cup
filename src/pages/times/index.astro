@@ -1,15 +1,78 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import TeamStatsList from '../../components/TeamStatsList.astro';
+import { loadCompetition } from '../../lib/data/load';
+import { activePlayers } from '../../lib/domain/players';
+import { rankTeams } from '../../lib/domain/standings';
+import { buildTeamStats } from '../../lib/domain/stats';
+import { withBase } from '../../lib/site';
+
+const competition = loadCompetition();
+const ranking = rankTeams(competition);
+const teamStats = buildTeamStats(competition);
+
+const statsByTeam = new Map(teamStats.map((stats) => [stats.teamId, stats]));
+const positionByTeam = new Map(ranking.rows.map((row) => [row.teamId, row.position]));
 ---
 
 <BaseLayout
   title="Times"
-  description="Conheça os três times e os elencos da Copa de Futsal Feminino Vila Mariana 2026."
+  description="Os três times da Copa de Futsal Feminino Vila Mariana 2026, com elencos ativos, posições e estatísticas coletivas."
   activeNav="times"
+  notices={competition.notices}
 >
-  <section class="page">
-    <h1>Times</h1>
-    <p class="lead">Os três times e seus elencos.</p>
-    <p>Os elencos ativos, as estatísticas coletivas e o histórico da edição serão publicados aqui.</p>
-  </section>
+  <div class="page">
+    <div class="page-header">
+      <h1>Times</h1>
+      <p class="lead">
+        Os três times da edição, com elenco ativo e campanha na fase classificatória e na final.
+      </p>
+    </div>
+
+    <section class="section" aria-labelledby="lista-times">
+      <h2 id="lista-times">Os três times</h2>
+
+      {
+        competition.teams.length === 0 ? (
+          <EmptyState
+            title="Times indisponíveis"
+            description="Ainda não há times cadastrados na fonte oficial da competição."
+          />
+        ) : (
+          <ul class="team-grid">
+            {competition.teams.map((team) => {
+              const stats = statsByTeam.get(team.id);
+              const active = activePlayers(team).length;
+              const position = positionByTeam.get(team.id);
+
+              return (
+                <li>
+                  <article class="card">
+                    <p class="badge-list">
+                      <span class="badge">{team.abbreviation}</span>
+                      {active < 5 && <span class="badge">Elenco em formação</span>}
+                    </p>
+                    <h3 class="card__title">
+                      <a href={withBase(`/times/${team.id}/`)}>{team.name}</a>
+                    </h3>
+                    <p class="meta">
+                      {position === undefined ? 'Sem posição' : `${position}º na classificação`} ·{' '}
+                      {active} atletas ativas
+                    </p>
+                    {stats !== undefined && <TeamStatsList stats={stats} />}
+                  </article>
+                </li>
+              );
+            })}
+          </ul>
+        )
+      }
+    </section>
+
+    <p class="meta">
+      A campanha nos pênaltis é registrada separadamente e não é somada a vitórias, empates e
+      derrotas.
+    </p>
+  </div>
 </BaseLayout>

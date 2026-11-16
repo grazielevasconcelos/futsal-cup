@@ -1,0 +1,112 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import RosterTable from '../../components/RosterTable.astro';
+import TeamStatsList from '../../components/TeamStatsList.astro';
+import { loadCompetition } from '../../lib/data/load';
+import { activePlayers } from '../../lib/domain/players';
+import { rankTeams } from '../../lib/domain/standings';
+import { buildPlayerStats, buildTeamStats } from '../../lib/domain/stats';
+import { buildSuspensionLabels } from '../../lib/format/suspension';
+import { withBase } from '../../lib/site';
+
+export function getStaticPaths() {
+  const competition = loadCompetition();
+  return competition.teams.map((team) => ({ params: { teamId: team.id } }));
+}
+
+const competition = loadCompetition();
+const team = competition.teams.find((item) => item.id === Astro.params.teamId);
+
+if (team === undefined) {
+  throw new Error(`Time não encontrado: ${Astro.params.teamId ?? 'sem id'}`);
+}
+
+const ranking = rankTeams(competition);
+const row = ranking.rows.find((item) => item.teamId === team.id);
+const stats = buildTeamStats(competition).find((item) => item.teamId === team.id);
+
+const active = activePlayers(team);
+const playerStats = buildPlayerStats(competition);
+const statsById = new Map(playerStats.map((item) => [item.playerId, item]));
+const suspensionLabels = buildSuspensionLabels(competition);
+
+const history = team.players.filter((player) => {
+  if (player.leftAt === null) return false;
+  const item = statsById.get(player.id);
+  if (item === undefined) return false;
+  return (
+    item.goals + item.assists + item.ownGoals + item.yellow + item.red > 0
+  );
+});
+
+const caption = `Elenco ativo do ${team.name} — Copa de Futsal Feminino Vila Mariana 2026`;
+const historyCaption = `Atletas com histórico na edição — ${team.name} — Copa de Futsal Feminino Vila Mariana 2026`;
+---
+
+<BaseLayout
+  title={`${team.name} (${team.abbreviation})`}
+  description={`Elenco ativo, suspensões e estatísticas coletivas do ${team.name} na Copa de Futsal Feminino Vila Mariana 2026.`}
+  activeNav="times"
+  notices={competition.notices}
+>
+  <div class="page">
+    <p class="meta"><a href={withBase('/times/')}>Todos os times</a></p>
+
+    <div class="page-header">
+      <p class="badge-list">
+        <span class="badge">{team.abbreviation}</span>
+        {active.length < 5 && <span class="badge">Elenco em formação</span>}
+      </p>
+      <h1>{team.name}</h1>
+      <p class="lead">
+        {row === undefined ? 'Sem posição na classificação' : `${row.position}º na classificação`} ·{' '}
+        {active.length} atletas ativas
+      </p>
+    </div>
+
+    <section class="section" aria-labelledby="estatisticas-coletivas">
+      <h2 id="estatisticas-coletivas">Estatísticas coletivas</h2>
+      {stats === undefined ? (
+        <p class="empty-state">Ainda não há estatísticas coletivas para este time.</p>
+      ) : (
+        <TeamStatsList stats={stats} />
+      )}
+      <p class="meta">
+        V, E e D consideram o tempo normal das partidas oficiais, incluindo a final. Uma final
+        decidida nos pênaltis conta como empate; a campanha nos pênaltis aparece separada.
+      </p>
+    </section>
+
+    <section class="section" aria-labelledby="elenco-ativo">
+      <h2 id="elenco-ativo">Elenco ativo</h2>
+      <RosterTable
+        players={active}
+        stats={statsById}
+        suspensionLabels={suspensionLabels}
+        caption={caption}
+        labelledBy="elenco-ativo"
+        mode="active"
+      />
+    </section>
+
+    {
+      history.length > 0 && (
+        <section class="section" aria-labelledby="historico">
+          <h2 id="historico">Atletas com histórico na edição</h2>
+          <RosterTable
+            players={history}
+            stats={statsById}
+            suspensionLabels={suspensionLabels}
+            caption={historyCaption}
+            labelledBy="historico"
+            mode="history"
+          />
+        </section>
+      )
+    }
+
+    <p class="meta">
+      <a href={withBase('/estatisticas/')}>Ver estatísticas de todas as atletas</a>
+    </p>
+  </div>
+</BaseLayout>
