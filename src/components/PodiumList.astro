@@ -1,0 +1,27 @@
+---
+import type { Podium, Team, TeamId } from '../lib/domain/types';
+
+interface Props {
+  podium: Podium;
+  teams: ReadonlyMap<TeamId, Team>;
+}
+
+const { podium, teams } = Astro.props;
+
+const places = [
+  { label: 'Campeã', teamId: podium.champion },
+  { label: 'Vice-campeã', teamId: podium.runnerUp },
+  { label: '3º lugar', teamId: podium.third },
+].filter((place): place is { label: string; teamId: TeamId } => place.teamId !== null);
+---
+
+<ol class="podium">
+  {
+    places.map((place) => (
+      <li class="podium__item">
+        <p class="meta">{place.label}</p>
+        <p class="podium__team">{teams.get(place.teamId)?.name ?? place.teamId}</p>
+      </li>
+    ))
+  }
+</ol>

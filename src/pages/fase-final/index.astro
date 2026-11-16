@@ -1,18 +1,100 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import FriendlyCard from '../../components/FriendlyCard.astro';
+import MatchCard from '../../components/MatchCard.astro';
+import PodiumList from '../../components/PodiumList.astro';
+import { loadCompetition } from '../../lib/data/load';
+import { buildPodium, isGroupComplete } from '../../lib/domain/finalists';
+import { buildFriendlyCard } from '../../lib/domain/friendly';
+import { buildTeamMap } from '../../lib/domain/players';
+import { getBuildDate, withBase } from '../../lib/site';
+
+const competition = loadCompetition();
+const now = getBuildDate();
+const teams = buildTeamMap(competition);
+
+const groupComplete = isGroupComplete(competition);
+const finalMatch = competition.matches.find((match) => match.id === 'final');
+const finalFinished = finalMatch?.status === 'finished';
+const podium = finalFinished ? buildPodium(competition) : null;
+const friendly = buildFriendlyCard(competition);
 ---
 
 <BaseLayout
   title="Fase final"
-  description="Final única, card informativo do amistoso e pódio de três posições da Copa de Futsal Feminino Vila Mariana 2026."
+  description="Final única entre o 1º e o 2º colocados, card informativo do amistoso e pódio de três posições da Copa de Futsal Feminino Vila Mariana 2026."
   activeNav="fase-final"
+  notices={competition.notices}
 >
-  <section class="page">
-    <h1>Fase final</h1>
-    <p class="lead">A final única e o pódio de três posições.</p>
-    <p>
-      A final será disputada entre o 1º e o 2º colocados da fase classificatória. O card do
-      amistoso e o pódio serão exibidos aqui quando os dados estiverem disponíveis.
-    </p>
-  </section>
+  <div class="page">
+    <div class="page-header">
+      <h1>Fase final</h1>
+      <p class="lead">
+        Final única entre o 1º e o 2º colocados e pódio de três posições.
+      </p>
+    </div>
+
+    {
+      friendly !== null && (
+        <section class="section" aria-labelledby="amistoso">
+          <h2 id="amistoso">Amistoso do 3º colocado</h2>
+          <FriendlyCard friendly={friendly} />
+        </section>
+      )
+    }
+
+    {
+      podium !== null && (
+        <section class="section" aria-labelledby="podio">
+          <h2 id="podio">Pódio</h2>
+          <PodiumList podium={podium} teams={teams} />
+        </section>
+      )
+    }
+
+    <section class="section" aria-labelledby="final">
+      <h2 id="final">Final</h2>
+
+      {
+        !groupComplete ? (
+          <>
+            <EmptyState
+              title="Confrontos a definir"
+              description="A final depende das seis partidas da fase classificatória. As finalistas serão o 1º e o 2º colocados."
+            />
+            <p><a href={withBase('/classificacao/')}>Acompanhar a classificação</a></p>
+          </>
+        ) : finalMatch === undefined ? (
+          <p class="empty-state">A final ainda não está cadastrada na fonte oficial.</p>
+        ) : (
+          <MatchCard
+            match={finalMatch}
+            competition={competition}
+            now={now}
+            showStage={false}
+          />
+        )
+      }
+    </section>
+
+    <section class="section" aria-labelledby="como-funciona">
+      <h2 id="como-funciona">Como funciona</h2>
+      <ul>
+        <li>Apenas o 1º e o 2º colocados da fase classificatória disputam a final, em partida única.</li>
+        <li>Não há semifinais.</li>
+        <li>
+          Empate no tempo normal vai direto para os pênaltis: cinco cobranças alternadas e morte
+          súbita, se necessário.
+        </li>
+        <li>
+          A 3ª colocada é a 3ª da classificação da fase classificatória, sem partida extra.
+        </li>
+        <li>
+          O amistoso do 3º colocado é informativo e não altera classificação, estatísticas,
+          suspensões ou pódio.
+        </li>
+      </ul>
+    </section>
+  </div>
 </BaseLayout>
