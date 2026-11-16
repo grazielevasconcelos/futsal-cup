@@ -89,9 +89,9 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 ## 7. Publicação
 
 - [x] Configurar GitHub Actions com permissões mínimas.
-- [ ] Habilitar GitHub Pages em Settings → Pages → Source: GitHub Actions.
-- [ ] Validar o deploy em `https://grazielevasconcelos.github.io/futsal-cup/`.
-- [ ] Verificar hard refresh após o deploy.
+- [x] Habilitar GitHub Pages em Settings → Pages → Source: GitHub Actions.
+- [x] Validar o deploy em `https://grazielevasconcelos.github.io/futsal-cup/`.
+- [x] Verificar hard refresh após o deploy (HTML e CSS conferidos com cache-busting).
 - [x] Documentar rollback por commit.
 - [x] Confirmar ausência de segredos, analytics e chamadas externas.
 
@@ -101,5 +101,5 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 - [ ] Horários, nomes dos times e local definidos pela organização.
 - [ ] Amistoso definido ou `friendly: null`.
 - [ ] `npm run validate` sem erros; avisos revisados.
-- [ ] Site publicado e acessível antes de 24/11/2026.
-- [ ] Checklist manual do Apêndice D assinado.
+- [x] Site publicado e acessível antes de 24/11/2026.
+- [ ] Checklist manual do Apêndice D assinado (leitor de tela, Safari/Firefox/Edge e Lighthouse).
