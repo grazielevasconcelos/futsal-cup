@@ -1,15 +1,87 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import EmptyState from '../../components/EmptyState.astro';
+import StandingsTable from '../../components/StandingsTable.astro';
+import { loadCompetition } from '../../lib/data/load';
+import { buildTeamMap } from '../../lib/domain/players';
+import { rankTeams } from '../../lib/domain/standings';
+
+const competition = loadCompetition();
+const ranking = rankTeams(competition);
+const teams = buildTeamMap(competition);
+
+const caption =
+  'Classificação da fase classificatória — Copa de Futsal Feminino Vila Mariana 2026';
 ---
 
 <BaseLayout
   title="Classificação"
-  description="Classificação da fase classificatória da Copa de Futsal Feminino Vila Mariana 2026, com critérios de desempate."
+  description="Classificação da fase classificatória da Copa de Futsal Feminino Vila Mariana 2026, com pontos, saldo de gols e critérios de desempate."
   activeNav="classificacao"
+  notices={competition.notices}
 >
-  <section class="page">
-    <h1>Classificação</h1>
-    <p class="lead">Posições, pontos e critérios de desempate da fase classificatória.</p>
-    <p>A tabela será calculada automaticamente a partir das partidas registradas na fonte oficial.</p>
-  </section>
+  <div class="page">
+    <div class="page-header">
+      <h1>Classificação</h1>
+      <p class="lead">
+        Posições da fase classificatória, calculadas a partir das seis partidas de grupo.
+      </p>
+    </div>
+
+    <section class="section" aria-labelledby="tabela-classificacao">
+      <h2 id="tabela-classificacao">Tabela</h2>
+
+      {
+        ranking.rows.length === 0 ? (
+          <EmptyState
+            title="Classificação indisponível"
+            description="Ainda não há times suficientes para montar a classificação."
+          />
+        ) : (
+          <StandingsTable
+            rows={ranking.rows}
+            teams={teams}
+            provisional={ranking.provisional}
+            caption={caption}
+            labelledBy="tabela-classificacao"
+          />
+        )
+      }
+
+      <p class="meta">
+        V = vitórias, E = empates, D = derrotas, GP = gols pró, GC = gols contra, SG = saldo de
+        gols, CA = cartões amarelos, CV = cartões vermelhos, PD = pontos disciplinares.
+        Vermelhos incluem o segundo amarelo. Pontos disciplinares: amarelo 1, vermelho 2,
+        segundo amarelo 3 no total; menor é melhor.
+      </p>
+      <p class="meta">
+        A classificação considera apenas as seis partidas da fase classificatória. A final e o
+        amistoso do 3º colocado não alteram as posições.
+      </p>
+    </section>
+
+    <section class="section" aria-labelledby="criterios-desempate">
+      <h2 id="criterios-desempate">Critérios de desempate</h2>
+      <ol>
+        <li>
+          Confronto direto, apenas quando exatamente dois times estão empatados em pontos e os
+          dois jogos entre eles estão encerrados: soma dos pontos dos dois jogos e, se ainda
+          houver empate, saldo agregado dos dois jogos.
+        </li>
+        <li>Número de vitórias.</li>
+        <li>Saldo de gols (gols pró menos gols contra).</li>
+        <li>Gols pró.</li>
+        <li>Menos gols contra.</li>
+        <li>
+          Pontos disciplinares: cartão amarelo 1, vermelho 2 e segundo amarelo 3 no total;
+          menor é melhor.
+        </li>
+        <li>Sorteio, com a ordem registrada na fonte de dados.</li>
+      </ol>
+      <p>
+        Com três ou mais times empatados, o confronto direto só é aplicado quando o grupo se
+        reduz a dois.
+      </p>
+    </section>
+  </div>
 </BaseLayout>
