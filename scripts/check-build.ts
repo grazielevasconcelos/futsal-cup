@@ -81,6 +81,36 @@ if (forbiddenPaths.length > 0) {
   fail(`Rota proibida encontrada em dist/: ${forbiddenPaths.join(', ')}`);
 }
 
+const basePath = '/futsal-cup/';
+const brokenLinks = new Map<string, string>();
+
+function resolveInternalTarget(href: string): string | null {
+  if (!href.startsWith(basePath)) {
+    return null;
+  }
+
+  const pathname = href.split('#')[0]?.split('?')[0] ?? '';
+  const relativePath = pathname.slice(basePath.length);
+
+  if (relativePath === '') {
+    return 'index.html';
+  }
+
+  return relativePath.endsWith('/') ? `${relativePath}index.html` : relativePath;
+}
+
+function checkInternalLink(href: string, page: string): void {
+  if (/^javascript:/i.test(href)) {
+    fail(`Link javascript: encontrado em dist/${page}`);
+    return;
+  }
+
+  const target = resolveInternalTarget(href);
+  if (target !== null && !relativeFiles.includes(target)) {
+    brokenLinks.set(`${href} (${page})`, `Link interno sem destino em dist/${page}: ${href}`);
+  }
+}
+
 const titles = new Map<string, string>();
 const descriptions = new Map<string, string>();
 
@@ -88,6 +118,13 @@ for (const file of htmlFiles) {
   const relativePath = relative(distDirectory, file);
   const html = readFileSync(file, 'utf8');
   const gzipSize = gzipSync(html).byteLength;
+
+  for (const match of html.matchAll(/(?:href|src)="([^"]*)"/g)) {
+    const value = match[1];
+    if (value !== undefined) {
+      checkInternalLink(value, relativePath);
+    }
+  }
 
   if (html.includes('<script')) {
     fail(`Tag <script> encontrada em dist/${relativePath}`);
@@ -170,6 +207,10 @@ for (const file of htmlFiles) {
   if (/\b(?:mailto|tel):/i.test(html)) {
     fail(`Link de contato pessoal encontrado em dist/${relativePath}`);
   }
+}
+
+for (const message of brokenLinks.values()) {
+  fail(message);
 }
 
 for (const file of cssFiles) {
