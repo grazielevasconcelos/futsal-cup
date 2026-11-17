@@ -58,6 +58,14 @@ Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal 
 - Habilitar GitHub Pages e validar o deploy.
 - Critério: CI verde, site publicado e checklist do Apêndice D assinado.
 
+### Fatia 6 — Cobertura pendente
+
+- Fechar os testes de elenco e elegibilidade `TST-039`…`TST-048` em dados e domínio.
+- Cobrir o badge “Elenco em formação” (`TST-042`) com teste de componente.
+- Cobrir os três estados da Fase final (`TST-078`) com teste de componente.
+- Cobrir lista de jogos por data (`TST-071`), detalhe da partida (`TST-072`…`TST-074`) e página do time (`TST-076`).
+- Critério: `TST-039`…`TST-048` e `TST-066`…`TST-083` cobertos por testes automatizados; `TST-104` permanece manual.
+
 ## Marcos
 
 | Data | Marco |

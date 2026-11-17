@@ -78,9 +78,9 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 - [x] TST-017…TST-027 e TST-112: cartões e suspensão.
 - [x] TST-028…TST-038: gols, assistências, pênaltis e estatísticas individuais.
 - [x] TST-115: estatísticas coletivas com shootout.
-- [ ] TST-039…TST-048: elenco e elegibilidade.
+- [x] TST-039…TST-048: elenco e elegibilidade.
 - [x] TST-049…TST-065, TST-107, TST-109 e TST-116: validação, schema, fase final e simetria.
-- [ ] TST-066…TST-083 e TST-106/108/113/114: interface e estados.
+- [x] TST-066…TST-083 e TST-106/108/113/114: interface, estados e componentes.
 - [x] TST-084…TST-094: build, segurança e determinismo.
 - [x] TST-095…TST-103: acessibilidade e layout automatizados (axe, foco, teclado, 320px, tabela rolável, reduced motion, sem cor exclusiva, semântica e zoom 200%).
 - [ ] TST-104: leitores de tela (NVDA/VoiceOver), verificação manual.
