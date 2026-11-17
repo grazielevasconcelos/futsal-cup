@@ -34,6 +34,74 @@ test.describe('páginas da competição', () => {
     await expect(links.first()).toHaveAttribute('href', /\/times\/ta\/$/);
   });
 
+  test('TST-071: a lista de jogos agrupa as sete partidas oficiais por data', async ({
+    page,
+  }) => {
+    await page.goto('jogos/');
+
+    await expect(page.getByRole('heading', { level: 1, name: 'Jogos' })).toBeVisible();
+
+    const days = page.locator('section.section');
+    await expect(days).toHaveCount(4);
+    await expect(days.nth(0)).toContainText('24/11/2026');
+    await expect(days.nth(1)).toContainText('26/11/2026');
+    await expect(days.nth(2)).toContainText('01/12/2026');
+    await expect(days.nth(3)).toContainText('03/12/2026');
+
+    const cards = page.locator('.match-card');
+    await expect(cards).toHaveCount(7);
+    await expect(cards.filter({ hasText: 'Amistoso' })).toHaveCount(0);
+    await expect(page.getByText('3º lugar')).toHaveCount(0);
+
+    for (const id of ['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'final']) {
+      await expect(page.locator(`a[href$="/jogos/${id}/"]`)).toHaveCount(1);
+    }
+  });
+
+  test('TST-072: o detalhe mantém a ordem dos eventos por minuto', async ({ page }) => {
+    await page.goto('jogos/g3/');
+
+    await expect(page.getByRole('heading', { level: 2, name: 'Eventos' })).toBeVisible();
+    await expect(page.locator('.event__minute')).toHaveText([
+      '9 min',
+      '14 min',
+      '18 min',
+      '22 min',
+    ]);
+  });
+
+  test('TST-073: o detalhe do W.O. mostra o placar na ordem mandante/visitante', async ({
+    page,
+  }) => {
+    await page.goto('jogos/g2/');
+
+    await expect(page.locator('.score span[aria-hidden="true"]')).toHaveText('0 x 1 (W.O.)');
+    await expect(
+      page.getByRole('heading', { level: 2, name: 'Vitória por W.O. — Não compareceu' }),
+    ).toBeVisible();
+    await expect(page.getByText('TB não compareceu.')).toBeVisible();
+    await expect(page.getByText('Sem eventos registrados.')).toBeVisible();
+  });
+
+  test('TST-074: o detalhe da final mostra o placar dos pênaltis', async ({ page }) => {
+    await page.goto('jogos/final/');
+
+    await expect(page.locator('.score span[aria-hidden="true"]')).toHaveText('1 (4) x (3) 1');
+    await expect(page.locator('.score .visually-hidden')).toContainText('4 a 3 nos pênaltis');
+    await expect(page.getByText('Pênalti', { exact: true })).toBeVisible();
+  });
+
+  test('o detalhe da partida lista as desfalques por suspensão', async ({ page }) => {
+    await page.goto('jogos/g5/');
+
+    const absences = page.locator('section[aria-labelledby="desfalques"]');
+    await expect(absences.getByRole('heading', { level: 2 })).toHaveText(
+      'Desfalques por suspensão',
+    );
+    await expect(absences.getByRole('heading', { level: 3, name: 'Time C' })).toBeVisible();
+    await expect(absences.getByRole('listitem')).toHaveText(['Olívia']);
+  });
+
   test('a página do time tem elenco ativo e estatísticas coletivas', async ({ page }) => {
     await page.goto('times/ta/');
 
@@ -48,6 +116,29 @@ test.describe('páginas da competição', () => {
     const roster = page.locator('table.data-table').first();
     await expect(roster.locator('caption')).toContainText('Elenco ativo');
     await expect(roster.locator('tbody tr')).not.toHaveCount(0);
+  });
+
+  test('TST-076: a página do time mostra badge, suspensão e histórico', async ({ page }) => {
+    await page.goto('times/ta/');
+
+    await expect(page.locator('.page-header .badge', { hasText: 'TA' })).toBeVisible();
+    await expect(page.locator('.page-header')).not.toContainText('Elenco em formação');
+
+    const roster = page.locator('table.data-table').first();
+    await expect(roster.locator('tbody tr')).toHaveCount(7);
+
+    const history = page.locator('section[aria-labelledby="historico"]');
+    await expect(history.getByRole('heading', { level: 2 })).toContainText(
+      'Atletas com histórico na edição',
+    );
+    const gabi = history.getByRole('row', { name: /Gabi/ });
+    await expect(gabi).toContainText('fora do elenco ativo');
+    await expect(gabi.getByRole('cell').nth(2)).toHaveText('1');
+
+    await page.goto('times/tb/');
+    await expect(page.getByRole('row', { name: /Mari/ })).toContainText(
+      'Suspensão sem efeito — sem próxima partida',
+    );
   });
 
   test('as estatísticas têm as cinco seções pedidas', async ({ page }) => {
