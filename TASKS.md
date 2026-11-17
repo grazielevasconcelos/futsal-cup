@@ -83,6 +83,8 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 - [x] TST-066…TST-083 e TST-106/108/113/114: interface, estados e componentes.
 - [x] TST-084…TST-094: build, segurança e determinismo.
 - [x] TST-095…TST-103: acessibilidade e layout automatizados (axe, foco, teclado, 320px, tabela rolável, reduced motion, sem cor exclusiva, semântica e zoom 200%).
+- [x] Smoke cross-browser em Firefox e WebKit (desktop e iOS) para rotas, menu, skip link e tabela larga.
+- [x] Checagem de links internos e de `javascript:` no build.
 - [ ] TST-104: leitores de tela (NVDA/VoiceOver), verificação manual.
 - [x] `npm run verify` completo.
 

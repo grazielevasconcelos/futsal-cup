@@ -38,11 +38,13 @@ npm run test:e2e                    # Playwright + axe
 npm run verify                      # sequência completa
 ```
 
-Na primeira execução do E2E:
+Na primeira execução do E2E, instale os três motores:
 
 ```bash
-npx playwright install --with-deps chromium
+npx playwright install --with-deps chromium firefox webkit
 ```
+
+O E2E roda a suíte completa em Chromium (desktop e mobile) e um smoke de compatibilidade em Firefox; no CI, o mesmo smoke roda também em WebKit (Safari desktop e iOS). Para rodar WebKit localmente, use `PLAYWRIGHT_WEBKIT=1` após instalar as dependências do sistema.
 
 ## Estrutura
 

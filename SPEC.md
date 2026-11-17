@@ -2349,6 +2349,8 @@ export default defineConfig({
 ```ts
 import { defineConfig, devices } from '@playwright/test';
 
+const runWebkit = Boolean(process.env.CI) || process.env.PLAYWRIGHT_WEBKIT === '1';
+
 export default defineConfig({
   testDir: 'tests/e2e',
   fullyParallel: true,
@@ -2368,13 +2370,33 @@ export default defineConfig({
   projects: [
     { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile-chromium', use: { ...devices['Pixel 5'] } },
+    {
+      name: 'desktop-firefox',
+      testMatch: /compatibility\.spec\.ts/,
+      use: { ...devices['Desktop Firefox'] },
+    },
+    ...(runWebkit
+      ? [
+          {
+            name: 'desktop-webkit',
+            testMatch: /compatibility\.spec\.ts/,
+            use: { ...devices['Desktop Safari'] },
+          },
+          {
+            name: 'mobile-webkit',
+            testMatch: /compatibility\.spec\.ts/,
+            use: { ...devices['iPhone 13'] },
+          },
+        ]
+      : []),
   ],
 });
 ```
 
-- CI instala apenas Chromium: `npx playwright install --with-deps chromium`.
+- CI instala Chromium, Firefox e WebKit: `npx playwright install --with-deps chromium firefox webkit`.
+- `tests/e2e/compatibility.spec.ts` roda um smoke de rotas, menu móvel, skip link e tabela larga em Firefox e, no CI (ou com `PLAYWRIGHT_WEBKIT=1`), em Safari desktop e iOS Safari via WebKit. Chrome/Edge usam o Chromium; a conferência visual e em dispositivos reais continua no checklist manual (Apêndice D).
+- WebKit exige bibliotecas de sistema; por isso os projetos WebKit ficam fora do `npm run verify` local por padrão e rodam no CI, onde `--with-deps` as instala. Para rodar localmente, use `PLAYWRIGHT_WEBKIT=1` após instalar as dependências.
 - `--ignore-lock` mantém o preview em primeiro plano em ambientes que detectam agentes; o Playwright encerra o processo ao final.
-- Safari/Firefox/Edge são verificados no checklist manual (Apêndice D).
 - O `webServer` exige `dist/` construído; o CI roda `npm run build` antes.
 - axe é executado em todas as rotas principais; falhas `serious`/`critical` bloqueiam.
 
@@ -2428,8 +2450,8 @@ jobs:
       - name: Checar artefatos
         run: npm run test:build
 
-      - name: Instalar Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Instalar navegadores
+        run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Testes E2E e acessibilidade
         run: npm run test:e2e
@@ -2514,10 +2536,10 @@ Nenhuma variável contém segredo. Não há `.env` versionado.
 |---|---|---|---|
 | Unitários | Vitest | Placar, classificação, desempate, cartões, suspensão, estatísticas, pódio, próximo jogo, formatação, normalização, contraste de tokens. | Sim |
 | Dados | Vitest + fixtures/factories | Schema, todas as validações bloqueantes, avisos, agregação de erros. | Sim |
-| Build | `scripts/check-build.ts` | Rotas, 404, ausência de Regulamento, 0 KB JS, termos proibidos, fontes proprietárias, orçamento, IDs de jogadora. | Sim |
-| E2E | Playwright | Navegação, teclado, foco, 320px, tabelas roláveis, meta tags, 404, menu `<details>`. | Sim |
+| Build | `scripts/check-build.ts` | Rotas, links internos, 404, ausência de Regulamento, 0 KB JS, termos proibidos, fontes proprietárias, orçamento, IDs de jogadora. | Sim |
+| E2E | Playwright | Navegação, teclado, foco, 320px, tabelas roláveis, meta tags, 404, menu `<details>`. Smoke em Chromium, Firefox e WebKit (Safari desktop e iOS). | Sim |
 | Acessibilidade | Playwright + axe-core | Violações `serious`/`critical` nas rotas principais. | Sim |
-| Manual | Checklist Apêndice D | Leitor de tela, zoom 200%, Safari/Firefox/Edge, Lighthouse, inspeção visual. | Antes da publicação |
+| Manual | Checklist Apêndice D | Leitor de tela, zoom 200%, dispositivos reais, Safari/Firefox/Edge, Lighthouse, inspeção visual. | Antes da publicação |
 
 - Sem snapshot visual no MVP.
 - Sem meta de cobertura; a matriz do Apêndice E é obrigatória.
@@ -2623,7 +2645,7 @@ npm run check
 npm test
 npm run build
 npm run test:build
-npx playwright install --with-deps chromium
+npx playwright install --with-deps chromium firefox webkit
 npm run test:e2e
 ```
 
@@ -2633,9 +2655,10 @@ Ou, após o setup:
 npm run verify
 ```
 
-- `npm run verify` não instala navegadores; rode o `npx playwright install` uma vez.
+- `npm run verify` não instala navegadores; rode o `npx playwright install --with-deps chromium firefox webkit` uma vez.
 - O CI executa os passos na ordem acima.
 - `npm run test:build` e `npm run test:e2e` exigem `dist/` atualizado.
+- O smoke cross-browser (`compatibility.spec.ts`) roda em `desktop-firefox` localmente e, no CI (ou com `PLAYWRIGHT_WEBKIT=1`), também em `desktop-webkit` e `mobile-webkit`; os demais testes de UI rodam nas duas viewports Chromium.
 
 ---
 
@@ -3549,6 +3572,8 @@ Executar antes da publicação e após mudanças de UI. Registrar data e respons
 - [ ] Nenhuma imagem de pessoa; favicon sem marca de terceiros.
 
 ### D.5 Navegadores e dispositivos
+
+> O smoke automatizado (`tests/e2e/compatibility.spec.ts`) cobre carregamento, menu móvel, skip link e tabela larga em Firefox e WebKit. A inspeção visual, os dispositivos reais e o Lighthouse continuam manuais.
 
 - [ ] Chrome desktop.
 - [ ] Firefox desktop.

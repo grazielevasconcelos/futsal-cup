@@ -66,6 +66,13 @@ Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal 
 - Cobrir lista de jogos por data (`TST-071`), detalhe da partida (`TST-072`…`TST-074`) e página do time (`TST-076`).
 - Critério: `TST-039`…`TST-048` e `TST-066`…`TST-083` cobertos por testes automatizados; `TST-104` permanece manual.
 
+### Fatia 7 — Compatibilidade e CI
+
+- Adicionar smoke cross-browser em Firefox, WebKit desktop e WebKit mobile (Safari/iOS) para rotas, menu móvel, skip link e tabela larga.
+- Instalar Chromium, Firefox e WebKit no workflow e documentar a matriz.
+- Adicionar checagem de links internos e de `javascript:` no `scripts/check-build.ts`.
+- Critério: CI passa nos três motores (Chromium, Firefox e WebKit); link interno quebrado falha o build; a conferência manual de navegadores fica restrita a dispositivos e inspeção visual.
+
 ## Marcos
 
 | Data | Marco |
