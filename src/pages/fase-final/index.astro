@@ -1,23 +1,13 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import EmptyState from '../../components/EmptyState.astro';
+import FinalPhase from '../../components/FinalPhase.astro';
 import FriendlyCard from '../../components/FriendlyCard.astro';
-import MatchCard from '../../components/MatchCard.astro';
-import PodiumList from '../../components/PodiumList.astro';
 import { loadCompetition } from '../../lib/data/load';
-import { buildPodium, isGroupComplete } from '../../lib/domain/finalists';
 import { buildFriendlyCard } from '../../lib/domain/friendly';
-import { buildTeamMap } from '../../lib/domain/players';
-import { getBuildDate, withBase } from '../../lib/site';
+import { getBuildDate } from '../../lib/site';
 
 const competition = loadCompetition();
 const now = getBuildDate();
-const teams = buildTeamMap(competition);
-
-const groupComplete = isGroupComplete(competition);
-const finalMatch = competition.matches.find((match) => match.id === 'final');
-const finalFinished = finalMatch?.status === 'finished';
-const podium = finalFinished ? buildPodium(competition) : null;
 const friendly = buildFriendlyCard(competition);
 ---
 
@@ -44,39 +34,7 @@ const friendly = buildFriendlyCard(competition);
       )
     }
 
-    {
-      podium !== null && (
-        <section class="section" aria-labelledby="podio">
-          <h2 id="podio">Pódio</h2>
-          <PodiumList podium={podium} teams={teams} />
-        </section>
-      )
-    }
-
-    <section class="section" aria-labelledby="final">
-      <h2 id="final">Final</h2>
-
-      {
-        !groupComplete ? (
-          <>
-            <EmptyState
-              title="Confrontos a definir"
-              description="A final depende das seis partidas da fase classificatória. As finalistas serão o 1º e o 2º colocados."
-            />
-            <p><a href={withBase('/classificacao/')}>Acompanhar a classificação</a></p>
-          </>
-        ) : finalMatch === undefined ? (
-          <p class="empty-state">A final ainda não está cadastrada na fonte oficial.</p>
-        ) : (
-          <MatchCard
-            match={finalMatch}
-            competition={competition}
-            now={now}
-            showStage={false}
-          />
-        )
-      }
-    </section>
+    <FinalPhase competition={competition} now={now} />
 
     <section class="section" aria-labelledby="como-funciona">
       <h2 id="como-funciona">Como funciona</h2>

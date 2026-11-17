@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import EmptyState from '../../components/EmptyState.astro';
+import TeamBadges from '../../components/TeamBadges.astro';
 import TeamStatsList from '../../components/TeamStatsList.astro';
 import { loadCompetition } from '../../lib/data/load';
 import { activePlayers } from '../../lib/domain/players';
@@ -49,10 +50,7 @@ const positionByTeam = new Map(ranking.rows.map((row) => [row.teamId, row.positi
               return (
                 <li>
                   <article class="card">
-                    <p class="badge-list">
-                      <span class="badge">{team.abbreviation}</span>
-                      {active < 5 && <span class="badge">Elenco em formação</span>}
-                    </p>
+                    <TeamBadges abbreviation={team.abbreviation} activeCount={active} />
                     <h3 class="card__title">
                       <a href={withBase(`/times/${team.id}/`)}>{team.name}</a>
                     </h3>

@@ -1,0 +1,13 @@
+---
+interface Props {
+  abbreviation: string;
+  activeCount: number;
+}
+
+const { abbreviation, activeCount } = Astro.props;
+---
+
+<p class="badge-list">
+  <span class="badge">{abbreviation}</span>
+  {activeCount < 5 && <span class="badge">Elenco em formação</span>}
+</p>
