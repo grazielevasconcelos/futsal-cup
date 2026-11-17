@@ -1,6 +1,22 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const isCI = Boolean(process.env.CI);
+const runWebkit = isCI || process.env.PLAYWRIGHT_WEBKIT === '1';
+
+const webkitProjects = runWebkit
+  ? [
+      {
+        name: 'desktop-webkit',
+        testMatch: /compatibility\.spec\.ts/,
+        use: { ...devices['Desktop Safari'] },
+      },
+      {
+        name: 'mobile-webkit',
+        testMatch: /compatibility\.spec\.ts/,
+        use: { ...devices['iPhone 13'] },
+      },
+    ]
+  : [];
 
 export default defineConfig({
   testDir: 'tests/e2e',
@@ -24,5 +40,11 @@ export default defineConfig({
   projects: [
     { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'mobile-chromium', use: { ...devices['Pixel 5'] } },
+    {
+      name: 'desktop-firefox',
+      testMatch: /compatibility\.spec\.ts/,
+      use: { ...devices['Desktop Firefox'] },
+    },
+    ...webkitProjects,
   ],
 });

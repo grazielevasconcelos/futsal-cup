@@ -45,8 +45,8 @@ jobs:
       - name: Checar artefatos
         run: npm run test:build
 
-      - name: Instalar Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Instalar navegadores
+        run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Testes E2E e acessibilidade
         run: npm run test:e2e
