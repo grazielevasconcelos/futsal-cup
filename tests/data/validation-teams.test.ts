@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest';
 
 import { validateCompetition } from '../../src/lib/data/load';
+import { activePlayers } from '../../src/lib/domain/players';
 import { codes, player, team, validData } from '../factories/competition';
+
+function addPlayer(
+  data: Record<string, any>,
+  teamId: string,
+  entry: Record<string, any>,
+): void {
+  team(data, teamId).players.push(entry);
+}
 
 describe('validação semântica de times e elencos', () => {
   it('VAL-004: bloqueia IDs de time duplicados', () => {
@@ -65,5 +74,68 @@ describe('validação semântica de times e elencos', () => {
     const errorCodes = codes(validateCompetition(data));
     expect(errorCodes).toContain('VAL-010');
     expect(errorCodes).toContain('VAL-019');
+  });
+
+  it('TST-039: aceita elenco com 7 e com 8 jogadoras ativas', () => {
+    const seven = validData();
+    const sevenResult = validateCompetition(seven);
+    expect(sevenResult.errors).toEqual([]);
+    expect(activePlayers(team(seven, 'tb') as any)).toHaveLength(7);
+
+    const eight = validData();
+    player(eight, 'p-007').leftAt = null;
+    const eightResult = validateCompetition(eight);
+    expect(eightResult.errors).toEqual([]);
+    expect(activePlayers(team(eight, 'ta') as any)).toHaveLength(8);
+  });
+
+  it('TST-043: aceita apelidos diferentes que só variam pelo acento', () => {
+    const data = validData();
+    player(data, 'p-001').nickname = 'Ana';
+    player(data, 'p-002').nickname = 'Aná';
+
+    expect(codes(validateCompetition(data))).not.toContain('VAL-007');
+  });
+
+  it('TST-045: leftAt preserva o histórico e libera a vaga', () => {
+    const data = validData();
+    const saiu = player(data, 'p-007');
+    expect(saiu.leftAt).toBe('2026-11-25T00:00:00-03:00');
+
+    addPlayer(data, 'ta', {
+      id: 'p-023',
+      nickname: 'Zoe',
+      position: 'linha',
+      joinedAt: '2026-11-26T00:00:00-03:00',
+      leftAt: null,
+    });
+
+    expect(codes(validateCompetition(data))).toEqual([]);
+    expect(activePlayers(team(data, 'ta') as any).map((item) => item.id)).not.toContain(
+      'p-007',
+    );
+    expect(activePlayers(team(data, 'ta') as any)).toHaveLength(8);
+  });
+
+  it('TST-046: bloqueia jogadora que entra no mesmo instante da partida', () => {
+    const data = validData();
+    player(data, 'p-002').joinedAt = '2026-11-24T19:00:00-03:00';
+    expect(codes(validateCompetition(data))).toContain('VAL-020');
+  });
+
+  it('TST-048: bloqueia sobreposição de 9 ativas antes da saída', () => {
+    const data = validData();
+    addPlayer(data, 'ta', {
+      id: 'p-023',
+      nickname: 'Zoe',
+      position: 'linha',
+      joinedAt: '2026-11-20T00:00:00-03:00',
+      leftAt: null,
+    });
+
+    expect(codes(validateCompetition(data))).toContain('VAL-009');
+
+    player(data, 'p-023').joinedAt = '2026-11-26T00:00:00-03:00';
+    expect(codes(validateCompetition(data))).toEqual([]);
   });
 });
