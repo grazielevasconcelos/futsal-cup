@@ -178,7 +178,7 @@ Nenhum desses itens pode ser usado como desculpa para “a definir” silencioso
 
 ### 2.6 Premissas
 
-- A edição é 2026; o build lê somente `data/2026/copa.yaml`.
+- A edição é 2026; o build de produção lê somente `data/2026/copa.yaml`. O build de teste do E2E pode ler `tests/fixtures/valida.yaml` via `COPA_DATA_FILE` e grava em `dist-test/`.
 - O formato é de **3 times e 7 partidas oficiais** (6 de grupo + final).
 - O repositório é público; a fonte não contém dados pessoais além do apelido.
 - O mapeamento `p-XXX` → pessoa fica fora do repositório (Apêndice F).
@@ -2358,12 +2358,13 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
-    baseURL: 'http://127.0.0.1:4321/futsal-cup/',
+    baseURL: 'http://127.0.0.1:4322/futsal-cup/',
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: 'npm run preview -- --host 127.0.0.1 --port 4321 --ignore-lock',
-    url: 'http://127.0.0.1:4321/futsal-cup/',
+    command:
+      'npm run build:test && npm run preview:test -- --host 127.0.0.1 --port 4322 --ignore-lock',
+    url: 'http://127.0.0.1:4322/futsal-cup/',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },
@@ -2397,7 +2398,8 @@ export default defineConfig({
 - `tests/e2e/compatibility.spec.ts` roda um smoke de rotas, menu móvel, skip link e tabela larga em Firefox e, no CI (ou com `PLAYWRIGHT_WEBKIT=1`), em Safari desktop e iOS Safari via WebKit. Chrome/Edge usam o Chromium; a conferência visual e em dispositivos reais continua no checklist manual (Apêndice D).
 - WebKit exige bibliotecas de sistema; por isso os projetos WebKit ficam fora do `npm run verify` local por padrão e rodam no CI, onde `--with-deps` as instala. Para rodar localmente, use `PLAYWRIGHT_WEBKIT=1` após instalar as dependências.
 - `--ignore-lock` mantém o preview em primeiro plano em ambientes que detectam agentes; o Playwright encerra o processo ao final.
-- O `webServer` exige `dist/` construído; o CI roda `npm run build` antes.
+- O `webServer` do E2E constrói `dist-test/` a partir de `tests/fixtures/valida.yaml` e serve essa pasta na porta 4322. O build de produção em `dist/` permanece intacto e é o único publicado.
+- O `webServer` do E2E não depende de `dist/`; `npm run test:build` continua exigindo o build de produção.
 - axe é executado em todas as rotas principais; falhas `serious`/`critical` bloqueiam.
 
 ### 12.6 Workflow do GitHub Actions
@@ -2478,6 +2480,7 @@ jobs:
 ```
 
 - Deploy somente em `main`; sem preview de PR.
+- O E2E constrói `dist-test/` com a fixture concluída; o artefato publicado continua sendo `dist/`, gerado a partir de `data/2026/copa.yaml`.
 - Se qualquer etapa falhar, o artefato não é enviado e o site anterior permanece.
 - `actions/configure-pages` deve rodar antes do upload.
 - O job summary da validação é escrito pelo script; não é necessário um step extra.
@@ -2493,12 +2496,14 @@ jobs:
 | `npm run validate` | Valida `data/2026/copa.yaml` e imprime erros/avisos. | Antes de commit. |
 | `npm run check` | `astro check` (TypeScript + Astro). | Antes de commit/CI. |
 | `npm test` | Vitest (unitários + dados). | Antes de commit/CI. |
-| `npm run build` | Gera `dist/` estático. | Publicação local/CI. |
-| `npm run preview` | Serve `dist/` em `localhost:4321/futsal-cup/`. | Conferência local/E2E. |
-| `npm run test:build` | Varre `dist/` (rotas, JS, termos, orçamento). | Após build. |
-| `npm run test:e2e` | Playwright + axe. | Após build. |
+| `npm run build` | Gera `dist/` estático com a fonte pública. | Publicação local/CI. |
+| `npm run build:test` | Gera `dist-test/` com a fixture concluída, sem tocar em `dist/`. | E2E local/CI. |
+| `npm run preview` | Serve `dist/` em `localhost:4321/futsal-cup/`. | Conferência local. |
+| `npm run preview:test` | Serve `dist-test/` em `localhost:4322/futsal-cup/`. | E2E local. |
+| `npm run test:build` | Varre `dist/` (rotas, JS, termos, orçamento). | Após build de produção. |
+| `npm run test:e2e` | Playwright + axe sobre `dist-test/`. | Após build de teste. |
 | `npm run verify` | Sequência completa local. | Antes de PR/publicação. |
-| `npx playwright install --with-deps chromium` | Instala o navegador de teste. | Setup do E2E. |
+| `npx playwright install --with-deps chromium firefox webkit` | Instala os navegadores de teste. | Setup do E2E. |
 
 ### 12.8 Publicação e operação
 
@@ -2521,6 +2526,7 @@ jobs:
 | Variável | Uso | Obrigatória |
 |---|---|---|
 | `SOURCE_DATE_EPOCH` | Instante do build para rodapé/próximo jogo; se ausente, usa o relógio. | Não |
+| `COPA_DATA_FILE` | Fonte alternativa usada apenas pelo build de teste do E2E; o build de produção não a define. | Não |
 | `CI` | Detecta CI (Playwright/Vitest). | Não |
 | `GITHUB_STEP_SUMMARY` | Arquivo de resumo do Actions. | Fornecido pelo Actions |
 
@@ -2630,7 +2636,7 @@ Os casos abaixo são derivados do AGENTS e do PRD. A matriz completa está no Ap
 
 ### 13.3 Fixtures e factories
 
-- `tests/fixtures/valida.yaml`: temporada completa válida (pode ser a do Apêndice A).
+- `tests/fixtures/valida.yaml`: temporada completa válida (pode ser a do Apêndice A); é a fixture do build de teste do E2E, não a fonte pública.
 - `tests/fixtures/invalida-*.yaml`: casos de schema (campo desconhecido, tipo, data, enum).
 - `tests/factories/competition.ts`: `buildValidCompetition()`, `withTeam()`, `withMatch()`, `withEvent()`, `withFinalists()`, `withDrawOrder()`.
 - Testes semânticos mutam a factory e esperam o código `VAL-*` exato.
@@ -2657,7 +2663,7 @@ npm run verify
 
 - `npm run verify` não instala navegadores; rode o `npx playwright install --with-deps chromium firefox webkit` uma vez.
 - O CI executa os passos na ordem acima.
-- `npm run test:build` e `npm run test:e2e` exigem `dist/` atualizado.
+- `npm run test:build` exige `dist/` atualizado; `npm run test:e2e` constrói `dist-test/` a partir da fixture e não altera `dist/`.
 - O smoke cross-browser (`compatibility.spec.ts`) roda em `desktop-firefox` localmente e, no CI (ou com `PLAYWRIGHT_WEBKIT=1`), também em `desktop-webkit` e `mobile-webkit`; os demais testes de UI rodam nas duas viewports Chromium.
 
 ---

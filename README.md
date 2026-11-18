@@ -33,8 +33,10 @@ npm run check                       # astro check
 npm test                            # testes unitários e de dados
 npm run build                       # gera dist/
 npm run preview                     # serve dist/
+npm run build:test                  # build do E2E com a fixture concluída
+npm run preview:test                # serve dist-test/ em localhost:4322
 npm run test:build                  # varre dist/
-npm run test:e2e                    # Playwright + axe
+npm run test:e2e                    # Playwright + axe sobre dist-test/
 npm run verify                      # sequência completa
 ```
 
@@ -44,7 +46,7 @@ Na primeira execução do E2E, instale os três motores:
 npx playwright install --with-deps chromium firefox webkit
 ```
 
-O E2E roda a suíte completa em Chromium (desktop e mobile) e um smoke de compatibilidade em Firefox; no CI, o mesmo smoke roda também em WebKit (Safari desktop e iOS). Para rodar WebKit localmente, use `PLAYWRIGHT_WEBKIT=1` após instalar as dependências do sistema.
+O E2E usa a fixture de temporada concluída `tests/fixtures/valida.yaml`, constrói `dist-test/` e serve essa pasta na porta 4322. O build de produção em `dist/` não é alterado. A suíte completa roda em Chromium (desktop e mobile) e um smoke de compatibilidade em Firefox; no CI, o mesmo smoke roda também em WebKit (Safari desktop e iOS). Para rodar WebKit localmente, use `PLAYWRIGHT_WEBKIT=1` após instalar as dependências do sistema.
 
 ## Estrutura
 
@@ -69,6 +71,8 @@ O E2E roda a suíte completa em Chromium (desktop e mobile) e um smoke de compat
 ## Fonte de dados
 
 A fonte única de dados do MVP é `data/2026/copa.yaml`: edição, times, elencos, partidas, eventos, finalistas, `drawOrder`, amistoso e avisos. O site não terá dados duplicados no HTML e não permitirá edição pelo navegador.
+
+A fonte pública está no estado pré-competição: nomes dos times, elencos, horários, local e amistoso ainda serão confirmados pela organização. Não há resultados fictícios publicados. A temporada concluída usada pelos testes fica em `tests/fixtures/valida.yaml` e não vai para o build de produção.
 
 Antes de publicar, rode:
 

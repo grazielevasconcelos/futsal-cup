@@ -99,9 +99,11 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 
 ## 8. Antes da primeira partida
 
-- [ ] `data/2026/copa.yaml` com times, elencos e calendário reais.
+- [x] `data/2026/copa.yaml` válido no estado pré-competição, com as 7 partidas agendadas e sem resultados fictícios.
+- [ ] Times, elencos e calendário reais definidos pela organização.
 - [ ] Horários, nomes dos times e local definidos pela organização.
-- [ ] Amistoso definido ou `friendly: null`.
-- [ ] `npm run validate` sem erros; avisos revisados.
+- [x] Amistoso definido ou `friendly: null`.
+- [x] `npm run validate` sem erros; avisos de elenco vazio revisados.
+- [x] E2E isolado em `dist-test/` com a fixture concluída; build de produção sem dados de exemplo.
 - [x] Site publicado e acessível antes de 24/11/2026.
 - [ ] Checklist manual do Apêndice D assinado (leitor de tela, Safari/Firefox/Edge e Lighthouse).

@@ -73,6 +73,13 @@ Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal 
 - Adicionar checagem de links internos e de `javascript:` no `scripts/check-build.ts`.
 - Critério: CI passa nos três motores (Chromium, Firefox e WebKit); link interno quebrado falha o build; a conferência manual de navegadores fica restrita a dispositivos e inspeção visual.
 
+### Fatia 8 — Fonte pública pré-competição
+
+- Substituir o fixture de temporada encerrada em `data/2026/copa.yaml` por uma fonte pré-competição: 3 times provisórios, elencos vazios, 7 partidas `scheduled`, sem eventos, W.O., shootout, finalistas, sorteio ou amistoso.
+- Preservar a temporada concluída em `tests/fixtures/valida.yaml` e usá-la nos testes de domínio, componentes e no build de teste do E2E.
+- Separar `dist/` (produção) de `dist-test/` (E2E), sem publicar dados de exemplo.
+- Critério: `npm run validate` sem erros e com avisos de elenco; `npm run verify` passa; a fonte pública não contém resultados nem elencos fictícios; o build de produção continua sem JS de cliente.
+
 ## Marcos
 
 | Data | Marco |

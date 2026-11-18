@@ -237,6 +237,7 @@ O catálogo completo de códigos `VAL-*` e `VAL-W*` está na `SPEC.md` §8.
 - Derive classificação e estatísticas sempre a partir dos eventos; nunca as armazene como verdade editável.
 - `buildTeamStats` agrega grupo + final; V/E/D usam o tempo normal, uma final decidida nos pênaltis conta como empate e a campanha nos pênaltis é registrada separadamente (`shootoutWins`/`shootoutLosses`); o shootout não altera GP/GC/SG; o amistoso não entra.
 - A fonte de dados deve ser legível por humanos e ter formato validado antes do build.
+- O build de produção usa somente `data/2026/copa.yaml`; fixtures em `tests/fixtures/` alimentam apenas testes e o `dist-test/` do E2E, nunca o `dist/` publicado.
 - Evite dependências desnecessárias; o site precisa carregar rápido em 4G.
 - Preserve a estrutura preparada para edições futuras, mas exiba apenas 2026.
 - Aplique os tokens de design antes dos estilos de componentes; não codifique cores, tamanhos, espaçamentos ou sombras diretamente.
@@ -318,9 +319,11 @@ Comandos definidos na `SPEC.md` §12.7. Use apenas comandos reais e verificávei
 | `npm run validate` | Valida `data/2026/copa.yaml` e imprime erros/avisos. | Antes de commit. |
 | `npm run check` | `astro check` (TypeScript + Astro). | Antes de commit/CI. |
 | `npm test` | Vitest (unitários + dados). | Antes de commit/CI. |
-| `npm run build` | Gera `dist/` estático. | Publicação local/CI. |
-| `npm run preview` | Serve `dist/` em `localhost:4321/futsal-cup/`. | Conferência local/E2E. |
-| `npm run test:build` | Varre `dist/` (rotas, JS, termos, orçamento). | Após build. |
-| `npm run test:e2e` | Playwright + axe. | Após build. |
+| `npm run build` | Gera `dist/` estático com a fonte pública. | Publicação local/CI. |
+| `npm run build:test` | Gera `dist-test/` com a fixture concluída, sem tocar em `dist/`. | E2E local/CI. |
+| `npm run preview` | Serve `dist/` em `localhost:4321/futsal-cup/`. | Conferência local. |
+| `npm run preview:test` | Serve `dist-test/` em `localhost:4322/futsal-cup/`. | E2E local. |
+| `npm run test:build` | Varre `dist/` (rotas, JS, termos, orçamento). | Após build de produção. |
+| `npm run test:e2e` | Playwright + axe sobre `dist-test/`. | Após build de teste. |
 | `npm run verify` | Sequência completa local. | Antes de PR/publicação. |
-| `npx playwright install --with-deps chromium` | Instala o navegador de teste. | Setup do E2E. |
+| `npx playwright install --with-deps chromium firefox webkit` | Instala os navegadores de teste. | Setup do E2E. |
