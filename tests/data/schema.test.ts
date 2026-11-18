@@ -36,10 +36,11 @@ describe('pipeline de dados', () => {
     expect(result.competition?.matches).toHaveLength(7);
   });
 
-  it('aceita a fonte real da edição 2026', () => {
+  it('aceita a fonte pública da edição 2026', () => {
     const result = loadCompetitionResult('data/2026/copa.yaml');
     expect(result.errors).toEqual([]);
-    expect(result.competition?.friendly).not.toBeNull();
+    expect(result.competition?.teams).toHaveLength(3);
+    expect(result.competition?.matches).toHaveLength(7);
   });
 
   it('congela a competição validada', () => {

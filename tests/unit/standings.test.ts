@@ -320,7 +320,7 @@ describe('classificação e desempate', () => {
   });
 
   it('TST-016: mantém a final e seus cartões fora da classificação', () => {
-    const competition = loadCompetition('data/2026/copa.yaml');
+    const competition = loadCompetition('tests/fixtures/valida.yaml');
     const rows = buildStandings(competition);
 
     expect(rows.map((item) => item.teamId)).toEqual(['tc', 'ta', 'tb']);

@@ -48,22 +48,22 @@ function withReversedEvents(competition: Competition): Competition {
 
 describe('determinismo e pureza do domínio', () => {
   it('TST-091: duas execuções produzem classificação, estatísticas e pódio idênticos', () => {
-    const first = loadCompetition('data/2026/copa.yaml');
-    const second = loadCompetition('data/2026/copa.yaml');
+    const first = loadCompetition('tests/fixtures/valida.yaml');
+    const second = loadCompetition('tests/fixtures/valida.yaml');
 
     expect(snapshot(second)).toEqual(snapshot(first));
     expect(scheduleSnapshot(second)).toEqual(scheduleSnapshot(first));
   });
 
   it('TST-092: a ordem dos eventos não altera classificação nem estatísticas', () => {
-    const competition = loadCompetition('data/2026/copa.yaml');
+    const competition = loadCompetition('tests/fixtures/valida.yaml');
     const shuffled = withReversedEvents(competition);
 
     expect(snapshot(shuffled)).toEqual(snapshot(competition));
   });
 
   it('TST-093: os construtores não mutam a competição congelada', () => {
-    const frozen = deepFreeze(loadCompetition('data/2026/copa.yaml'));
+    const frozen = deepFreeze(loadCompetition('tests/fixtures/valida.yaml'));
 
     expect(() => snapshot(frozen)).not.toThrow();
     expect(() => scheduleSnapshot(frozen)).not.toThrow();

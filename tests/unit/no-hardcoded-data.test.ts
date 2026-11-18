@@ -14,7 +14,7 @@ function sourceFiles(directory: string): string[] {
 
 describe('fonte única de dados', () => {
   it('TST-089: nomes de times e apelidos não estão hardcoded em src/', () => {
-    const competition = loadCompetition('data/2026/copa.yaml');
+    const competition = loadCompetition('tests/fixtures/valida.yaml');
     const names = competition.teams.flatMap((team) => [
       team.name,
       ...team.players.map((player) => player.nickname),

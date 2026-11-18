@@ -114,7 +114,7 @@ describe('estado da Início', () => {
 
   it('TST-069: identifica o estado após a final', () => {
     expect(
-      getHomeState(loadCompetition('data/2026/copa.yaml'), new Date('2026-12-04T12:00:00-03:00')),
+      getHomeState(loadCompetition('tests/fixtures/valida.yaml'), new Date('2026-12-04T12:00:00-03:00')),
     ).toBe('afterFinal');
   });
 });
@@ -229,7 +229,7 @@ describe('próximo jogo e resultados', () => {
 
   it('usa a final como último resultado quando ela termina', () => {
     expect(
-      getLastResults(loadCompetition('data/2026/copa.yaml')).map((match) => match.id),
+      getLastResults(loadCompetition('tests/fixtures/valida.yaml')).map((match) => match.id),
     ).toEqual(['final']);
   });
 });

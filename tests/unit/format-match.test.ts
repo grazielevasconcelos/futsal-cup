@@ -106,7 +106,7 @@ describe('formatScore', () => {
   });
 
   it('formata o W.O. e o shootout da fonte real', () => {
-    const competition = loadCompetition('data/2026/copa.yaml');
+    const competition = loadCompetition('tests/fixtures/valida.yaml');
     const teams = playerTeams(competition);
     const walkover = competition.matches.find((match) => match.id === 'g2') as Match;
     const final = competition.matches.find((match) => match.id === 'final') as Match;

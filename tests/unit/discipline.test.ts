@@ -132,7 +132,7 @@ describe('suspensões', () => {
   });
 
   it('TST-112: aplica a suspensão na segunda partida do mesmo dia', () => {
-    const competition = loadCompetition('data/2026/copa.yaml');
+    const competition = loadCompetition('tests/fixtures/valida.yaml');
 
     const changed = makeCompetition({
       teams: competition.teams,

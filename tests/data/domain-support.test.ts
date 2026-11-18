@@ -7,7 +7,7 @@ import { deriveScore } from '../../src/lib/domain/score';
 import { rankTeams } from '../../src/lib/domain/standings';
 
 describe('apoio de domínio usado pela validação', () => {
-  const competition = loadCompetition('data/2026/copa.yaml');
+  const competition = loadCompetition('tests/fixtures/valida.yaml');
 
   it('ordena a classificação do fixture conforme o Apêndice A', () => {
     const ranking = rankTeams(competition);

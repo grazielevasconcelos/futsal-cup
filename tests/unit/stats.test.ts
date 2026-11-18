@@ -31,7 +31,7 @@ function teamStat(stats: readonly TeamStats[], teamId: TeamId): TeamStats {
   return found;
 }
 
-const competition = loadCompetition('data/2026/copa.yaml');
+const competition = loadCompetition('tests/fixtures/valida.yaml');
 const teams = buildTeamMap(competition);
 const playerStats = buildPlayerStats(competition);
 const teamStats = buildTeamStats(competition);
