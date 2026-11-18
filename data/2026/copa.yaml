@@ -3,8 +3,10 @@
 # O mapeamento p-XXX -> pessoa fica FORA do repositório.
 # Não inclua nome completo, foto, contato, camisa ou data de nascimento.
 #
-# Estado atual: pré-competição. Nomes dos times, elencos, horários e local
-# ainda serão confirmados pela organização. Não registre resultados fictícios.
+# Estado atual: pré-competição. Elencos definidos em 17/11/2026 com nomes de
+# times provisórios (Time A/B/C); horários e local ainda serão confirmados pela
+# organização. Vi é a única goleira; as demais jogadoras atuam na linha.
+# Não registre resultados fictícios.
 
 edition: 2026
 timezone: "America/Sao_Paulo"
@@ -13,17 +15,137 @@ teams:
   - id: "ta"
     name: "Time A" # provisório até a organização confirmar o nome público
     abbreviation: "TA"
-    players: []
+    players:
+      - id: "p-001"
+        nickname: "Aline"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-002"
+        nickname: "Carol Arana"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-003"
+        nickname: "Gisele"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-004"
+        nickname: "Grazi"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-005"
+        nickname: "Isa"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-006"
+        nickname: "Paulinha"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-007"
+        nickname: "Renatinha"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-008"
+        nickname: "Ste"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
 
   - id: "tb"
     name: "Time B" # provisório até a organização confirmar o nome público
     abbreviation: "TB"
-    players: []
+    players:
+      - id: "p-009"
+        nickname: "Ani"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-010"
+        nickname: "Debora"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-011"
+        nickname: "Erica"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-012"
+        nickname: "Helo"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-013"
+        nickname: "Meimei"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-014"
+        nickname: "Regiane"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-015"
+        nickname: "Tchula"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-016"
+        nickname: "Thais"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
 
   - id: "tc"
     name: "Time C" # provisório até a organização confirmar o nome público
     abbreviation: "TC"
-    players: []
+    players:
+      - id: "p-017"
+        nickname: "Camila Arana"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-018"
+        nickname: "Edna"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-019"
+        nickname: "Livia"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-020"
+        nickname: "Luiza"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-021"
+        nickname: "Maria Clara"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-022"
+        nickname: "Pati"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-023"
+        nickname: "Raquel"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
+      - id: "p-024"
+        nickname: "Vi"
+        position: "goleira"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
 
 matches:
   - id: "g1"
