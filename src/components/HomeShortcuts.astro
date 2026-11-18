@@ -1,0 +1,23 @@
+---
+import type { Team } from '../lib/domain/types';
+import { withBase } from '../lib/site';
+
+interface Props {
+  teams: readonly Team[];
+}
+
+const { teams } = Astro.props;
+---
+
+<ul class="shortcut-list">
+  <li><a href={withBase('/jogos/')}>Jogos</a></li>
+  <li><a href={withBase('/times/')}>Times</a></li>
+  <li><a href={withBase('/classificacao/')}>Classificação</a></li>
+  {
+    teams.map((team) => (
+      <li>
+        <a href={withBase(`/times/${team.id}/`)}>{team.name}</a>
+      </li>
+    ))
+  }
+</ul>

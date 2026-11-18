@@ -39,9 +39,9 @@ test.describe('compatibilidade entre navegadores', () => {
 
     await page.keyboard.press('Enter');
     await expect(menu).toHaveAttribute('open', '');
-    await expect(
-      page.getByRole('navigation', { name: 'Principal (menu móvel)' }).getByRole('link'),
-    ).toHaveCount(6);
+    const mobileNav = page.getByRole('navigation', { name: 'Principal (menu móvel)' });
+    await expect(mobileNav.getByRole('link')).toHaveCount(9);
+    await expect(mobileNav.locator('.nav-submenu').getByRole('link')).toHaveCount(3);
 
     await page.keyboard.press('Space');
     await expect(menu).not.toHaveAttribute('open', '');

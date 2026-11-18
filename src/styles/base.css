@@ -159,6 +159,27 @@ a:hover {
   font-weight: var(--font-weight-bold);
 }
 
+.nav-list__item {
+  position: relative;
+}
+
+.nav-list a.nav-list__link--section {
+  border-bottom-color: var(--color-accent);
+  font-weight: var(--font-weight-semibold);
+}
+
+.nav-submenu {
+  margin: 0;
+  padding: 0 0 0 var(--space-2);
+  list-style: none;
+}
+
+.nav-submenu a {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 0 0 0 var(--space-1);
+}
+
 .menu-mobile {
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-small);
@@ -283,6 +304,29 @@ a:hover {
 @media (min-width: 48em) {
   .primary-nav {
     display: block;
+  }
+
+  .nav-submenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: var(--z-nav-submenu);
+    display: none;
+    min-width: 100%;
+    padding: var(--space-1) 0;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-small);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-floating);
+  }
+
+  .nav-list__item--has-submenu:hover > .nav-submenu,
+  .nav-list__item--has-submenu:focus-within > .nav-submenu {
+    display: block;
+  }
+
+  .nav-submenu a {
+    padding: 0 var(--space-2);
   }
 
   .menu-mobile {

@@ -1,13 +1,16 @@
 ---
 import NavList from './NavList.astro';
+import type { Team, TeamId } from '../lib/domain/types';
 import { SITE_NAME, withBase } from '../lib/site';
 import type { NavKey } from '../lib/site';
 
 interface Props {
   activeNav?: NavKey | undefined;
+  activeTeamId?: TeamId | null | undefined;
+  teams: readonly Team[];
 }
 
-const { activeNav } = Astro.props;
+const { activeNav, activeTeamId = null, teams } = Astro.props;
 ---
 
 <header class="site-header">
@@ -15,13 +18,13 @@ const { activeNav } = Astro.props;
     <a class="site-title" href={withBase('/')}>{SITE_NAME}</a>
 
     <nav class="primary-nav" aria-label="Principal">
-      <NavList activeNav={activeNav} />
+      <NavList activeNav={activeNav} activeTeamId={activeTeamId} teams={teams} />
     </nav>
 
     <details class="menu-mobile">
       <summary>Menu</summary>
       <nav aria-label="Principal (menu móvel)">
-        <NavList activeNav={activeNav} />
+        <NavList activeNav={activeNav} activeTeamId={activeTeamId} teams={teams} />
       </nav>
     </details>
   </div>

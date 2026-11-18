@@ -34,6 +34,34 @@
   line-height: var(--text-small-line);
 }
 
+.shortcut-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shortcut-list li {
+  min-width: 0;
+}
+
+.shortcut-list a {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  min-height: var(--tap-target);
+  padding: 0 var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-pill);
+  overflow-wrap: anywhere;
+}
+
+.shortcut-list a:hover {
+  border-color: var(--color-accent-strong);
+}
+
 .badge-list {
   display: flex;
   flex-wrap: wrap;

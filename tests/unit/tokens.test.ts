@@ -101,6 +101,7 @@ const requiredTokens = [
   '--underline-width-hover',
   '--underline-offset',
   '--z-skip-link',
+  '--z-nav-submenu',
   '--gradient-accent',
 ] as const;
 

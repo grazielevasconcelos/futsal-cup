@@ -2,6 +2,7 @@
 import NoticeBanner from '../components/NoticeBanner.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SiteHeader from '../components/SiteHeader.astro';
+import { loadCompetition } from '../lib/data/load';
 import type { Notice } from '../lib/domain/types';
 import { SITE_NAME, withBase } from '../lib/site';
 import type { NavKey } from '../lib/site';
@@ -18,6 +19,10 @@ interface Props {
 }
 
 const { title, description, activeNav, noindex = false, notices = [] } = Astro.props;
+
+const teams = loadCompetition().teams;
+const activeTeamId =
+  teams.find((team) => Astro.url.pathname === withBase(`/times/${team.id}/`))?.id ?? null;
 
 const pageTitle = !title || title === SITE_NAME ? SITE_NAME : `${title} — ${SITE_NAME}`;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
@@ -49,7 +54,7 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
   </head>
   <body>
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
-    <SiteHeader activeNav={activeNav} />
+    <SiteHeader activeNav={activeNav} activeTeamId={activeTeamId} teams={teams} />
     <NoticeBanner notices={notices} />
     <main id="conteudo" tabindex="-1">
       <slot />

@@ -278,6 +278,8 @@ O build **NÃO DEVE** consultar APIs, bancos, arquivos de outras edições ou o 
 ├── src/
 │   ├── components/
 │   │   ├── SiteHeader.astro
+│   │   ├── NavList.astro
+│   │   ├── HomeShortcuts.astro
 │   │   ├── SiteFooter.astro
 │   │   ├── NoticeBanner.astro
 │   │   ├── MatchCard.astro
@@ -1774,8 +1776,10 @@ Cada página **DEVE**:
 
 | Componente | Props principais | Obrigações |
 |---|---|---|
-| `BaseLayout.astro` | `title`, `description`, `canonicalPath`, `activeNav`, `noindex?` | `<html lang="pt-BR">`, skip link, header, nav, `<main id="conteudo">`, footer, notices, meta tags. |
-| `SiteHeader.astro` | `activeNav` | Nome público, nav desktop, `<details>` “Menu” no mobile, `aria-current="page"`. |
+| `BaseLayout.astro` | `title`, `description`, `canonicalPath`, `activeNav`, `noindex?` | `<html lang="pt-BR">`, skip link, header, nav, `<main id="conteudo">`, footer, notices, meta tags. Carrega os times da fonte oficial e repassa ao cabeçalho. |
+| `SiteHeader.astro` | `activeNav`, `activeTeamId?`, `teams` | Nome público, nav desktop, `<details>` “Menu” no mobile, submenu de Times, `aria-current="page"`. |
+| `NavList.astro` | `activeNav`, `activeTeamId?`, `teams` | Seis seções; submenu de Times com um link por time vindo dos dados; `aria-current` único. |
+| `HomeShortcuts.astro` | `teams` | Atalhos para Jogos, Times e Classificação, mais os três times com links diretos. |
 | `SiteFooter.astro` | `buildTimestamp` | Nome público, “Atualizado em … (horário de Brasília)”, sem instituição/Airbnb/analytics. |
 | `NoticeBanner.astro` | `notices` | `<aside aria-labelledby="avisos-title">`, lista com `<time>`, nada só por cor. |
 | `MatchCard.astro` | `match`, `competition`, `now`, `showStage?` | Times, fase, data, horário/local com fallback, status textual, placar/W.O./shootout, link para detalhe. Nunca é usado para o amistoso. |
@@ -1855,10 +1859,10 @@ Ordem do documento:
 <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
 <header>
   <a href="/futsal-cup/">Copa de Futsal Feminino Vila Mariana 2026</a>
-  <nav aria-label="Principal"> ... 6 links ... </nav>          // desktop
+  <nav aria-label="Principal"> ... 6 seções + submenu de Times ... </nav>   // desktop
   <details class="menu-mobile">
     <summary>Menu</summary>
-    <nav aria-label="Principal (menu móvel)"> ... 6 links ... </nav>
+    <nav aria-label="Principal (menu móvel)"> ... 6 seções + 3 times ... </nav>
   </details>
 </header>
 <aside aria-labelledby="avisos-title"> ... notices, se houver ... </aside>
@@ -1867,7 +1871,10 @@ Ordem do documento:
 ```
 
 - Nav: Início, Jogos, Classificação, Times, Estatísticas, Fase final. Sem Regulamento.
-- `aria-current="page"` no link ativo, com indicador visual que não depende só de cor (sublinhado + peso).
+- Times tem um submenu com um link por time, gerado a partir de `competition.teams`: href `/times/{id}/` e nome público vindos da fonte oficial, sem IDs ou nomes fixos no HTML.
+- No desktop, o submenu abre com `:hover` e `:focus-within`, sem JavaScript, posicionado sobre o conteúdo com `--shadow-floating` e `--z-nav-submenu`; fecha quando o ponteiro sai ou o foco tabula para fora.
+- No mobile, ao abrir `<details>` “Menu”, os três links de times ficam sempre visíveis como lista indentada, sem um segundo toque.
+- `aria-current="page"` no link ativo, uma única vez por navegação, com indicador visual que não depende só de cor (sublinhado + peso). Em `/times/`, marca Times; em `/times/{id}/`, marca o time no submenu e mantém Times destacado como seção, sem segundo `aria-current`.
 - O `<summary>` “Menu” é focável, tem alvo mínimo de 44×44px e funciona com Enter/Espaço nativamente.
 - No desktop (`min-width: 768px`), o menu mobile fica oculto e a nav desktop visível; no mobile, o contrário. Apenas uma nav é exibida por vez.
 - Não há JS para abrir/fechar o menu; `<details>` nativo resolve.
@@ -1885,7 +1892,7 @@ Condição: `hoje < primeira data do grupo` e nenhuma partida de grupo `finished
 
 - Nome público em `<h1>` curto.
 - “Primeira rodada — {data da primeira rodada}” com os dois jogos do dia, sem data fixa no componente.
-- Atalhos para Jogos, Times e Classificação.
+- Atalhos para Jogos, Times e Classificação, mais os três times com links diretos para `/times/{id}/`, gerados a partir dos dados.
 - Classificação zerada com as 3 linhas e “Classificação provisória — nenhuma partida encerrada”.
 - Sem “últimos resultados”; sem artilheira/líder de assistências; sem dados inventados.
 - Sem contagem regressiva.
@@ -2106,11 +2113,12 @@ A referência `airbnb-design-tokens.css` é interna e indicativa. Para evitar pu
 | `--radius-pill` | `--radius-pill` | `9999px` | Badges. |
 | `--shadow-card` | `--shadow-card` | `0 6px 16px rgba(0,0,0,0.12)` | Cards. |
 | `--shadow-floating` | `--shadow-floating` | `0 3px 12px rgba(0,0,0,0.15)` | Menu sobreposto. |
+| `--z-nav-submenu` | — | `5` | Sobreposição do submenu de Times no desktop. |
 | `--motion-default` | `--motion-default` | `250ms cubic-bezier(0.2,0,0,1)` | Transições discretas. |
 
 A referência agrupa tamanho e entrelinha no mesmo token; o projeto separa cada par em `*-size` e `*-line` para uso direto em `font-size`/`line-height`.
 
-Tokens técnicos adicionais (também em `tokens.css`): `--page-gutter`, `--content-max`, `--measure`, `--tap-target`, `--border-width`, `--focus-width`, `--focus-offset`, `--table-min-width`, `--gradient-accent`.
+Tokens técnicos adicionais (também em `tokens.css`): `--page-gutter`, `--content-max`, `--measure`, `--tap-target`, `--border-width`, `--focus-width`, `--focus-offset`, `--table-min-width`, `--z-nav-submenu`, `--gradient-accent`.
 
 - Componentes **NÃO DEVEM** conter hexadecimais, `rgb()`, `hsl()`, sombras ou medidas avulsas; devem consumir tokens.
 - `--color-border` é decorativa; não pode ser a única indicação de foco, erro ou estado.
@@ -2188,7 +2196,7 @@ Pares calculados com luminância relativa WCAG:
 - Meta: WCAG 2.2 AA.
 - Estrutura: `header`, `nav`, `main`, `footer`, `aside` para avisos; um `<h1>` por página; hierarquia sem saltos.
 - Skip link visível ao foco; `<main id="conteudo" tabindex="-1">`.
-- `aria-current="page"` no link ativo.
+- `aria-current="page"` no link ativo, uma única vez por navegação; no detalhe do time, o submenu marca o time e a seção Times permanece destacada.
 - Tabelas: `<caption>`, `<th scope="col">`, `<th scope="row">`, `<abbr title>`, sem tabela de layout.
 - Contêiner de rolagem: `role="region"`, `aria-labelledby`, `tabindex="0"`, instrução textual; foco visível.
 - Placar de pênaltis com texto acessível completo, não apenas “1 (4) x (3) 1”.
@@ -3734,8 +3742,8 @@ Os IDs `TST-*` são estáveis. Casos removidos na v1.1 (por exemplo, disputa de 
 | TST-108 | FR-21 | Amistoso fora do competitivo | `friendly` presente | Ausente da Início, jogos, classificação, estatísticas e pódio | U/E |
 | TST-113 | FR-07 | Pódio de 3 | Final finished | Campeã, vice e 3ª; sem 4º lugar | U/E |
 | TST-114 | FR-21 | Sem amistoso | `friendly: null` | Nenhum card ou placeholder | E |
-| TST-079 | FR-10 | Sem Regulamento | Nav/rotas | 6 links; `/regulamento/` 404 | E/B |
-| TST-080 | FR-11 | Menu mobile | 320px | `<details>` “Menu” por teclado | E |
+| TST-079 | FR-10 | Sem Regulamento | Nav/rotas | 6 seções + 3 links de times no submenu; `/regulamento/` 404 | E/B |
+| TST-080 | FR-11 | Menu mobile | 320px | `<details>` “Menu” por teclado; 3 links de times visíveis ao abrir | E |
 | TST-081 | FR-19 | 404 | URL inexistente | 404.html + link Início | E/B |
 | TST-082 | FR-19 | Meta/OG | Todas as rotas | title/description/canonical/OG; sem og:image | E/B |
 | TST-083 | FR-12 | Rotas geradas | `dist/` | Todas as rotas e 404 | B |
@@ -4024,7 +4032,7 @@ ADRs registram decisões de arquitetura e o porquê. O status de cada uma é **A
 
 - **Contexto:** o briefing marca FR-10 como ADIADO e FR-20 como FUTURO; não há conteúdo de regulamento nem de histórico nesta entrega.
 - **Decisão:** não criar rota, link, item de navegação, página ou placeholder de Regulamento; não implementar histórico de alterações. O 404 cobre eventual URL antiga.
-- **Consequências:** a navegação tem 6 links; `/regulamento/` não existe; PRD/AGENTS alinhados na v1.1; não há promessa pública de conteúdo futuro.
+- **Consequências:** a navegação tem 6 seções, com um submenu de Times alimentado pela fonte de dados; `/regulamento/` não existe; PRD/AGENTS alinhados na v1.1; não há promessa pública de conteúdo futuro.
 - **Alternativas rejeitadas:** página “em breve” (placeholder e escopo), link para PDF externo (não especificado), item oculto no rodapé (ainda é promessa).
 - **Rastreabilidade:** §2.4, §10.1; SPEC-011, SPEC-012, TST-079.
 

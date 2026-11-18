@@ -69,6 +69,7 @@
   --underline-width-hover: 3px;
   --underline-offset: 0.16em;
   --z-skip-link: 10;
+  --z-nav-submenu: 5;
   --gradient-accent: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-strong) 100%);
 }
 

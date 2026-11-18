@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import EmptyState from '../components/EmptyState.astro';
+import HomeShortcuts from '../components/HomeShortcuts.astro';
 import MatchCard from '../components/MatchCard.astro';
 import PodiumList from '../components/PodiumList.astro';
 import StandingsTable from '../components/StandingsTable.astro';
@@ -121,11 +122,7 @@ const standingsCaption =
 
           <section class="section" aria-labelledby="atalhos">
             <h2 id="atalhos">Atalhos</h2>
-            <ul>
-              <li><a href={withBase('/jogos/')}>Jogos</a></li>
-              <li><a href={withBase('/times/')}>Times</a></li>
-              <li><a href={withBase('/classificacao/')}>Classificação</a></li>
-            </ul>
+            <HomeShortcuts teams={competition.teams} />
           </section>
 
           <section class="section" aria-labelledby="classificacao">

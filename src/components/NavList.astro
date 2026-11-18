@@ -1,25 +1,54 @@
 ---
-import { NAV_ITEMS } from '../lib/site';
+import type { Team, TeamId } from '../lib/domain/types';
+import { NAV_ITEMS, withBase } from '../lib/site';
 import type { NavKey } from '../lib/site';
 
 interface Props {
   activeNav?: NavKey | undefined;
+  activeTeamId?: TeamId | null | undefined;
+  teams: readonly Team[];
 }
 
-const { activeNav } = Astro.props;
+const { activeNav, activeTeamId = null, teams } = Astro.props;
 ---
 
 <ul class="nav-list">
   {
-    NAV_ITEMS.map((item) => (
-      <li>
-        <a
-          href={item.href}
-          aria-current={activeNav === item.key ? 'page' : undefined}
+    NAV_ITEMS.map((item) => {
+      const hasSubmenu = item.key === 'times' && teams.length > 0;
+      const isActiveSection = activeNav === item.key;
+      const isCurrent = isActiveSection && !(hasSubmenu && activeTeamId !== null);
+
+      return (
+        <li
+          class:list={[
+            'nav-list__item',
+            { 'nav-list__item--has-submenu': hasSubmenu },
+          ]}
         >
-          {item.label}
-        </a>
-      </li>
-    ))
+          <a
+            href={item.href}
+            class={isActiveSection && !isCurrent ? 'nav-list__link--section' : undefined}
+            aria-current={isCurrent ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+          {hasSubmenu && (
+            <ul class="nav-submenu">
+              {teams.map((team) => (
+                <li>
+                  <a
+                    href={withBase(`/times/${team.id}/`)}
+                    aria-current={activeTeamId === team.id ? 'page' : undefined}
+                  >
+                    {team.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      );
+    })
   }
 </ul>
