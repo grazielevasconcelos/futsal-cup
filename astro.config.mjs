@@ -7,7 +7,7 @@ function dataValidation() {
     name: 'copa-data-validation',
     hooks: {
       'astro:build:start': () => {
-        loadCompetition('data/2026/copa.yaml');
+        loadCompetition();
       },
     },
   };

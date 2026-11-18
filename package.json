@@ -8,7 +8,9 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "build:test": "COPA_DATA_FILE=tests/fixtures/valida.yaml astro build --config astro.config.test.mjs",
     "preview": "astro preview",
+    "preview:test": "astro preview --config astro.config.test.mjs",
     "validate": "tsx scripts/validate-data.ts",
     "check": "astro check",
     "test": "vitest run",

@@ -51,7 +51,7 @@ test.describe('qualidade e acessibilidade', () => {
         return;
       }
 
-      if (new URL(url).origin !== 'http://127.0.0.1:4321') {
+      if (new URL(url).origin !== 'http://127.0.0.1:4322') {
         externalRequests.push(url);
       }
     });

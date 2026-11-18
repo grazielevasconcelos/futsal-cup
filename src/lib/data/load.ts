@@ -13,6 +13,12 @@ import { competitionSchema } from './schema';
 import { mapSchemaIssues } from './schema-issues';
 import { validateSemantics } from './validate';
 
+export const PRODUCTION_DATA_FILE = 'data/2026/copa.yaml';
+
+export function defaultDataFile(): string {
+  return process.env.COPA_DATA_FILE ?? PRODUCTION_DATA_FILE;
+}
+
 export interface ValidationOptions {
   readonly now?: Date;
   readonly source?: string;
@@ -100,7 +106,7 @@ export function parseCompetition(
 }
 
 export function loadCompetition(
-  filePath = 'data/2026/copa.yaml',
+  filePath = defaultDataFile(),
   options: Omit<ValidationOptions, 'source'> = {},
 ): Competition {
   const rawText = readFileSync(filePath, 'utf8');
@@ -108,7 +114,7 @@ export function loadCompetition(
 }
 
 export function loadCompetitionResult(
-  filePath = 'data/2026/copa.yaml',
+  filePath = defaultDataFile(),
   options: Omit<ValidationOptions, 'source'> = {},
 ): ValidationResult {
   const rawText = readFileSync(filePath, 'utf8');
