@@ -1,3 +1,5 @@
+> **Registro histórico:** este é o contexto original da organização e foi mantido apenas como histórico. Ele menciona 4 times e uma fase mata-mata com 3º x 4º, o que **não** corresponde ao formato vigente. Prevalecem o `PRD.md` v2.0, a `SPEC.md` v2.0 e o `AGENTS.md` v2.0: 3 times, 6 jogos de grupo, semifinal 2º x 3º, final 1º x vencedora da semifinal, vantagem do empate, 3ª colocada como perdedora da semifinal e nenhum amistoso ou disputa de pênaltis.
+
 ## Objetivo
 
 O curso de futsal feminino do Sesc Vila Mariana irá organizar a Copa de futsal entre as jogadoras que frequentam a turma. Todos os anos ao final do ano a competição ocorre, esta é a edição do ano de 2026.

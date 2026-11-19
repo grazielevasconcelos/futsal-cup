@@ -2,7 +2,7 @@
 
 Site público, estático e somente leitura da Copa de Futsal Feminino Vila Mariana 2026.
 
-A edição de 2026 tem **3 times**, **6 partidas na fase classificatória em turno e returno** e **1 final**, totalizando **7 partidas oficiais**. No dia da final, a organização realiza um **amistoso do 3º colocado**, exibido apenas como card informativo e sem efeito competitivo.
+A edição de 2026 tem **3 times**, **6 partidas na fase classificatória em turno e returno**, **1 semifinal** e **1 final**, totalizando **8 partidas oficiais**. A semifinal é **2º x 3º**, com **vantagem do empate para o 2º**; a final é **1º x vencedora da semifinal**, com **vantagem do empate para o 1º**. A **3ª colocada é a perdedora da semifinal**; não há disputa de 3º lugar, 4º lugar, amistoso, prorrogação, pênaltis ou shootout.
 
 - **Site:** https://grazielevasconcelos.github.io/futsal-cup/
 - **Publicação:** GitHub Pages
@@ -70,9 +70,9 @@ O E2E usa a fixture de temporada concluída `tests/fixtures/valida.yaml`, constr
 
 ## Fonte de dados
 
-A fonte única de dados do MVP é `data/2026/copa.yaml`: edição, times, elencos, partidas, eventos, finalistas, `drawOrder`, amistoso e avisos. O site não terá dados duplicados no HTML e não permitirá edição pelo navegador.
+A fonte única de dados do MVP é `data/2026/copa.yaml`: edição, times, elencos, partidas (`g1`…`g6`, `semi`, `final`), eventos, `semifinalists`, `finalists`, `drawOrder` e avisos. O site não terá dados duplicados no HTML e não permitirá edição pelo navegador.
 
-A fonte pública está no estado pré-competição: nomes dos times, elencos, horários, local e amistoso ainda serão confirmados pela organização. Não há resultados fictícios publicados. A temporada concluída usada pelos testes fica em `tests/fixtures/valida.yaml` e não vai para o build de produção.
+A fonte pública está no estado pré-competição: nomes dos times, elencos, horários e local ainda serão confirmados pela organização. Não há resultados fictícios publicados. A temporada concluída usada pelos testes fica em `tests/fixtures/valida.yaml` e não vai para o build de produção.
 
 Antes de publicar, rode:
 
@@ -80,7 +80,7 @@ Antes de publicar, rode:
 npm run validate
 ```
 
-A validação bloqueia a publicação quando há erro de schema, confronto inválido, jogadora inelegível, evento de suspensa, W.O. ou shootout inválido, amistoso inválido, campo de privacidade ou divergência de finalistas.
+A validação bloqueia a publicação quando há erro de schema, confronto inválido, jogadora inelegível, evento de suspensa, W.O. inválido, campo de privacidade ou divergência de `semifinalists`/`finalists`. Campos antigos `friendly` e `shootout` geram erro de migração.
 
 ## Publicação
 
@@ -113,6 +113,7 @@ O CI valida e republica a versão anterior. Não é necessário mexer no ambient
 | [`AGENTS.md`](AGENTS.md) | Restrições do repositório, design, acessibilidade e testes. |
 | [`PLAN.md`](PLAN.md) | Plano de execução por fatias. |
 | [`TASKS.md`](TASKS.md) | Checklist de implementação. |
+| [`docs/decisoes-v2.0.md`](docs/decisoes-v2.0.md) | Registro das decisões da v2.0 (semifinal, vantagem do empate, 3ª colocada e remoções). |
 | [`docs/decisoes-v1.1.md`](docs/decisoes-v1.1.md) | Registro histórico das decisões da v1.1. |
 
 ## Licença e referências

@@ -2,7 +2,9 @@
 
 Checklist de execução do MVP. Marque apenas o que estiver realmente concluído.
 
-## 0. Documentação e alinhamento
+> As seções 0–8 registram a implementação histórica da v1.1. A seção 9 acompanha a migração para o formato v2.0 (8 partidas, semifinal, final e vantagem do empate), que substitui as decisões anteriores.
+
+## 0. Documentação e alinhamento (histórico v1.1)
 
 - [x] Atualizar `PRD.md` para v1.1 (3 times, 7 partidas, calendário, amistoso, W.O., `finalists`, `drawOrder`, estatísticas com shootout).
 - [x] Atualizar `AGENTS.md` para v1.1 (regras, design, validação, comandos e testes).
@@ -107,3 +109,49 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 - [x] E2E isolado em `dist-test/` com a fixture concluída; build de produção sem dados de exemplo.
 - [x] Site publicado e acessível antes de 24/11/2026.
 - [ ] Checklist manual do Apêndice D assinado (leitor de tela, Safari/Firefox/Edge e Lighthouse).
+
+## 9. Migração para o formato v2.0
+
+### 9.1 Documentação
+
+- [ ] Atualizar `PRD.md` para v2.0 (8 partidas, semifinal 2º x 3º, final 1º x vencedora, vantagem do empate, 3ª colocada, sem amistoso/shootout).
+- [ ] Atualizar `AGENTS.md` para v2.0.
+- [ ] Atualizar `SPEC.md` para v2.0 (schema, algoritmos, validação, UI, testes, apêndices e ADRs).
+- [ ] Criar `docs/decisoes-v2.0.md` e marcar `context.md`/`docs/decisoes-v1.1.md` como históricos.
+- [ ] Atualizar `README.md`, `PLAN.md` e `TASKS.md`.
+- [ ] Commits `docs(prd)`, `docs(agents)`, `docs(spec)` e `docs:`.
+
+### 9.2 Dados e validação
+
+- [ ] Adicionar `semi` (02/12/2026) e remover `shootout`/`friendly` de `data/2026/copa.yaml`.
+- [ ] Adicionar `semifinalists` e `finalists` ao envelope; ambos `null` antes da competição.
+- [ ] Atualizar `schema.ts` para 8 IDs, `stage: semi`, snapshots e proibição de campos antigos.
+- [ ] Atualizar `validate.ts`: conjunto de partidas, progressão, snapshots, W.O. no mata-mata, suspensões e migração.
+- [ ] Atualizar fixture `tests/fixtures/valida.yaml`: TC 1ª, TA 2ª, TB 3ª; semi TA 1x2 TB; final TC 1x1 TB; TC campeã por vantagem.
+- [ ] Garantir suspensões da fixture: TB `p-014` vermelho em g6 cumpre na semi; TC `p-016` 2º amarelo em g3 cumpre em g5.
+
+### 9.3 Domínio
+
+- [ ] Implementar `PlayoffSnapshots`, `resolveMatchTeams` e `deriveScore` para `semi`/`final`.
+- [ ] Implementar `winnerOf` com W.O. e vantagem do empate; `semi` empata para o 2º, `final` empata para o 1º.
+- [ ] Renomear/reescrever `finalists.ts` como `playoffs.ts`; 3ª colocada = perdedora da semifinal; pódio de 3.
+- [ ] Atualizar `discipline.ts` para o caminho real do time (1º sem semi; vermelho na semi só conta na final se avançar; vermelho na final sem efeito).
+- [ ] Atualizar `stats.ts` para grupo + semi + final, sem `shootoutWins`/`shootoutLosses`.
+- [ ] Atualizar `format/match.ts`, `format/events.ts` e `format/suspension.ts`; remover `friendly.ts`.
+
+### 9.4 UI
+
+- [ ] Remover `FriendlyCard.astro` e estilos do amistoso.
+- [ ] Atualizar Início para cinco estados e cards de semifinal/final.
+- [ ] Atualizar Jogos e detalhe para `semi`/`final`, vantagem textual e ausência de shootout.
+- [ ] Atualizar Fase final: semifinal 2º x 3º, final 1º x vencedora, vantagem do empate, 3ª colocada.
+- [ ] Atualizar Times/Estatísticas para 8 partidas e sem colunas de pênaltis.
+- [ ] Remover rotas/links de amistoso e 3º lugar.
+
+### 9.5 Testes e build
+
+- [ ] Atualizar factories e testes unitários/de dados para snapshots, vantagem do empate, W.O. no mata-mata e suspensões.
+- [ ] Atualizar E2E: 8 cards, 5 datas, semifinal, final, 3ª colocada, ausência de amistoso/shootout.
+- [ ] Atualizar `scripts/check-build.ts`: rota `jogos/semi/`, termos proibidos e ausência de JS.
+- [ ] Rodar `npm run validate`, `npm run check`, `npm test`, `npm run build`, `npm run build:test`, `npm run test:build`, `npm run test:e2e` e `npm run verify`.
+- [ ] Commits `feat(dados)`, `feat(dominio)`, `feat(ui)`, `test:` e `chore(build)`.

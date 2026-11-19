@@ -4,7 +4,7 @@ Plano de execução do MVP, subordinado ao `PRD.md`, ao `AGENTS.md` e à `SPEC.m
 
 ## Objetivo
 
-Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal Feminino Vila Mariana 2026, com 3 times, 6 partidas de grupo em turno e returno, final única, pódio de 3 e card informativo do amistoso do 3º colocado.
+Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal Feminino Vila Mariana 2026, com 3 times, 6 partidas de grupo em turno e returno, semifinal 2º x 3º, final 1º x vencedora da semifinal, vantagem do empate e pódio de 3. Não há amistoso, disputa de 3º lugar, prorrogação, pênaltis ou shootout.
 
 ## Princípios
 
@@ -27,26 +27,26 @@ Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal 
 
 ### Fatia 2 — Dados e validação
 
-- Implementar o schema Zod do envelope, times, jogadoras, partidas, eventos, `finalists`, `drawOrder`, `friendly` e `notices`.
+- Implementar o schema Zod do envelope, times, jogadoras, partidas, eventos, `semifinalists`, `finalists`, `drawOrder` e `notices`, sem `friendly`/`shootout`.
 - Implementar o pipeline YAML → schema → validação semântica → erros agregados.
 - Implementar `npm run validate` com resumo em Markdown e exit code correto.
-- Criar `data/2026/copa.yaml` de exemplo com 3 times, 7 partidas e amistoso.
+- Criar `data/2026/copa.yaml` de exemplo com 3 times e 8 partidas (`g1`…`g6`, `semi`, `final`).
 - Critério: fixtures válidas passam; todas as `VAL-*` bloqueantes têm teste; avisos não bloqueiam.
 
 ### Fatia 3 — Domínio
 
-- Implementar `deriveScore`, `buildStandings`, `rankTeams` com confronto direto de dois jogos, cartões, suspensões, `buildPlayerStats`, `buildTeamStats`, `buildFinalists`, `buildPodium` e `buildNextMatch`.
-- Implementar `formatScore`, `formatScoreAccessible`, `cardSummary` e estados de UI.
-- Critério: testes unitários de pontuação, desempate, W.O., shootout, cartões, suspensão, estatísticas e pódio passam.
+- Implementar `deriveScore`, `resolveMatchTeams`, `buildStandings`, `rankTeams` com confronto direto de dois jogos, cartões, suspensões, `buildPlayerStats`, `buildTeamStats`, `buildPlayoffs`, `buildPodium` e `buildNextMatch`.
+- Implementar `formatScore`, `formatScoreAccessible`, `cardSummary` e os cinco estados de UI.
+- Critério: testes unitários de pontuação, desempate, W.O., vantagem do empate, cartões, suspensão, estatísticas e pódio passam.
 
 ### Fatia 4 — Páginas
 
-- Início nos quatro estados.
-- Jogos: lista por data e detalhe com eventos, W.O., shootout e desfalques.
+- Início nos cinco estados (`beforeCup`, `duringGroup`, `groupComplete`, `semiComplete`, `afterFinal`).
+- Jogos: lista por data (5 datas) e detalhe com eventos, W.O. e desfalques; sem shootout.
 - Classificação: 13 colunas, provisória, sorteio e critérios.
-- Times: elenco ativo, badge <5, suspensão, histórico e estatísticas coletivas com campanha nos pênaltis separada.
+- Times: elenco ativo, badge <5, suspensão, histórico e estatísticas coletivas das 8 partidas, sem colunas de pênaltis.
 - Estatísticas: artilharia, assistências, cartões e gols contra.
-- Fase final: “a definir”, card do amistoso antes da final e pódio de 3.
+- Fase final: semifinal, final, vantagem do empate textual, card da final antes da semi com o 1º e “Vencedora da semifinal”, pódio de 3.
 - 404 e metadados.
 - Critério: todas as rotas estáticas, sem JS de cliente e sem overflow em 320px.
 
@@ -80,17 +80,26 @@ Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal 
 - Separar `dist/` (produção) de `dist-test/` (E2E), sem publicar dados de exemplo.
 - Critério: `npm run validate` sem erros e com avisos de elenco; `npm run verify` passa; a fonte pública não contém resultados nem elencos fictícios; o build de produção continua sem JS de cliente.
 
+### Fatia 9 — Migração para o formato v2.0
+
+- Atualizar `data/2026/copa.yaml` para 8 partidas: adicionar `semi`, manter `final`, preencher `semifinalists`/`finalists` como `null` antes da competição e remover `shootout`/`friendly`.
+- Atualizar schema, validação, tipos e domínio: snapshots `semifinalists`/`finalists`, `winnerOf` com vantagem do empate, 3ª colocada como perdedora da semifinal e suspensões pelo caminho real do time.
+- Atualizar UI, fixture, testes e `check-build` para semifinal, final, 8 cards, 5 datas, ausência de amistoso/shootout e rotas `jogos/semi/`.
+- Critério: `npm run verify` passa; build de produção com 8 partidas; nenhuma referência a amistoso, shootout, 3º lugar ou 4º lugar em dados, UI ou `dist/`.
+
 ## Marcos
 
 | Data | Marco |
 |---|---|
 | 12/11/2026 | PRD v1.1, SPEC v1.2 e documentos alinhados |
-| 13–20/11/2026 | Implementação |
+| 18/11/2026 | PRD/SPEC/AGENTS v2.0 e migração do formato |
+| 18–20/11/2026 | Implementação |
 | 21–23/11/2026 | Testes, dados de exemplo e congelamento |
 | 24/11/2026 | Primeira rodada |
 | 26/11/2026 | Segunda rodada |
 | 01/12/2026 | Terceira rodada |
-| 03/12/2026 | Amistoso e final |
+| 02/12/2026 | Semifinal |
+| 03/12/2026 | Final |
 | 04/12/2026 | Retrospectiva |
 
 ## Riscos de execução
@@ -104,7 +113,7 @@ Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal 
 ## Definição de pronto
 
 - `npm run verify` passa localmente e no CI.
-- `data/2026/copa.yaml` válido, com 3 times, 7 partidas e amistoso.
-- Nenhuma rota/link/placeholder de Regulamento ou de 3º lugar.
+- `data/2026/copa.yaml` válido, com 3 times e 8 partidas (`g1`…`g6`, `semi`, `final`), sem amistoso ou shootout.
+- Nenhuma rota/link/placeholder de Regulamento, amistoso ou 3º lugar; a 3ª colocada é a perdedora da semifinal.
 - Nenhum JS de cliente, termo proibido, fonte proprietária, foto ou dado pessoal no `dist/`.
 - Site publicado no GitHub Pages e acessível antes de 24/11/2026.

@@ -4,6 +4,8 @@
 **Status:** Registro histórico reconstruído  
 **Fontes:** `SPEC.md` §15, `PRD.md` v1.1 e `AGENTS.md` v1.1
 
+> **Registro histórico:** este documento descreve a v1.1 e foi **substituído pelas decisões da v2.0** em `docs/decisoes-v2.0.md`. Ele é mantido apenas como histórico. O formato atual tem 8 partidas oficiais, semifinal 2º x 3º, final 1º x vencedora da semifinal, vantagem do empate e 3ª colocada como perdedora da semifinal; não há amistoso nem disputa de pênaltis.
+
 > **Aviso:** este documento é uma **reconstrução** das decisões da v1.1 a partir da SPEC e dos documentos alinhados. O briefing original da v1.1 não está versionado no repositório. Este registro não é a fonte original, não é normativo e não substitui o PRD, o AGENTS ou a SPEC. Em caso de divergência, prevalecem o PRD v1.1, o AGENTS v1.1 e a SPEC v1.2.
 
 ## 1. Formato da edição 2026
