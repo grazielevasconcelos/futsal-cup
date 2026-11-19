@@ -1,18 +1,22 @@
 # PRD — Copa de Futsal Feminino Vila Mariana 2026
 
-**Versão:** 1.1  
-**Data:** 12/11/2026  
+**Versão:** 2.0  
+**Data:** 18/11/2026  
 **Status:** Aceito  
 **Responsável:** Organização da Copa  
 **Público-alvo:** organização, desenvolvimento e jogadoras
 
-> **Nota da v1.1:** esta versão incorpora as decisões de produto de 12/11/2026 registradas em `docs/decisoes-v1.1.md` e detalhadas na `SPEC.md`. A aprovação formal da §18 está registrada neste documento.
+> **Nota da v2.0:** esta versão incorpora as decisões de produto de 18/11/2026 registradas em `docs/decisoes-v2.0.md`. A competição passa a ter **8 partidas oficiais**: 6 jogos classificatórios em turno e returno, **1 semifinal** e **1 final**. Não há mais amistoso do 3º colocado nem disputa de pênaltis. A versão 1.1 permanece como registro histórico em `docs/decisoes-v1.1.md`.
+
+> **Nota histórica da v1.1:** a versão 1.1 incorporou as decisões de produto de 12/11/2026 e detalhava uma competição com 7 partidas oficiais, final direta entre 1º e 2º, amistoso informativo do 3º colocado e disputa de pênaltis na final. Esses elementos foram substituídos pela v2.0.
 
 ---
 
 ## 1. Contexto e problema
 
-A Copa de Futsal Feminino Vila Mariana é uma competição anual organizada pela turma de futsal feminino do Sesc Vila Mariana. A edição de 2026 terá **3 times**, **6 partidas na fase classificatória em turno e returno** e **1 final**, totalizando **7 partidas oficiais**. No dia da final, a organização realiza também um **amistoso do 3º colocado**, tratado como evento informativo e sem efeito competitivo.
+A Copa de Futsal Feminino Vila Mariana é uma competição anual organizada pela turma de futsal feminino do Sesc Vila Mariana. A edição de 2026 terá **3 times**, **6 partidas na fase classificatória em turno e returno**, **1 semifinal** e **1 final**, totalizando **8 partidas oficiais**.
+
+A semifinal será disputada entre o **2º e o 3º colocado** da fase classificatória, com **vantagem do empate para o 2º colocado**. A final será disputada entre o **1º colocado** e a **vencedora da semifinal**, com **vantagem do empate para o 1º colocado**. Empates encerram a partida no tempo normal: **não há prorrogação, disputa de pênaltis ou cobranças alternadas**. A 3ª colocada é a perdedora da semifinal; não há disputa de 3º lugar nem 4º lugar.
 
 Hoje, o acompanhamento da competição depende de planilhas, mensagens e cálculos manuais. Isso cria riscos de erro nos critérios de desempate, dificulta a consulta pelas jogadoras e reduz a visibilidade da copa.
 
@@ -35,6 +39,7 @@ A implementação segue estes documentos:
 | `AGENTS.md` | Restrições do repositório, design, acessibilidade, privacidade e testes. |
 | `SPEC.md` | Especificação técnica normativa: stack, schema, algoritmos, validação, UI, CI e deploy. |
 | `PLAN.md` / `TASKS.md` | Plano e checklist de execução, subordinados ao PRD, ao AGENTS e à SPEC. |
+| `docs/decisoes-v2.0.md` | Registro histórico das decisões da v2.0; não é normativo. |
 | `docs/decisoes-v1.1.md` | Registro histórico das decisões da v1.1; não é normativo. |
 
 Restrições de produto já conhecidas:
@@ -55,9 +60,9 @@ Restrições de produto já conhecidas:
 - Automatizar a classificação e os critérios de desempate.
 - Registrar gols, assistências e cartões vinculados à jogadora que realizou a ação.
 - Dar visibilidade para jogadoras e torcida.
-- Exibir a fase final e o pódio de três posições.
-- Garantir consistência entre placar, eventos e classificação.
-- Reduzir a zero os cálculos manuais de classificação.
+- Exibir a semifinal, a final e o pódio de três posições.
+- Garantir consistência entre placar, eventos, classificação e chaveamento.
+- Reduzir a zero os cálculos manuais de classificação e de definição de finalistas.
 
 ### 3.2 Não objetivos do MVP
 
@@ -73,9 +78,9 @@ Restrições de produto já conhecidas:
 ## 4. Métricas de sucesso
 
 - Site publicado e acessível antes da primeira partida, em **24/11/2026**.
-- **100% das 7 partidas oficiais** registradas ao final da copa; o amistoso é informativo e não entra nessa contagem.
-- Classificação e estatísticas corretas em **100% dos casos**, incluindo empates e desempates.
-- Nenhum cálculo manual de classificação durante a competição.
+- **100% das 8 partidas oficiais** registradas ao final da copa.
+- Classificação e estatísticas corretas em **100% dos casos**, incluindo empates, desempates e vantagem do empate na semifinal e na final.
+- Nenhum cálculo manual de classificação ou de definição de finalistas durante a competição.
 - Nenhum evento (gol, assistência ou cartão) vinculado à jogadora errada.
 - Todas as jogadoras conseguem consultar a classificação e seus próprios números pelo celular.
 - Organização consegue atualizar o site após uma partida sem depender de desenvolvimento.
@@ -101,12 +106,14 @@ No MVP não existem contas, login, níveis de permissão ou área administrativa
 - **3 times:** TA, TB e TC, com nomes editáveis.
 - Elencos de 7 ou 8 jogadoras ativas.
 - Cadastro de jogadoras com apelido obrigatório, posição opcional e time.
-- Calendário com **6 jogos classificatórios em turno e returno + 1 final**.
+- Calendário com **6 jogos classificatórios em turno e returno + 1 semifinal + 1 final**.
 - Registro de resultados, gols, assistências e cartões.
 - Classificação automática com critérios de desempate.
-- Fase final, pódio de três posições e campeã.
-- Estatísticas individuais e coletivas, incluindo campanha separada nos pênaltis.
-- Card informativo do **amistoso do 3º colocado**, sem efeito competitivo.
+- Semifinal com vantagem do empate para o 2º colocado.
+- Final com vantagem do empate para o 1º colocado.
+- Definição automática dos semifinalistas e finalistas por snapshots validados.
+- Pódio de três posições: campeã, vice-campeã e 3ª colocada.
+- Estatísticas individuais e coletivas das 8 partidas oficiais.
 - Páginas: Início, Jogos, Classificação, Times, Estatísticas e Fase final.
 - Validação automática dos dados antes da publicação.
 - Publicação no GitHub Pages.
@@ -123,7 +130,8 @@ No MVP não existem contas, login, níveis de permissão ou área administrativa
 - Notificações, chat, pagamentos, streaming ou ingressos.
 - W.O. automático e detecção automática de ausência ou de jogadoras em quadra.
 - Partida de 3º lugar e 4º lugar.
-- Amistoso tratado como partida oficial, com placar, eventos, cartões ou estatísticas.
+- Prorrogação, disputa de pênaltis, shootout ou cobranças alternadas.
+- Amistoso do 3º colocado ou qualquer partida não oficial.
 - Arbitragem, materiais, logística e cerimonial do evento.
 - Modo escuro, impressão/PDF e analytics como itens obrigatórios.
 - Login para atletas.
@@ -144,11 +152,15 @@ No MVP não existem contas, login, níveis de permissão ou área administrativa
 
 - **3 times:** TA, TB e TC.
 - **Fase classificatória:** todos contra todos, em **turno e returno**, totalizando **6 partidas**. Cada time joga **4 partidas** e cada par de times tem **um jogo em casa para cada lado**.
-- **Pontuação:** vitória = 3 pontos; empate = 1 ponto; derrota = 0 ponto.
-- **Fase final:** **1º x 2º na final única**. Não há semifinais.
-- **3º lugar:** é o 3º colocado da classificação. **Não há disputa de 3º x 4º e não há 4º lugar.**
-- A vencedora da final é campeã; a perdedora é vice-campeã; a 3ª da classificação completa o pódio.
-- O **amistoso do 3º colocado** é um evento informativo no dia da final, não uma partida oficial.
+- **Pontuação da fase classificatória:** vitória = 3 pontos; empate = 1 ponto; derrota = 0 ponto.
+- **Classificação:** define 1º, 2º e 3º colocados. Apenas as 6 partidas de grupo contam para esta tabela.
+- **Semifinal:** **2º x 3º**, em partida única. O **2º colocado tem vantagem do empate** e joga como mandante.
+- **Final:** **1º x vencedora da semifinal**, em partida única. O **1º colocado tem vantagem do empate** e joga como mandante.
+- **Empates:** uma partida empatada termina no tempo normal. **Não há prorrogação, disputa de pênaltis, shootout ou cobranças alternadas.** Na semifinal, o empate classifica o 2º colocado; na final, o empate dá o título ao 1º colocado.
+- **3ª colocada:** é a **perdedora da semifinal**. **Não há disputa de 3º x 4º, partida de 3º lugar nem 4º lugar.**
+- **Pódio:** campeã (vencedora da final), vice-campeã (perdedora da final) e 3ª colocada (perdedora da semifinal).
+- **W.O. na semifinal ou na final:** o vencedor administrativo avança ou conquista o título; o W.O. prevalece sobre a vantagem do empate.
+- **Total:** **8 partidas oficiais** (g1…g6, semifinal e final).
 
 ### 7.2 Elenco
 
@@ -179,8 +191,8 @@ No MVP não existem contas, login, níveis de permissão ou área administrativa
 - O produto não controla cronômetro, tempo técnico, faltas ou superioridade numérica. Essas regras ficam na organização/arbitragem.
 - Status de partida no modelo:
   - `scheduled`: agendada; `date` obrigatória e `startsAt` opcional;
-  - `finished`: encerrada; exige `startsAt` e permite eventos, W.O. ou shootout;
-  - `postponed`: adiada; não tem eventos, W.O. nem shootout.
+  - `finished`: encerrada; exige `startsAt` e permite eventos ou W.O.;
+  - `postponed`: adiada; não tem eventos nem W.O.
 - Uma partida `scheduled` com data/horário já passados é exibida como **“Resultado pendente”** e não é tratada como próximo jogo.
 
 ### 7.4 Critérios de desempate
@@ -208,20 +220,24 @@ Observações:
 
 - Com **3 ou mais times empatados**, o confronto direto não é aplicado; segue-se para vitórias, saldo, gols pró, menos gols contra, cartões e sorteio.
 - A classificação considera **apenas as 6 partidas da fase classificatória**.
-- Cartões e resultados da final e do amistoso não alteram a classificação.
+- Resultados e cartões da **semifinal e da final** não alteram a classificação.
 - O `drawOrder` é um registro manual da ordem vigente. Se o sorteio for refeito, ele pode ser atualizado; o MVP não mantém histórico de sorteios.
 
 ### 7.5 Cartões e suspensão
 
 - Cartão amarelo é advertência; cartão vermelho é expulsão.
 - Um segundo amarelo no mesmo jogo gera vermelho.
-- Cartão vermelho, direto ou por segundo amarelo, **suspende a jogadora da próxima partida do time** na competição.
+- Cartão vermelho, direto ou por segundo amarelo, **suspende a jogadora da próxima partida real do time** na competição.
+- A “próxima partida real” considera o caminho do time no chaveamento:
+  - o 1º colocado não disputa a semifinal; após a fase classificatória, sua próxima partida é a final;
+  - o 2º e o 3º colocados disputam a semifinal; um vermelho na última partida de grupo é cumprido na semifinal;
+  - um vermelho na semifinal é cumprido na final se o time se classificar; se o time for eliminado, não há partida seguinte e a suspensão não tem efeito;
+  - um vermelho na final não tem partida seguinte e não tem efeito.
 - Se o time não tiver próxima partida, a suspensão não tem efeito.
 - Não há suspensão por acúmulo de cartões amarelos.
-- Cartões durante a disputa de pênaltis não entram nas estatísticas nem geram suspensão; o modelo não registra eventos de shootout.
 - A jogadora suspensa não pode ter eventos registrados na partida que ela não pode disputar; o sistema deve alertar e bloquear.
-- Cartões da final contam para as estatísticas e para a suspensão, mas **não** alteram a classificação.
-- Cartões em W.O. são permitidos apenas nos motivos `insufficient_players` e `withdrawal`; `no_show` não tem eventos. O amistoso não tem cartões.
+- Cartões da semifinal e da final contam para as estatísticas e para a suspensão, mas **não** alteram a classificação.
+- Cartões em W.O. são permitidos apenas nos motivos `insufficient_players` e `withdrawal`; `no_show` não tem eventos.
 
 ### 7.6 Gols, assistências e placar
 
@@ -234,23 +250,25 @@ Observações:
   - **Normal:** conta para o placar e para a artilharia da marcadora.
   - **Pênalti no tempo normal:** conta para o placar e para a artilharia.
   - **Gol contra:** vinculado à jogadora que marcou contra, mas conta para o time adversário e **não** entra na artilharia dela; não tem assistência.
-- Gols e assistências da final contam para as estatísticas individuais.
-- Gols da **disputa de pênaltis** não contam para placar, artilharia ou assistências. A disputa é registrada apenas pelo placar final dos pênaltis.
+- Gols, assistências e cartões da semifinal e da final contam para as estatísticas individuais.
+- Não há disputa de pênaltis nem gols de shootout.
 - Uma jogadora só pode ser vinculada a um evento se estiver no elenco do time naquela partida e elegível no início dela.
-- O amistoso não tem gols, assistências, placar ou eventos no modelo.
 
 ### 7.7 Fase final
 
-- A final é disputada entre **1º e 2º colocados** da fase classificatória.
-- O confronto é registrado em um snapshot `finalists`, preenchido somente quando as 6 partidas de grupo estiverem encerradas e igual à classificação final.
-- Em caso de empate no tempo normal na final, o vencedor é definido em **disputa de pênaltis direta**: 5 cobranças alternadas e, se necessário, morte súbita.
-- O resultado é exibido no formato `1 (4) x (3) 1`, com o placar dos pênaltis entre parênteses.
-- O MVP registra apenas o placar dos pênaltis, sem detalhes de quem cobrou ou converteu.
-- A 3ª colocada é a 3ª da classificação; **não há disputa de 3º lugar nem 4º lugar**.
+- A **semifinal** é disputada entre **2º e 3º colocados** da fase classificatória.
+- A **final** é disputada entre o **1º colocado** e a **vencedora da semifinal**.
+- O confronto da semifinal é registrado em um snapshot `semifinalists`, no formato `[2º, 3º]`, preenchido somente quando as 6 partidas de grupo estiverem encerradas e igual à classificação final.
+- O confronto da final é registrado em um snapshot `finalists`, no formato `[1º, vencedora da semifinal]`, preenchido somente quando a semifinal estiver encerrada.
+- A ordem dos snapshots define o mando de campo e a **vantagem do empate**: o primeiro time é o mandante e avança ou conquista o título em caso de empate.
+- **Semifinal empatada:** o 2º colocado avança; o 3º colocado é a 3ª colocada.
+- **Final empatada:** o 1º colocado é campeão; a vencedora da semifinal é vice-campeã.
+- **Não há prorrogação nem pênaltis.** O placar do tempo normal é o placar oficial; a classificação ou o título em caso de empate é uma informação separada, derivada da vantagem.
+- W.O. na semifinal define o vencedor administrativo, que avança; W.O. na final define o título conforme o vencedor administrativo. O W.O. prevalece sobre a vantagem do empate.
+- Se uma correção após a semifinal mudar os semifinalistas esperados, o build **falha** listando os semifinalistas antigos e os novos; a organização deve reconciliar os dados e explicar a correção em `notices`.
+- Se uma correção após a final mudar os finalistas, o build **falha** listando os finalistas antigos e os novos; atualizar `finalists` é a confirmação explícita da mudança. A correção também deve ser explicada em `notices`.
+- A 3ª colocada é a **perdedora da semifinal**; **não há disputa de 3º lugar nem 4º lugar**.
 - O pódio tem **campeã, vice-campeã e 3ª colocada**.
-- W.O. na final define o título conforme o vencedor administrativo.
-- Se uma correção após a final mudar os finalistas, o build **falha** listando os finalistas antigos e os novos; atualizar `finalists` é a confirmação explícita. A correção também deve ser explicada em `notices`.
-- O amistoso do 3º colocado é exibido antes da final, como card informativo, e não altera o pódio.
 
 ### 7.8 Calendário e local
 
@@ -259,29 +277,21 @@ Observações:
 | **24/11/2026** | TA x TB (g1) e TB x TC (g2) |
 | **26/11/2026** | TA x TC (g3) e TB x TA (g4) |
 | **01/12/2026** | TC x TA (g5) e TC x TB (g6) |
-| **03/12/2026** | Amistoso do 3º colocado (informativo) e 1º x 2º (final) |
+| **02/12/2026** | Semifinal: 2º x 3º |
+| **03/12/2026** | Final: 1º x vencedora da semifinal |
 
-- Cada time joga **duas vezes** em 24/11, 26/11 e 01/12; os horários devem ser distintos e respeitar a ordem canônica g1 → g2 → g3 → g4 → g5 → g6 → final.
-- O amistoso acontece na mesma data da final e antes do horário da final, quando a final tiver horário definido.
+- Cada time joga **duas vezes** em 24/11, 26/11 e 01/12; os horários devem ser distintos e respeitar a ordem canônica g1 → g2 → g3 → g4 → g5 → g6 → semifinal → final.
 - Horários exatos: **a definir**.
 - Local: Vila Mariana, São Paulo. O nome da instituição não deve aparecer na interface pública.
 - Se uma partida for adiada, a organização atualiza `status` para `postponed`, ajusta `date`/`startsAt` e, quando remarcar, volta para `scheduled`.
-- **W.O.:** é registrado manualmente, com placar fixo **1x0** para o vencedor. Motivos: `no_show`, `insufficient_players` ou `withdrawal`. Não há gols ou assistências fictícios. Cartões são permitidos em `insufficient_players`/`withdrawal`; `no_show` não tem eventos. O site não detecta ausência nem automatiza retirada de time; a organização registra um W.O. por partida restante.
-- Não há partida de 3º lugar.
+- **W.O.:** é registrado manualmente, com placar fixo **1x0** para o vencedor. Motivos: `no_show`, `insufficient_players` ou `withdrawal`. Não há gols ou assistências fictícios. Cartões são permitidos em `insufficient_players`/`withdrawal`; `no_show` não tem eventos. O site não detecta ausência nem automatiza retirada de time; a organização registra um W.O. por partida restante. W.O. é permitido na semifinal e na final.
+- Não há partida de 3º lugar nem amistoso.
 
-### 7.9 Amistoso do 3º colocado
+### 7.9 Correções, sorteio e avisos
 
-- O amistoso é um **metadado informativo** (`friendly`), não uma partida.
-- Campos: data, horário, local e nota. A data deve ser a mesma da final; o horário deve ser anterior ao da final, quando ela tiver horário.
-- Participantes, se necessário, são descritos apenas na nota, por apelido ou descrição genérica, sem dados estruturados ou dados pessoais.
-- O amistoso **não** tem placar, eventos, cartões, estatísticas, suspensões, classificação, pódio ou link de jogo.
-- A interface exibe o card com o rótulo **“Informativo — não é partida oficial”**, antes da final.
-- Se não houver amistoso, o campo é `null` e nenhum card ou placeholder é exibido.
-
-### 7.10 Correções, sorteio e avisos
-
-- Correções de resultados e eventos recalculam classificação, estatísticas, suspensões e pódio.
-- `finalists` é o snapshot oficial da final; uma correção que mude os finalistas depois da final bloqueia o build até o snapshot ser atualizado.
+- Correções de resultados e eventos recalculam classificação, estatísticas, suspensões, semifinalistas, finalistas e pódio.
+- `semifinalists` é o snapshot oficial da semifinal; depois da semifinal, uma correção que mude os semifinalistas bloqueia o build até os dados serem reconciliados.
+- `finalists` é o snapshot oficial da final; depois da final, uma correção que mude os finalistas bloqueia o build até o snapshot ser atualizado.
 - `drawOrder` é o registro manual da ordem do sorteio vigente; se o sorteio for refeito, ele pode ser atualizado.
 - `notices` é o canal público para explicar correções, adiamentos e decisões operacionais; a interface exibe um banner global.
 - O aviso de build é o canal operacional; nenhum dos dois é obrigatório para o build passar, mas ambos são recomendados.
@@ -295,29 +305,28 @@ Observações:
 | FR-01 | Fonte de dados única e versionada com edição, times, jogadoras, partidas e eventos | Obrigatório | O site é gerado a partir de uma única fonte; não há dados duplicados ou editados manualmente no HTML |
 | FR-02 | Validação automática dos dados | Obrigatório | Dados inválidos bloqueiam a publicação com mensagem clara e indicação do problema |
 | FR-03 | Times e elencos | Obrigatório | Exibir 3 times, elencos com apelido e posição, e permitir nomes editáveis |
-| FR-04 | Calendário de jogos | Obrigatório | Exibir as 7 partidas oficiais agrupadas por data, com status, placar e local; o amistoso não entra na lista de jogos |
-| FR-05 | Detalhe da partida | Obrigatório | Exibir placar derivado dos gols, eventos de gol, assistência, cartões e pênaltis |
-| FR-06 | Classificação automática | Obrigatório | Aplicar 3/1/0 e todos os critérios de desempate na ordem definida |
-| FR-07 | Fase final e pódio | Obrigatório | Exibir 1º x 2º, campeã, vice-campeã e 3ª colocada; sem 3º x 4º e sem 4º lugar |
-| FR-08 | Estatísticas individuais e coletivas | Obrigatório | Artilharia, assistências, cartões e gols contra vinculados à jogadora; estatísticas do time com V/E/D no tempo normal e campanha separada nos pênaltis |
+| FR-04 | Calendário de jogos | Obrigatório | Exibir as 8 partidas oficiais agrupadas por data, com status, placar e local |
+| FR-05 | Detalhe da partida | Obrigatório | Exibir placar derivado dos gols, eventos de gol, assistência e cartões |
+| FR-06 | Classificação automática | Obrigatório | Aplicar 3/1/0 e todos os critérios de desempate na ordem definida, apenas nas 6 partidas de grupo |
+| FR-07 | Fase final e pódio | Obrigatório | Exibir semifinal 2º x 3º, final 1º x vencedora da semifinal, campeã, vice-campeã e 3ª colocada; sem 3º x 4º e sem 4º lugar |
+| FR-08 | Estatísticas individuais e coletivas | Obrigatório | Artilharia, assistências, cartões e gols contra vinculados à jogadora; estatísticas do time com V/E/D no tempo normal nas 8 partidas oficiais |
 | FR-09 | Página inicial | Desejável | Exibir próximo jogo, últimos resultados, resumo da classificação e destaques |
 | FR-10 | Página de Regulamento | **ADIADO** | Sem rota, link, página ou placeholder no MVP |
 | FR-11 | Layout mobile-first e acessível | Obrigatório | Navegação e tabelas funcionam em celular; contraste, foco e semântica adequados |
 | FR-12 | Publicação no GitHub Pages | Obrigatório | Site público, sem login, atualizado após a publicação da fonte de dados |
-| FR-13 | Suspensões | Obrigatório | Exibir jogadoras suspensas e a partida que perdem; bloquear eventos indevidos |
-| FR-14 | Correções e avisos | Obrigatório | Correções recalculam classificação, estatísticas e chaveamento; alertar se finalistas mudarem após a final; `notices` gera banner |
+| FR-13 | Suspensões | Obrigatório | Exibir jogadoras suspensas e a partida que perdem; bloquear eventos indevidos; considerar o caminho do time no chaveamento |
+| FR-14 | Correções e avisos | Obrigatório | Correções recalculam classificação, estatísticas e chaveamento; alertar se semifinalistas ou finalistas mudarem após a respectiva partida; `notices` gera banner |
 | FR-15 | Flexibilidade de elenco | Obrigatório | Permitir inclusão de novas alunas dentro do limite de 8 ativas, com elegibilidade a partir da próxima partida |
 | FR-16 | Edição 2026 | Obrigatório | Exibir apenas 2026, com estrutura preparada para edições futuras |
 | FR-17 | Privacidade | Obrigatório | Exibir apenas apelido, posição, time e estatísticas; sem nome completo, foto, contato, camisa ou data de nascimento |
 | FR-18 | Nome de exibição | Obrigatório | Usar “Copa de Futsal Feminino Vila Mariana 2026”; não exibir o nome da instituição na interface |
 | FR-19 | Compartilhamento | Desejável | Título e descrição adequados para compartilhamento do link |
 | FR-20 | Histórico de alterações | **FUTURO** | Não obrigatório no MVP; pode ser avaliado em versões futuras |
-| FR-21 | Amistoso do 3º colocado | Obrigatório (quando houver amistoso) | Exibir apenas como card informativo na Fase final, antes da final; sem placar, eventos, cartões, estatísticas, suspensões ou efeito competitivo |
 
 ### 8.1 Regras de validação obrigatórias
 
 - Exatamente **3 times** na edição 2026, com IDs `ta`, `tb` e `tc`.
-- Exatamente **7 partidas oficiais**: `g1`…`g6` e `final`.
+- Exatamente **8 partidas oficiais**: `g1`…`g6`, `semi` e `final`.
 - Cada time com no máximo **8 jogadoras ativas simultaneamente**; menos de 7 gera aviso.
 - Apelido único dentro do time após normalização.
 - Jogadora não pode estar em dois times.
@@ -325,15 +334,16 @@ Observações:
 - Assistência deve ser de jogadora do mesmo time da marcadora, diferente dela, e é proibida em pênalti e em gol contra.
 - Gol contra não pode ter assistência.
 - Placar deve ser derivado dos gols; campo de placar materializado é proibido.
-- A final deve ser **1º x 2º** conforme a classificação; não há 3º x 4º.
-- `finalists` deve ser nulo com grupo incompleto e igual à classificação quando o grupo estiver completo; divergência após a final bloqueia o build.
+- A **semifinal** deve ser **2º x 3º** conforme a classificação; a **final** deve ser **1º x vencedora da semifinal**; não há 3º x 4º.
+- `semifinalists` deve ser nulo com grupo incompleto e igual à classificação quando o grupo estiver completo; divergência após a semifinal bloqueia o build.
+- `finalists` deve ser nulo com semifinal incompleta e igual ao esperado quando a semifinal estiver completa; divergência após a final bloqueia o build.
+- A ordem dos snapshots define mando e vantagem do empate; não há campo separado de vantagem.
 - `drawOrder` deve ser uma permutação dos 3 times ou nulo; é exigido quando um empate chega ao sorteio na classificação final.
-- Jogadora suspensa não pode ter evento na partida em que está suspensa.
+- Jogadora suspensa não pode ter evento na partida em que está suspensa, considerando o caminho do time no chaveamento e a ausência de semifinal para o 1º colocado.
 - Datas e horários devem ser válidos e coerentes com America/Sao_Paulo.
 - Não pode haver referência a time, jogadora, partida ou aviso inexistente.
-- W.O. deve ser `finished`, ter vencedor participante, motivo válido, sem shootout e sem gols/assistências; `no_show` não tem eventos; cartões só em `insufficient_players`/`withdrawal`.
-- Shootout só na final, `finished`, sem W.O., com tempo normal empatado e valores inteiros ≥0 e diferentes.
-- O amistoso deve ter data igual à da final, horário anterior ao da final quando ela tiver horário, local e nota não vazios; não pode ter campos de partida.
+- W.O. deve ser `finished`, ter vencedor participante, motivo válido, sem gols/assistências e sem shootout; `no_show` não tem eventos; cartões só em `insufficient_players`/`withdrawal`. W.O. é permitido na semifinal e na final e prevalece sobre a vantagem do empate.
+- Campos de partida de shootout ou de amistoso são proibidos e devem gerar mensagem de migração clara.
 - Campos de privacidade proibidos: nome completo, foto, contato, camisa, data de nascimento, telefone, e-mail, endereço ou redes sociais.
 
 ---
@@ -367,15 +377,15 @@ Observações:
 - Resumo da classificação (3 times).
 - Destaques: artilheira, líder de assistências.
 - Atalho para a fase final quando definida.
-- Estado especial: antes da copa, durante a classificatória, classificatória encerrada e após a final.
+- Estados especiais: antes da copa, durante a classificatória, classificatória encerrada, após a semifinal e após a final.
 - Partida `scheduled` vencida aparece como “Resultado pendente” e não como próximo jogo.
 
 ### 10.2 Jogos
 
-- Lista por data, com as **7 partidas oficiais**.
+- Lista por data, com as **8 partidas oficiais**.
 - Cada partida mostra: times, data, horário, local, status e placar.
-- Detalhe da partida: gols, assistências, cartões, pênaltis e minuto quando informado.
-- O amistoso **não** aparece na lista de jogos; ele tem card próprio na Fase final.
+- Detalhe da partida: gols, assistências, cartões e minuto quando informado.
+- Sem prorrogação, pênaltis ou shootout.
 
 ### 10.3 Classificação
 
@@ -383,34 +393,35 @@ Observações:
 - Explicação dos critérios de desempate, incluindo o confronto direto de dois jogos.
 - Indicação de empate que exigiu sorteio.
 - Atualização automática após cada resultado.
-- A classificação usa apenas as 6 partidas de grupo; a final e o amistoso não entram.
+- A classificação usa apenas as 6 partidas de grupo; a semifinal e a final não entram.
 
 ### 10.4 Times
 
 - 3 times com nome, abreviação e elenco.
 - Cada jogadora: apelido, posição, gols, assistências, cartões e status de suspensão.
-- Estatísticas coletivas: jogos, V/E/D no tempo normal, campanha nos pênaltis (V/D), GP/GC/SG, cartões e pontos disciplinares.
-- A campanha nos pênaltis é exibida separadamente e não é somada a V/E/D; uma final decidida nos pênaltis conta como empate no tempo normal.
+- Estatísticas coletivas: jogos, V/E/D no tempo normal, GP/GC/SG, cartões e pontos disciplinares nas 8 partidas oficiais.
+- Uma semifinal ou final empatada conta como empate em V/E/D; a definição por vantagem do empate é exibida separadamente e não altera o placar.
 - Badge “Elenco em formação” quando houver menos de 5 atletas ativas.
 - Jogadoras com `leftAt` e histórico aparecem em seção separada, com a marca “fora do elenco ativo”.
 
 ### 10.5 Estatísticas
 
-- **Artilharia:** gols em todas as partidas oficiais, incluindo pênaltis do tempo normal e excluindo a disputa de pênaltis. Ordenação: gols, assistências, apelido, time.
+- **Artilharia:** gols em todas as 8 partidas oficiais, incluindo pênaltis do tempo normal e excluindo gols contra. Ordenação: gols, assistências, apelido, time.
 - **Assistências:** ordenação: assistências, gols, apelido, time.
 - **Cartões:** amarelos, vermelhos e pontos disciplinares por jogadora e por time.
 - **Gols contra:** separados, sem entrada na artilharia.
 - Atletas fora do elenco ativo com eventos aparecem com marca textual.
-- O amistoso não entra em nenhuma estatística.
 
 ### 10.6 Fase final
 
-- Apenas a final **1º x 2º**.
-- Card informativo do amistoso, quando houver, antes da final, com o rótulo “Informativo — não é partida oficial”.
-- Placar do tempo normal e placar dos pênaltis.
+- **Semifinal:** 2º x 3º, com indicação da vantagem do empate para o 2º colocado.
+- **Final:** 1º x vencedora da semifinal, com indicação da vantagem do empate para o 1º colocado.
+- A final pode ser exibida antes da semifinal com o 1º colocado definido e a indicação “Vencedora da semifinal”; não usar “Confrontos a definir” quando o 1º já é conhecido.
+- Placar do tempo normal; em caso de empate, indicar textualmente quem avançou ou foi campeã pela vantagem.
+- W.O. exibido com o placar administrativo e o vencedor.
 - Campeã, vice-campeã e 3ª colocada.
 - Estado “a definir” antes da classificação.
-- Não há card, rota ou link de disputa de 3º lugar.
+- Não há card, rota ou link de disputa de 3º lugar nem de amistoso.
 
 ### 10.7 Regulamento
 
@@ -425,13 +436,13 @@ Observações:
 ### 11.1 Antes da copa
 
 1. Organização cria a fonte de dados com edição, times, elencos e calendário.
-2. Validação automática verifica limites, apelidos, referências, datas, confrontos e amistoso.
+2. Validação automática verifica limites, apelidos, referências, datas, confrontos e a sequência das 8 partidas.
 3. Site é publicado.
 4. Público consulta times, jogos e classificação.
 
 ### 11.2 Após cada partida
 
-1. Organização registra gols, assistências, cartões e pênaltis, se houver.
+1. Organização registra gols, assistências e cartões.
 2. Placar é derivado dos gols.
 3. Classificação, estatísticas e suspensões são recalculadas.
 4. Site é publicado.
@@ -441,26 +452,35 @@ Observações:
 
 1. Classificação final é calculada com todos os critérios.
 2. Se houver empate persistente, organização realiza sorteio e registra `drawOrder`.
-3. Finalistas são gravados em `finalists` (1º x 2º).
-4. Site publica o confronto da final.
-5. A 3ª colocada é definida pela classificação; não há partida de 3º lugar.
+3. Semifinalistas são gravados em `semifinalists` no formato `[2º, 3º]`.
+4. Site publica a semifinal e a final com o 1º colocado e a indicação “Vencedora da semifinal”.
+5. A 3ª colocada será a perdedora da semifinal; não há partida de 3º lugar.
 
-### 11.4 Final
+### 11.4 Semifinal
 
-1. Organização registra o amistoso apenas como metadado informativo, se houver.
-2. Organização registra o resultado da final.
-3. Se houver empate no tempo normal, registra o placar dos pênaltis.
+1. Organização registra o resultado da semifinal.
+2. Se houver empate no tempo normal, o 2º colocado avança pela vantagem do empate.
+3. Se houver W.O., o vencedor administrativo avança; o W.O. prevalece sobre a vantagem.
+4. Finalistas são gravados em `finalists` no formato `[1º, vencedora da semifinal]`.
+5. A perdedora da semifinal é a 3ª colocada.
+6. Site publica o confronto da final.
+
+### 11.5 Final
+
+1. Organização registra o resultado da final.
+2. Se houver empate no tempo normal, o 1º colocado é campeão pela vantagem do empate.
+3. Se houver W.O., o vencedor administrativo é campeão.
 4. Site publica campeã, vice-campeã e 3ª colocada.
-5. O amistoso não altera classificação, estatísticas, suspensões ou pódio.
 
-### 11.5 Correção
+### 11.6 Correção
 
 1. Organização edita o resultado ou evento.
 2. Validação e recálculo são executados.
-3. Se a correção alterar os finalistas depois da final, o build falha listando antigos e novos; a organização atualiza `finalists` para confirmar.
-4. Se a correção alterar um empate que dependia de sorteio, a organização revisa `drawOrder`.
-5. Organização adiciona um `notice` explicando a correção.
-6. Site é republicado.
+3. Se a correção alterar os semifinalistas depois da semifinal, o build falha listando antigos e novos; a organização reconcilia os dados e explica a correção em `notices`.
+4. Se a correção alterar os finalistas depois da final, o build falha listando antigos e novos; a organização atualiza `finalists` para confirmar e explica a correção em `notices`.
+5. Se a correção alterar um empate que dependia de sorteio, a organização revisa `drawOrder`.
+6. Organização adiciona um `notice` explicando a correção.
+7. Site é republicado.
 
 ---
 
@@ -476,6 +496,7 @@ Observações:
 
 2. **Pontuação**
    - Vitória soma 3 pontos; empate soma 1; derrota soma 0.
+   - Apenas as 6 partidas de grupo contam para a classificação.
 
 3. **Desempate entre dois times**
    - Dois times empatados em pontos: a soma dos pontos dos dois jogos do confronto direto decide.
@@ -492,56 +513,68 @@ Observações:
 5. **Cartões**
    - Amarelo = 1 ponto; vermelho = 2 pontos.
    - Segundo amarelo no mesmo jogo = 1 amarelo + 1 vermelho = 3 pontos para o time.
-   - Vermelho suspende a jogadora da próxima partida.
+   - Vermelho suspende a jogadora da próxima partida real do time, considerando o chaveamento e a ausência de semifinal para o 1º colocado.
+   - Um vermelho na semifinal suspende a final apenas se o time se classificar; um vermelho na final não tem efeito.
    - Não há suspensão por acúmulo de amarelos.
-   - Cartões da final contam para estatísticas e suspensão, não para a classificação.
+   - Cartões da semifinal e da final contam para estatísticas e suspensão, não para a classificação.
    - Cartões de W.O. contam em `insufficient_players`/`withdrawal`; `no_show` não tem eventos.
 
 6. **Gols e assistências**
    - O placar é a soma dos gols registrados.
    - Gol contra conta para o time adversário e não entra na artilharia da jogadora.
    - Assistência é opcional, do mesmo time e diferente da marcadora; é proibida em pênalti e em gol contra.
-   - Pênalti no tempo normal conta para artilharia; pênalti da disputa não conta.
+   - Pênalti no tempo normal conta para artilharia; não há pênaltis de disputa.
 
-7. **Fase final**
-   - 1º x 2º na final; não há 3º x 4º.
-   - Empate no tempo normal vai direto para pênaltis.
-   - O placar dos pênaltis é exibido entre parênteses.
-   - Campeã, vice-campeã e 3ª colocada são exibidas corretamente; não há 4º lugar.
-   - Uma final decidida nos pênaltis conta como empate em V/E/D nas estatísticas do time e soma campanha separada nos pênaltis.
+7. **Semifinal**
+   - É disputada entre 2º e 3º colocados.
+   - O 2º colocado tem vantagem do empate e mando de campo.
+   - Empate no tempo normal classifica o 2º colocado.
+   - Não há prorrogação nem pênaltis.
+   - W.O. é permitido e prevalece sobre a vantagem do empate.
 
-8. **Elenco flexível**
-   - Nova jogadora pode ser incluída se o time tiver menos de 8 ativas.
-   - Ela fica elegível a partir da próxima partida.
-   - Não há eventos retroativos.
-   - Jogadora que já atuou não pode trocar de time.
-   - `leftAt` preserva histórico e libera vaga.
+8. **Final**
+   - É disputada entre o 1º colocado e a vencedora da semifinal.
+   - O 1º colocado tem vantagem do empate e mando de campo.
+   - Empate no tempo normal dá o título ao 1º colocado.
+   - Não há prorrogação nem pênaltis.
+   - W.O. é permitido e prevalece sobre a vantagem do empate.
+   - Uma semifinal ou final empatada conta como empate em V/E/D nas estatísticas do time.
 
-9. **Suspensão**
-   - Jogadora suspensa não pode ter eventos na partida que perde.
-   - O site exibe a suspensão e a partida afetada.
+9. **Pódio e 3ª colocada**
+   - A 3ª colocada é a perdedora da semifinal.
+   - O pódio exibe campeã, vice-campeã e 3ª colocada.
+   - Não há 4º lugar, disputa de 3º lugar ou partida de consolação.
 
-10. **Correções e avisos**
-    - Correção de resultado recalcula classificação, estatísticas, suspensões e chaveamento.
-    - Se a correção mudar os finalistas após a final, o sistema bloqueia o build até `finalists` ser atualizado.
+10. **Snapshots e correções**
+    - `semifinalists` é nulo com grupo incompleto e igual à classificação quando o grupo termina.
+    - `finalists` é nulo com semifinal incompleta e igual ao esperado quando a semifinal termina.
+    - A ordem dos snapshots define mando e vantagem do empate.
+    - Se uma correção mudar os semifinalistas depois da semifinal, o build falha listando antigos e novos.
+    - Se uma correção mudar os finalistas depois da final, o build falha até `finalists` ser atualizado.
     - `notices` gera banner global.
-    - Se o sorteio for refeito, `drawOrder` pode ser atualizado.
 
-11. **Amistoso**
-    - O amistoso aparece apenas como card informativo na Fase final, antes da final.
-    - Não tem placar, eventos, cartões, estatísticas, suspensões, classificação, pódio ou link de jogo.
-    - Participantes, se houver, ficam apenas na nota.
-    - Se `friendly` for `null`, nenhum card ou placeholder aparece.
+11. **Elenco flexível**
+    - Nova jogadora pode ser incluída se o time tiver menos de 8 ativas.
+    - Ela fica elegível a partir da próxima partida.
+    - Não há eventos retroativos.
+    - Jogadora que já atuou não pode trocar de time.
+    - `leftAt` preserva histórico e libera vaga.
 
-12. **Publicação e acesso**
+12. **Suspensão**
+    - Jogadora suspensa não pode ter eventos na partida que perde.
+    - O site exibe a suspensão e a partida afetada.
+    - A suspensão considera o caminho real do time: 1º vai direto à final; 2º e 3º disputam a semifinal; o vencedor da semifinal disputa a final.
+
+13. **Publicação e acesso**
     - Site público, sem login, no GitHub Pages.
     - Fonte de dados versionada e validada.
     - Nenhum dado sensível além do apelido.
 
-13. **Interface**
+14. **Interface**
     - Nome de exibição sem o nome da instituição.
     - Layout mobile-first, em português, acessível e sem JavaScript no cliente.
     - Páginas Início, Jogos, Classificação, Times, Estatísticas e Fase final acessíveis.
+    - A fase final exibe semifinal e final, com a vantagem do empate indicada textualmente.
     - `/regulamento/` não existe e não aparece em links.
 
 ---
@@ -552,12 +585,14 @@ Observações:
 |---|---|
 | **09/11/2026** | PRD v1.0 proposto |
 | **12/11/2026** | PRD v1.1 e SPEC v1.2 alinhados às decisões de formato |
-| **13/11 a 20/11/2026** | Implementação do MVP |
+| **18/11/2026** | PRD v2.0 e SPEC v2.0 alinhados ao novo formato com semifinal |
+| **18/11 a 20/11/2026** | Implementação do MVP v2.0 |
 | **21/11 a 23/11/2026** | Testes, dados de exemplo e congelamento do escopo |
 | **24/11/2026** | Primeira rodada (g1/g2) |
 | **26/11/2026** | Segunda rodada (g3/g4) |
 | **01/12/2026** | Terceira rodada (g5/g6) |
-| **03/12/2026** | Amistoso do 3º colocado e final |
+| **02/12/2026** | Semifinal (2º x 3º) |
+| **03/12/2026** | Final (1º x vencedora da semifinal) |
 | **04/12/2026** | Retrospectiva e registro de melhorias |
 
 **Contingência:** se o site não estiver pronto até 24/11, a organização pode registrar os dados na fonte versionada e publicar o site assim que possível, sem alterar a condução da copa.
@@ -572,11 +607,12 @@ Observações:
 | Carga física: um time joga duas vezes em 24/11, 26/11 e 01/12 | Alto | Calendário explícito; horários distintos; ordem canônica validada; a organização controla aquecimento/recuperação |
 | Erro no lançamento de dados | Alto | Validação automática, exemplos, revisão antes de publicar |
 | Interpretação errada dos desempates | Alto | Critérios explícitos, confronto direto de dois jogos e testes com casos de exemplo |
-| Correção após a final mudar finalistas | Alto | `finalists` snapshot; build falha com antigos/novos; `notices` para o público |
-| W.O. mal registrado | Médio | Schema de `walkover`; validação de motivo/eventos; UI explícita |
-| Amistoso confundido com partida oficial | Médio | Rótulo informativo, card sem placar/status/link, validação e testes |
+| Interpretação errada da vantagem do empate | Alto | Regra explícita na UI, rótulos textuais, testes unitários e E2E |
+| Semifinalistas ou finalistas errados | Alto | Snapshots `semifinalists`/`finalists` validados; build falha com antigos/novos; `notices` para o público |
+| Correção após a semifinal ou a final | Alto | Bloqueio do build com antigos/novos; reconciliação explícita e `notice` |
+| W.O. mal registrado | Médio | Schema de `walkover`; validação de motivo/eventos; UI explícita; W.O. prevalece sobre a vantagem |
 | Elenco flexível gerar inconsistência | Médio | `joinedAt`/`leftAt`, limite de 8 ativas, apelido único, vínculo imutável |
-| Suspensão aplicada à partida errada | Médio | Ordem canônica, validação de cronologia e testes |
+| Suspensão aplicada à partida errada | Médio | Ordem canônica, caminho do time no chaveamento, validação de cronologia e testes |
 | Sorteio refeito sem atualizar `drawOrder` | Médio | `drawOrder` é registro vigente; validação e `notice` |
 | Cache do GitHub Pages | Baixo | Verificar após o deploy e orientar recarregar a página |
 | Nome da instituição ou marca na interface | Médio | Revisão de textos públicos; nome de exibição definido no PRD |
@@ -598,21 +634,25 @@ Observações:
 - Site estático no GitHub Pages, sem backend, sem login, sem área administrativa e sem JavaScript no cliente.
 - Fonte de dados versionada e validada; site somente leitura.
 - Apenas a edição 2026, com estrutura preparada para edições futuras.
-- **3 times** (`ta`, `tb`, `tc`), **6 partidas de grupo em turno e returno** e **1 final**.
-- Calendário: 24/11, 26/11, 01/12 e 03/12/2026; horários a definir.
+- **3 times** (`ta`, `tb`, `tc`), **6 partidas de grupo em turno e returno**, **1 semifinal** e **1 final**, totalizando **8 partidas oficiais**.
+- Calendário: 24/11, 26/11, 01/12, 02/12 e 03/12/2026; horários a definir.
 - Cada par de times tem um jogo em casa para cada lado; `g4` é `tb x ta`.
-- **Não há disputa de 3º lugar nem 4º lugar**; a 3ª colocada é a 3ª da classificação.
+- A semifinal é **2º x 3º**, com vantagem do empate para o 2º colocado.
+- A final é **1º x vencedora da semifinal**, com vantagem do empate para o 1º colocado.
+- Empate encerra a partida no tempo normal; não há prorrogação, pênaltis ou shootout.
+- A 3ª colocada é a perdedora da semifinal; **não há disputa de 3º lugar nem 4º lugar**.
 - Pódio de três posições: campeã, vice-campeã e 3ª colocada.
-- O amistoso do 3º colocado é metadado informativo, sem efeito competitivo.
+- W.O. é permitido na semifinal e na final e prevalece sobre a vantagem do empate.
+- `semifinalists` e `finalists` são snapshots validados; a ordem define mando e vantagem.
+- Correção após a semifinal que mude semifinalistas bloqueia o build; correção após a final que mude finalistas bloqueia até atualização do snapshot.
 - Confronto direto apenas para dois times, considerando os dois jogos; se os pontos empatarem, o saldo agregado decide; só vale com os dois jogos `finished`; W.O. conta 1x0.
-- `finalists` é snapshot validado; correção após a final bloqueia o build até atualização.
 - `drawOrder` é obrigatório apenas quando o sorteio é necessário e pode ser atualizado se o sorteio for refeito.
-- Pênaltis diretos na final, com placar registrado apenas como resultado.
 - Placar derivado dos gols.
 - Segundo amarelo = 3 pontos para o time (1 amarelo + 1 vermelho).
+- Suspensão é cumprida na próxima partida real do time, considerando o chaveamento.
 - Elenco flexível, com limite de 8 ativas simultâneas e mínimo de 7 sinalizado; badge público com menos de 5.
 - Jogadora que já atuou não troca de time nesta edição.
-- Estatísticas do time somam grupo + final; V/E/D pelo tempo normal; final nos pênaltis conta como empate; campanha nos pênaltis é separada.
+- Estatísticas do time somam grupo + semifinal + final; V/E/D pelo tempo normal; empate na semifinal ou final conta como empate.
 - Sem nome completo, número de camisa, foto, contato ou data de nascimento.
 - Sem escalação, cronômetro, placar ao vivo ou controle de faltas.
 - Regulamento adiado no MVP; histórico de alterações é futuro.
@@ -624,11 +664,9 @@ Observações:
 
 Estas questões não bloqueiam o MVP e podem ser resolvidas pela organização durante a implementação:
 
-- Horários exatos das partidas, incluindo os dois jogos do mesmo time em 24/11, 26/11 e 01/12.
+- Horários exatos das partidas, incluindo os dois jogos do mesmo time em 24/11, 26/11 e 01/12 e os horários da semifinal e da final.
 - Nomes definitivos dos times.
 - Local/quadra exata a exibir publicamente.
-- Horário, local e texto do amistoso do 3º colocado.
-- Quem disputa o amistoso; se necessário, descrever apenas na nota, sem dados estruturados.
 - Como acomodar novas alunas se todos os times estiverem com 8 ativas.
 - Critério de assistência em casos duvidosos.
 - Data de habilitação do GitHub Pages.
@@ -640,8 +678,10 @@ Estas questões não bloqueiam o MVP e podem ser resolvidas pela organização d
 
 - **TA, TB, TC:** abreviações provisórias dos três times.
 - **Fase classificatória:** todos contra todos, em turno e returno, com 6 partidas.
-- **Fase final:** final única entre 1º e 2º.
-- **Amistoso do 3º colocado:** evento informativo no dia da final, sem efeito competitivo.
+- **Semifinal:** partida única entre o 2º e o 3º colocados, com vantagem do empate para o 2º.
+- **Final:** partida única entre o 1º colocado e a vencedora da semifinal, com vantagem do empate para o 1º.
+- **Vantagem do empate:** regra que classifica ou dá o título ao time melhor colocado quando a partida termina empatada no tempo normal.
+- **3ª colocada:** perdedora da semifinal.
 - **Confronto direto:** soma dos pontos e, se necessário, do saldo agregado dos dois jogos entre dois times empatados em pontos.
 - **Saldo de gols:** gols pró menos gols contra.
 - **Gols pró:** gols marcados.
@@ -649,13 +689,11 @@ Estas questões não bloqueiam o MVP e podem ser resolvidas pela organização d
 - **Gols sofridos:** gols marcados pelo adversário no gol do time.
 - **Pontos disciplinares:** amarelo = 1; vermelho = 2; segundo amarelo = 3 para o time.
 - **Tempo técnico:** pausa de 1 minuto por time por tempo.
-- **Pênaltis:** disputa de 5 cobranças alternadas e morte súbita.
-- **Shootout:** disputa de pênaltis da final; o placar é registrado separadamente e não conta para gols/assistências.
 - **W.O.:** vitória administrativa por 1x0; registrada manualmente, sem gols ou assistências fictícios.
 - **Fonte de dados:** arquivo versionado que contém todas as informações da copa.
-- **`finalists`:** snapshot dos dois finalistas, validado contra a classificação.
+- **`semifinalists`:** snapshot dos dois semifinalistas, no formato `[2º, 3º]`, validado contra a classificação.
+- **`finalists`:** snapshot dos dois finalistas, no formato `[1º, vencedora da semifinal]`, validado contra a classificação e o resultado da semifinal.
 - **`drawOrder`:** ordem manual do sorteio vigente.
-- **`friendly`:** metadado informativo do amistoso.
 
 ---
 
