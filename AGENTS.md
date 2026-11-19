@@ -4,9 +4,11 @@ Instruções para agentes de código que trabalham neste repositório.
 
 ## Visão geral
 
-Site público, estático e somente leitura da **Copa de Futsal Feminino Vila Mariana 2026**. A competição tem **3 times**, **6 partidas na fase classificatória em turno e returno** e **1 final**, totalizando **7 partidas oficiais**. No dia da final, a organização realiza um **amistoso do 3º colocado**, tratado como evento informativo e sem efeito competitivo. Os dados são mantidos em uma fonte versionada e o site é publicado no GitHub Pages.
+Site público, estático e somente leitura da **Copa de Futsal Feminino Vila Mariana 2026**. A competição tem **3 times**, **6 partidas na fase classificatória em turno e returno**, **1 semifinal** e **1 final**, totalizando **8 partidas oficiais**.
 
-**Estado atual:** o repositório contém o PRD v1.1, a SPEC v1.2, o plano de execução e as referências visuais. A implementação do site ainda não começou; a stack, o schema, os algoritmos e os comandos estão definidos na `SPEC.md`.
+A semifinal é disputada entre o **2º e o 3º colocado**, com **vantagem do empate para o 2º**. A final é disputada entre o **1º colocado** e a **vencedora da semifinal**, com **vantagem do empate para o 1º**. Empates encerram a partida no tempo normal: **não há prorrogação, pênaltis, shootout ou cobranças alternadas**. A 3ª colocada é a perdedora da semifinal; não há disputa de 3º lugar nem 4º lugar. Os dados são mantidos em uma fonte versionada e o site é publicado no GitHub Pages.
+
+**Estado atual:** o repositório contém o PRD v2.0, a SPEC v2.0, o plano de execução e as referências visuais. A stack, o schema, os algoritmos e os comandos estão definidos na `SPEC.md`.
 
 ## Fontes de verdade
 
@@ -18,6 +20,7 @@ Leia antes de implementar qualquer mudança:
 | `SPEC.md` | Especificação técnica normativa: stack, schema, algoritmos, validação, UI, testes, CI e deploy. |
 | `AGENTS.md` | Restrições do repositório, design, acessibilidade, privacidade e testes. |
 | `PLAN.md` / `TASKS.md` | Plano e checklist de execução, subordinados ao PRD, ao AGENTS e à SPEC. |
+| `docs/decisoes-v2.0.md` | Registro histórico das decisões da v2.0; não é normativo. |
 | `docs/decisoes-v1.1.md` | Registro histórico das decisões da v1.1; não é normativo. |
 | `context.md` | Contexto original da organização; em caso de conflito, prevalece o PRD. |
 | `README.md` | Visão geral, comandos e publicação. |
@@ -73,7 +76,7 @@ Os arquivos `airbnb-design-design.md` e `airbnb-design-tokens.css` são uma refe
 - `--color-accent` e `--color-accent-strong` têm cerca de 3:1 sobre branco: use apenas em texto grande (≥24px ou ≥19px em negrito), ícones ou elementos não textuais. Não use como cor de texto de corpo nem como fundo de texto normal.
 - `--color-accent-strong` fica no limite de 4,5:1 sobre branco. Valide o par exato antes de usá-lo como fundo de texto; gradientes podem reduzir o contraste.
 - `--color-border` é uma hairline decorativa (1,4:1): não use como única indicação de foco, borda de campo ou estado.
-- Não comunique estado (vitória/empate/derrota, classificação, cartão, suspensão) apenas por cor; use também texto, rótulo ou ícone.
+- Não comunique estado (vitória/empate/derrota, classificação, cartão, suspensão, avanço por vantagem do empate) apenas por cor; use também texto, rótulo ou ícone.
 - Todo par de cor usado em texto ou componente interativo deve atender WCAG AA: 4,5:1 para texto normal e 3:1 para texto grande e componentes de interface.
 - Os tokens de referência são de tema claro. Não implemente tema escuro no MVP; isso exigiria spec e novos tokens.
 
@@ -91,7 +94,8 @@ Os arquivos `airbnb-design-design.md` e `airbnb-design-tokens.css` são uma refe
 - Não exiba fotos de jogadoras. Evite imagens de pessoas reais; prefira composição tipográfica, cor e ícones discretos. Imagens decorativas, se existirem, devem ser leves, licenciadas, com `alt` adequado e sem marcas da Airbnb.
 - Não use o gradiente coral→pink em grandes áreas ou atrás de tabelas; reserve-o para pequenos acentos.
 - Não sacrifique densidade, contraste ou clareza para reproduzir o estilo. Em dúvida, acessibilidade e legibilidade vencem.
-- O card do amistoso é informativo: sem placar, status de partida, link de jogo ou tratamento visual de partida oficial.
+- A fase final deve indicar textualmente a vantagem do empate e quem avançou ou foi campeã em caso de empate; não use apenas cor ou posição na tabela.
+- Não há card de amistoso, disputa de 3º lugar ou pênaltis. A 3ª colocada é a perdedora da semifinal e deve ser rotulada como “3ª colocada”.
 
 ### Acessibilidade visual
 
@@ -106,11 +110,14 @@ Os arquivos `airbnb-design-design.md` e `airbnb-design-tokens.css` são uma refe
 
 - **3 times:** TA, TB e TC.
 - Fase classificatória em **turno e returno**: 6 partidas. Cada time joga 4 partidas e cada par tem um jogo em casa para cada lado.
-- Vitória = 3 pontos, empate = 1, derrota = 0.
-- Fase final: **1º x 2º** (final única). Não há semifinais.
-- **3º lugar:** é o 3º da classificação. **Não há 3º x 4º, disputa de 3º lugar nem 4º lugar.**
+- Vitória = 3 pontos, empate = 1, derrota = 0 na fase classificatória.
+- **Semifinal:** **2º x 3º**, partida única; o 2º tem vantagem do empate e mando de campo.
+- **Final:** **1º x vencedora da semifinal**, partida única; o 1º tem vantagem do empate e mando de campo.
+- Empate encerra a partida no tempo normal; **não há prorrogação, pênaltis ou shootout**. Na semifinal, o empate classifica o 2º; na final, o empate dá o título ao 1º.
+- **3ª colocada:** é a perdedora da semifinal. **Não há 3º x 4º, disputa de 3º lugar nem 4º lugar.**
 - Pódio de três posições: campeã, vice-campeã e 3ª colocada.
-- O **amistoso do 3º colocado** é um metadado informativo (`friendly`) no dia da final, antes da final; não é partida oficial e não altera classificação, estatísticas, suspensões ou pódio.
+- **8 partidas oficiais:** `g1`…`g6`, `semi` e `final`.
+- W.O. é permitido na semifinal e na final e prevalece sobre a vantagem do empate.
 
 ### Desempate (nesta ordem)
 
@@ -127,7 +134,7 @@ Os arquivos `airbnb-design-design.md` e `airbnb-design-tokens.css` são uma refe
 6. Pontos disciplinares (menor é melhor): amarelo = 1; vermelho = 2; **segundo amarelo no mesmo jogo = 1 + 2 = 3 pontos**, sem somar outro amarelo.
 7. Sorteio, com a ordem final registrada manualmente na fonte de dados em `drawOrder`.
 
-Com 3 ou mais times empatados, o confronto direto **não** é aplicado até que o grupo se reduza a dois. A classificação considera apenas as 6 partidas de grupo; a final e o amistoso não alteram posições.
+Com 3 ou mais times empatados, o confronto direto **não** é aplicado até que o grupo se reduza a dois. A classificação considera apenas as 6 partidas de grupo; a semifinal e a final não alteram posições.
 
 ### Elenco
 
@@ -149,32 +156,36 @@ Com 3 ou mais times empatados, o confronto direto **não** é aplicado até que 
 - Gol contra é vinculado à jogadora que marcou contra, conta para o time adversário e **não** entra na artilharia dela; não tem assistência.
 - Assistência é opcional, do mesmo time da marcadora e diferente dela; é proibida em pênalti e em gol contra.
 - Minuto de gol, assistência e cartão é opcional.
-- Gols, assistências e cartões da final contam para as estatísticas individuais.
-- Pênaltis da disputa não contam para placar, artilharia nem assistências; registra-se apenas o placar dos pênaltis.
+- Gols, assistências e cartões da semifinal e da final contam para as estatísticas individuais.
+- Não há disputa de pênaltis, shootout ou gols de shootout.
 - Só pode haver evento vinculado a jogadora do elenco do time naquela partida e elegível no início dela.
-- Status: `scheduled`, `finished` e `postponed`; `date` obrigatória; `startsAt` opcional em `scheduled`, obrigatório em `finished`; `postponed` sem eventos, W.O. ou shootout.
+- Status: `scheduled`, `finished` e `postponed`; `date` obrigatória; `startsAt` opcional em `scheduled`, obrigatório em `finished`; `postponed` sem eventos nem W.O.
 
 ### Cartões e suspensão
 
 - Segundo amarelo no mesmo jogo gera vermelho.
-- Vermelho (direto ou por segundo amarelo) suspende a jogadora da próxima partida do time.
+- Vermelho (direto ou por segundo amarelo) suspende a jogadora da **próxima partida real do time**, considerando o chaveamento:
+  - o 1º colocado não disputa a semifinal; seu próximo jogo após o grupo é a final;
+  - o 2º e o 3º disputam a semifinal; vermelho na última partida de grupo é cumprido na semifinal;
+  - vermelho na semifinal é cumprido na final se o time avançar; se for eliminado, não há partida seguinte;
+  - vermelho na final não tem efeito.
 - Não há suspensão por acúmulo de amarelos.
 - Jogadora suspensa não pode ter eventos na partida que não pode disputar; o sistema deve alertar e bloquear.
-- Cartões na disputa de pênaltis não entram nas estatísticas nem geram suspensão.
-- Cartões da final contam para estatísticas e suspensão, mas não para a classificação.
+- Cartões na semifinal e na final contam para estatísticas e suspensão, mas não para a classificação.
 - Cartões de W.O. contam, exceto `no_show`, que não tem eventos.
-- O amistoso não tem cartões.
 
 ### Fase final
 
-- Apenas **1º x 2º** na final; não há 3º x 4º.
-- `finalists` é o snapshot oficial dos dois finalistas, validado contra a classificação; é nulo enquanto o grupo não termina.
-- Empate no tempo normal na final vai direto para pênaltis: 5 cobranças alternadas e morte súbita, se necessário.
-- Exibir o resultado no formato `1 (4) x (3) 1`.
-- Apenas o placar dos pênaltis é registrado; sem detalhes de cobradoras.
-- Se uma correção após a final mudar os finalistas, o build falha listando antigos/novos e exige atualização de `finalists`.
-- A 3ª colocada é a 3ª da classificação; não há partida de 3º lugar.
-- W.O. na final define o título conforme o vencedor administrativo.
+- Semifinal **2º x 3º**; o 2º tem vantagem do empate.
+- Final **1º x vencedora da semifinal**; o 1º tem vantagem do empate.
+- `semifinalists` é o snapshot `[2º, 3º]`; a ordem define mando e vantagem.
+- `finalists` é o snapshot `[1º, vencedora da semifinal]`; a ordem define mando e vantagem.
+- `semifinalists` é nulo enquanto o grupo não termina; `finalists` é nulo enquanto a semifinal não termina.
+- Empate na semifinal classifica o 2º; empate na final dá o título ao 1º.
+- W.O. na semifinal ou na final define o vencedor administrativo e prevalece sobre a vantagem.
+- A 3ª colocada é a perdedora da semifinal; não há partida de 3º lugar.
+- Se uma correção após a semifinal mudar os semifinalistas, o build falha listando antigos/novos e exige reconciliação e explicação em `notices`.
+- Se uma correção após a final mudar os finalistas, o build falha listando antigos/novos e exige atualização de `finalists` e explicação em `notices`.
 
 ### Calendário
 
@@ -183,10 +194,10 @@ Com 3 ou mais times empatados, o confronto direto **não** é aplicado até que 
 | 24/11/2026 | TA x TB (g1) e TB x TC (g2) |
 | 26/11/2026 | TA x TC (g3) e TB x TA (g4) |
 | 01/12/2026 | TC x TA (g5) e TC x TB (g6) |
-| 03/12/2026 | Amistoso do 3º colocado (informativo) e 1º x 2º (final) |
+| 02/12/2026 | Semifinal: 2º x 3º |
+| 03/12/2026 | Final: 1º x vencedora da semifinal |
 
-- Cada time joga duas vezes em 24/11, 26/11 e 01/12; os horários devem ser distintos e respeitar a ordem canônica g1 → g2 → g3 → g4 → g5 → g6 → final.
-- O amistoso é na mesma data da final e antes do horário da final, quando ela tiver horário.
+- Cada time joga duas vezes em 24/11, 26/11 e 01/12; os horários devem ser distintos e respeitar a ordem canônica g1 → g2 → g3 → g4 → g5 → g6 → semifinal → final.
 - Horários e nomes definitivos dos times ainda não foram definidos; devem vir da fonte de dados, não fixos no código.
 - Se uma partida for adiada, a organização atualiza `status` para `postponed`, ajusta `date`/`startsAt` e, quando remarcar, volta para `scheduled`.
 
@@ -196,22 +207,16 @@ Com 3 ou mais times empatados, o confronto direto **não** é aplicado até que 
 - Motivos: `no_show`, `insufficient_players` ou `withdrawal`.
 - Sem gols ou assistências fictícios.
 - Cartões são permitidos em `insufficient_players`/`withdrawal`; `no_show` não tem eventos.
+- O W.O. é permitido na fase classificatória, na semifinal e na final.
+- Na semifinal e na final, o vencedor administrativo avança ou conquista o título; o W.O. prevalece sobre a vantagem do empate.
 - O site não detecta ausência nem automatiza retirada de time; a organização registra um W.O. por partida restante.
-
-### Amistoso do 3º colocado
-
-- Metadado `friendly` com data, horário, local e nota; data igual à da final; horário anterior ao da final, quando ela tiver horário.
-- Participantes, se necessário, apenas na nota, sem dados estruturados ou dados pessoais.
-- Sem placar, eventos, cartões, estatísticas, suspensões, classificação, pódio ou link de jogo.
-- Card informativo na Fase final, antes da final, com o rótulo “Informativo — não é partida oficial”.
-- Se `friendly` for `null`, nenhum card ou placeholder é exibido.
 
 ## Validação obrigatória dos dados
 
 A publicação deve ser bloqueada com mensagem clara quando houver:
 
 - quantidade de times diferente de 3 na edição 2026;
-- conjunto de partidas diferente de `g1`…`g6` + `final`;
+- conjunto de partidas diferente de `g1`…`g6` + `semi` + `final`;
 - confrontos de grupo diferentes dos seis do turno e returno, time repetido, time contra si mesmo ou par sem os dois jogos;
 - time com mais de 8 jogadoras ativas simultaneamente ou apelido repetido dentro do time;
 - jogadora em dois times;
@@ -219,23 +224,24 @@ A publicação deve ser bloqueada com mensagem clara quando houver:
 - assistência de jogadora de outro time, igual à marcadora, em pênalti ou em gol contra;
 - gol contra com assistência;
 - placar materializado ou incompatível com os gols registrados;
-- partida final sem o confronto 1º x 2º conforme a classificação;
-- `finalists` divergente da classificação ou ausente quando o grupo termina;
+- semifinal sem o confronto 2º x 3º conforme a classificação;
+- final sem o confronto 1º x vencedora da semifinal conforme a classificação e o resultado da semifinal;
+- `semifinalists` divergente da classificação ou ausente quando o grupo termina; divergência após a semifinal bloqueia o build;
+- `finalists` divergente do esperado ou ausente quando a semifinal termina; divergência após a final bloqueia o build;
 - `drawOrder` inválido ou ausente quando o sorteio é necessário;
-- evento de jogadora suspensa na partida em que está suspensa;
+- evento de jogadora suspensa na partida em que está suspensa, considerando o caminho do time no chaveamento e a ausência de semifinal para o 1º colocado;
 - data/hora inválida ou referência a time, jogadora, partida ou aviso inexistente;
-- W.O. inválido (não `finished`, vencedor fora dos participantes, motivo inválido, shootout presente, gols/assistências);
-- shootout inválido (fora da final, sem empate no tempo normal, com W.O., valores iguais ou negativos);
-- amistoso inválido (data diferente da final, horário posterior, local/nota vazio ou campo de partida);
+- W.O. inválido (não `finished`, vencedor fora dos participantes, motivo inválido, gols/assistências, shootout ou amistoso);
+- campo de partida de shootout ou de amistoso;
 - campo de privacidade proibido (nome completo, foto, contato, camisa, data de nascimento, telefone, e-mail, endereço ou redes sociais).
 
 O catálogo completo de códigos `VAL-*` e `VAL-W*` está na `SPEC.md` §8.
 
 ## Diretrizes de implementação
 
-- Isole as regras de negócio (pontuação, desempate, cartões, suspensões, placar, artilharia, estatísticas coletivas, pódio) em funções puras e testáveis.
+- Isole as regras de negócio (pontuação, desempate, cartões, suspensões, placar, artilharia, estatísticas coletivas, semifinalistas, finalistas e pódio) em funções puras e testáveis.
 - Derive classificação e estatísticas sempre a partir dos eventos; nunca as armazene como verdade editável.
-- `buildTeamStats` agrega grupo + final; V/E/D usam o tempo normal, uma final decidida nos pênaltis conta como empate e a campanha nos pênaltis é registrada separadamente (`shootoutWins`/`shootoutLosses`); o shootout não altera GP/GC/SG; o amistoso não entra.
+- `buildTeamStats` agrega grupo + semifinal + final; V/E/D usam o tempo normal, uma semifinal ou final empatada conta como empate; não há campanha de pênaltis; o placar e a vantagem do empate são informações separadas.
 - A fonte de dados deve ser legível por humanos e ter formato validado antes do build.
 - O build de produção usa somente `data/2026/copa.yaml`; fixtures em `tests/fixtures/` alimentam apenas testes e o `dist-test/` do E2E, nunca o `dist/` publicado.
 - Evite dependências desnecessárias; o site precisa carregar rápido em 4G.
@@ -290,14 +296,20 @@ chore: configura deploy no GitHub Pages
 - Confronto direto ignorado quando um dos dois jogos não está `finished`.
 - Desempate com 3+ times e reaplicação do confronto direto ao reduzir para dois.
 - Pontos disciplinares, incluindo segundo amarelo (3 pontos).
-- Suspensão automática e bloqueio de eventos.
-- Gol contra, assistência opcional e pênaltis fora da artilharia.
-- Estatísticas coletivas: grupo + final; final nos pênaltis conta como empate em V/E/D; `shootoutWins`/`shootoutLosses` separados; GP/GC/SG sem shootout; amistoso fora.
+- Suspensão automática e bloqueio de eventos, incluindo:
+  - 1º colocado sem semifinal, com vermelho no último jogo de grupo cumprido na final;
+  - vermelho na semifinal cumprido na final apenas se o time avançar;
+  - vermelho na final sem partida seguinte.
+- Gol contra, assistência opcional e pênaltis do tempo normal fora da artilharia.
+- Estatísticas coletivas: grupo + semifinal + final; empate na semifinal/final conta como empate em V/E/D; GP/GC/SG incluem as 8 partidas; sem colunas de shootout.
 - Simetria dos confrontos: cada par tem um jogo em casa para cada lado; `g4` é `tb x ta`.
-- Definição de finalistas e pódio de 3, sem 4º lugar.
-- W.O. 1x0, motivos e cartões permitidos.
-- `finalists`, `drawOrder` e `notices`.
-- Amistoso como card informativo e ausência em listas/estatísticas.
+- Semifinal 2º x 3º e vantagem do empate para o 2º.
+- Final 1º x vencedora da semifinal e vantagem do empate para o 1º.
+- Vitória administrativa por W.O. na semifinal e na final, inclusive quando o vencedor é o visitante.
+- Definição de 3ª colocada como perdedora da semifinal, sem 4º lugar.
+- `semifinalists`, `finalists`, `drawOrder` e `notices`.
+- Correção que muda semifinalistas após a semifinal e finalistas após a final bloqueia o build com antigos/novos.
+- Ausência de amistoso, shootout e disputa de pênaltis em dados, UI e build.
 - Todas as validações de dados listadas acima.
 - Contraste WCAG AA dos pares de cor usados em texto e componentes interativos.
 - Foco visível e navegação por teclado nos componentes interativos.
@@ -307,6 +319,7 @@ chore: configura deploy no GitHub Pages
 - `airbnb-design-design.md` fora do build e ausência de arquivos das fontes proprietárias `Airbnb Cereal` e `Circular`.
 - Textos e metadados públicos sem o nome da instituição ou marcas da Airbnb.
 - Ausência de JavaScript de cliente no `dist/`.
+- Card da final antes da semifinal com o 1º colocado e “Vencedora da semifinal”, sem “Confrontos a definir”.
 
 ## Comandos
 
