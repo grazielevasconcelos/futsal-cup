@@ -1,14 +1,14 @@
 # SPEC — Copa de Futsal Feminino Vila Mariana 2026
 
-**Versão:** 1.2  
-**Data:** 12/11/2026  
+**Versão:** 2.0  
+**Data:** 18/11/2026  
 **Status:** Aceito  
-**Fonte de produto:** `PRD.md` v1.1 + `AGENTS.md` v1.1  
-**Registro de decisões:** `docs/decisoes-v1.1.md` (reconstrução documentada)
+**Fonte de produto:** `PRD.md` v2.0 + `AGENTS.md` v2.0  
+**Registro de decisões:** `docs/decisoes-v2.0.md`
 
-Esta é a especificação técnica normativa do site. Ela está subordinada ao `PRD.md` (produto) e ao `AGENTS.md` (restrições do repositório). Em caso de conflito, prevalecem o PRD e o AGENTS; as interpretações e emendas estão registradas na §15. O alinhamento do PRD/AGENTS com a v1.1 foi aplicado e a aprovação formal do PRD (§18) está registrada. `PLAN.md` e `TASKS.md` são documentos de execução subordinados a esta SPEC.
+Esta é a especificação técnica normativa do site. Ela está subordinada ao `PRD.md` (produto) e ao `AGENTS.md` (restrições do repositório). Em caso de conflito, prevalecem o PRD e o AGENTS; as interpretações e emendas estão registradas na §15. O alinhamento do PRD/AGENTS com a v2.0 foi aplicado. `PLAN.md` e `TASKS.md` são documentos de execução subordinados a esta SPEC.
 
-> **Mudança de formato na v1.1 (12/11/2026):** a edição 2026 passa a ter **3 times fixos** (`ta`, `tb`, `tc`), **6 partidas classificatórias em turno e returno** e **final única** entre 1º e 2º. O 3º lugar é o 3º da classificação; **não há disputa de 3º x 4º nem 4º lugar**. O **amistoso do 3º colocado** é um metadado informativo (`friendly`), não uma partida. O confronto direto passa a considerar os **dois jogos** entre os times empatados. As emendas estão na §15 e foram refletidas no PRD v1.1 e no AGENTS v1.1.
+> **Mudança de formato na v2.0 (18/11/2026):** a edição 2026 passa a ter **8 partidas oficiais**: 6 classificatórias em turno e returno (`g1`…`g6`), **1 semifinal** (`semi`, 2º x 3º) e **1 final** (`final`, 1º x vencedora da semifinal). O 2º e o 1º colocados têm **vantagem do empate** na semifinal e na final, respectivamente. Empates encerram no tempo normal: **não há prorrogação, pênaltis ou shootout**. A **3ª colocada é a perdedora da semifinal**; não há disputa de 3º lugar nem 4º lugar. O **amistoso do 3º colocado foi removido** e os campos `friendly` e `shootout` são proibidos com mensagem de migração. As emendas estão na §15 e foram refletidas no PRD v2.0 e no AGENTS v2.0.
 
 ---
 
@@ -104,8 +104,10 @@ Os IDs são estáveis: renomear uma seção não altera o ID. Um ID não pode se
 | SPEC-013 | Cores, tipografia, espaçamento, raios, sombras e movimento vêm de tokens do projeto. | Teste de tokens e varredura de estilos. |
 | SPEC-014 | Orçamento: 0 KB de JS de cliente, CSS < 30 KB gzip, sem fontes externas e sem imagens de pessoas. | `npm run test:build`. |
 | SPEC-015 | Nenhum segredo, analytics, cookie de rastreamento ou requisição de terceiros. | Varredura e teste E2E de rede. |
-| SPEC-016 | O amistoso do 3º colocado é metadado informativo (`friendly`), não é partida e não tem placar, eventos, cartões, estatísticas, suspensões ou efeito na classificação/pódio. | Schema estrito, validação VAL-033 e testes de UI. |
-| SPEC-017 | O formato de 2026 tem 3 times e 7 partidas oficiais: 6 de grupo em turno e returno + 1 final. Não há partida de 3º lugar nem 4º lugar. | Schema, validação, rotas e testes. |
+| SPEC-016 | **OBSOLETO na v2.0:** o amistoso do 3º colocado foi removido. Não existe `friendly` nem partida não oficial; campos antigos geram erro de migração. | Schema estrito, validação `VAL-002` e testes de ausência na UI. |
+| SPEC-017 | O formato de 2026 tem 3 times e **8 partidas oficiais**: 6 de grupo em turno e returno + 1 semifinal + 1 final. Não há partida de 3º lugar nem 4º lugar. | Schema, validação, rotas e testes. |
+| SPEC-018 | Semifinal e final usam a **vantagem do empate** do mandante (2º e 1º colocados, respectivamente); não há prorrogação, pênaltis ou shootout. W.O. prevalece sobre a vantagem. | Testes de placar, vencedor, pódio e UI. |
+| SPEC-019 | `semifinalists` e `finalists` são snapshots validados; a ordem define mando e vantagem. Divergência após a respectiva partida bloqueia o build com antigos/novos. | Schema, validação e testes de correção. |
 
 ---
 
@@ -113,7 +115,7 @@ Os IDs são estáveis: renomear uma seção não altera o ID. Um ID não pode se
 
 ### 2.1 Produto
 
-Site público, estático e somente leitura da Copa de Futsal Feminino Vila Mariana 2026, com **3 times**, **6 partidas classificatórias em turno e returno** e **final única**. O 3º lugar é o 3º da classificação; não há disputa de 3º x 4º nem 4º lugar. O **amistoso do 3º colocado** é um metadado informativo na Fase final, não uma partida. A organização edita a fonte YAML; o site apenas lê, valida e publica.
+Site público, estático e somente leitura da Copa de Futsal Feminino Vila Mariana 2026, com **3 times**, **6 partidas classificatórias em turno e returno**, **1 semifinal** e **1 final**. A semifinal é **2º x 3º**, com vantagem do empate para o 2º; a final é **1º x vencedora da semifinal**, com vantagem do empate para o 1º. A 3ª colocada é a perdedora da semifinal; não há disputa de 3º lugar nem 4º lugar. A organização edita a fonte YAML; o site apenas lê, valida e publica.
 
 **Nome público (imutável na UI):** “Copa de Futsal Feminino Vila Mariana 2026”.
 
@@ -123,13 +125,12 @@ O nome da instituição **NÃO DEVE** aparecer em interface, título, metadados,
 
 - **3 times** com nomes e abreviações vindos da fonte (`ta`, `tb`, `tc`).
 - Elencos com apelido, posição opcional, `joinedAt`/`leftAt`.
-- Calendário de **7 partidas oficiais**, agrupado por data: 6 de grupo + 1 final.
-- **Amistoso informativo** (`friendly`) com data, horário, local e nota, exibido como card na Fase final, antes da final; não entra em placar, eventos, estatísticas, suspensões ou classificação.
-- Resultados derivados de gols, gols contra, assistências, cartões, W.O. e pênaltis.
+- Calendário de **8 partidas oficiais**, agrupado por data: 6 de grupo + 1 semifinal + 1 final.
+- Resultados derivados de gols, gols contra, assistências, cartões, W.O. e pênaltis do tempo normal.
 - Classificação automática com desempate por grupos e **confronto direto em dois jogos**.
-- Suspensões automáticas e bloqueio de eventos.
-- Fase final com `finalists` validado, **final única** e **pódio de 3**: campeã, vice e 3ª.
-- Estatísticas individuais e coletivas da fase classificatória e da final.
+- Suspensões automáticas e bloqueio de eventos, considerando o caminho do time no chaveamento.
+- Fase final com `semifinalists` e `finalists` validados, **semifinal**, **final** e **pódio de 3**: campeã, vice-campeã e 3ª colocada.
+- Estatísticas individuais e coletivas das **8 partidas oficiais**, sem campanha de pênaltis.
 - Páginas Início, Jogos, Classificação, Times, Estatísticas, Fase final e 404.
 - Validação bloqueante, avisos de build, CI e deploy no GitHub Pages.
 - Acessibilidade AA, SEO básico e performance em 4G.
@@ -139,8 +140,9 @@ O nome da instituição **NÃO DEVE** aparecer em interface, título, metadados,
 - Admin, login, backend, banco de dados, área de edição no site.
 - Placar ao vivo, cronômetro, faltas, escalação, presença, substituições.
 - Fotos de jogadoras, nomes completos, contatos, camisa, data de nascimento.
-- **Disputa de 3º lugar e 4º lugar**: o 3º é o 3º da classificação; não há partida extra.
-- **Amistoso como partida oficial**: não tem placar, eventos, cartões, estatísticas ou efeito na classificação/pódio.
+- **Disputa de 3º lugar e 4º lugar**: a 3ª colocada é a perdedora da semifinal; não há partida extra.
+- **Prorrogação, disputa de pênaltis ou shootout**: empates encerram no tempo normal e são resolvidos pela vantagem do empate no chaveamento.
+- **Amistoso ou outra partida não oficial**: não há `friendly`, card informativo ou evento recreativo na fonte.
 - Histórico de edições anteriores, multi-competição, busca, filtros com JS.
 - Notificações, chat, pagamentos, streaming, ingressos.
 - W.O. automático, detecção de jogadoras em quadra, automação de desistência de time inteiro.
@@ -154,9 +156,8 @@ O nome da instituição **NÃO DEVE** aparecer em interface, título, metadados,
 |---|---|---|
 | FR-10 — página de Regulamento | **ADIADO** | Sem rota `/regulamento/`, sem link na nav, sem placeholder. Acesso retorna 404. |
 | FR-20 — histórico de alterações | **FUTURO** | Sem página, sem API, sem UI. O histórico oficial é o Git. |
-| FR-09 — página inicial | Desejável no MVP | Implementada com os quatro estados da §10.3. |
+| FR-09 — página inicial | Desejável no MVP | Implementada com os estados da §10.3. |
 | FR-19 — compartilhamento | Desejável no MVP | Título, descrição, canonical e Open Graph básico. |
-| FR-21 — amistoso informativo | Obrigatório na v1.1 (campo opcional) | Card na Fase final, antes da final, quando `friendly` existir; não é partida e não altera classificação/pódio. |
 
 ### 2.5 Dados operacionais em aberto
 
@@ -166,10 +167,9 @@ Não há questão técnica bloqueante. Os itens abaixo são **dados** a preenche
 |---|---|---|
 | Nomes definitivos dos 3 times | `teams[].name` | O valor cadastrado (“Time A” etc.). |
 | Horários das partidas | `matches[].startsAt` | “Horário a definir”. |
-| Horário do amistoso | `friendly.startsAt` | Obrigatório; sem fallback, para garantir que seja anterior à final. |
 | Local/quadra das partidas | `matches[].venue` | “Local a definir”. |
-| Local do amistoso | `friendly.venue` | Obrigatório; sem fallback. |
-| Nota do amistoso | `friendly.note` | Obrigatória; explica que é recreativo e sem efeito na classificação. |
+| Horário e local da semifinal | `semi.startsAt`, `semi.venue` | “Horário a definir” / “Local a definir”. |
+| Horário e local da final | `final.startsAt`, `final.venue` | “Horário a definir” / “Local a definir”. |
 | Critério de assistência duvidosa | decisão da organização ao lançar `assistPlayerId` | Sem impacto técnico; o dado é opcional. |
 | Acomodação quando todos os times têm 8 | decisão da organização | O site bloqueia a 9ª ativa; a organização decide a saída/`leftAt`. |
 | Habilitar Pages | configuração do repositório | Documentado na §12. |
@@ -179,13 +179,13 @@ Nenhum desses itens pode ser usado como desculpa para “a definir” silencioso
 ### 2.6 Premissas
 
 - A edição é 2026; o build de produção lê somente `data/2026/copa.yaml`. O build de teste do E2E pode ler `tests/fixtures/valida.yaml` via `COPA_DATA_FILE` e grava em `dist-test/`.
-- O formato é de **3 times e 7 partidas oficiais** (6 de grupo + final).
+- O formato é de **3 times e 8 partidas oficiais** (6 de grupo + semifinal + final).
 - O repositório é público; a fonte não contém dados pessoais além do apelido.
 - O mapeamento `p-XXX` → pessoa fica fora do repositório (Apêndice F).
 - O site não controla quem está em quadra; W.O. é registrado manualmente.
 - O GitHub Pages serve o projeto em `/futsal-cup/`.
 - A mesma versão de Node/ICU e o mesmo `package-lock.json` são usados no build.
-- O amistoso é opcional (`friendly: null`) e, quando existir, é apenas informativo.
+- Não há amistoso nem shootout; `semifinalists` e `finalists` são os únicos snapshots do chaveamento.
 
 ---
 
@@ -199,23 +199,25 @@ Nenhum desses itens pode ser usado como desculpa para “a definir” silencioso
 | **Jogadora** | Pessoa no elenco de um time; ID opaco `p-001` etc.; público apenas o apelido. |
 | **Elenco ativo** | Jogadoras com `leftAt: null`. |
 | **Elegibilidade** | Condição temporal para atuar: `joinedAt < startsAt` e (`leftAt == null` ou `leftAt > startsAt`). |
-| **Partida** | Jogo oficial com `stage`, `date`, `status`, eventos e eventual W.O./shootout. |
+| **Partida** | Jogo oficial com `stage`, `date`, `status`, eventos e eventual W.O. |
 | **Fase classificatória** | **6 partidas em turno e returno**; somente elas contam para a classificação. Cada time joga 4 vezes. |
-| **Fase final** | **Final única** entre 1º e 2º; não há semifinais nem disputa de 3º lugar. |
-| **3º lugar** | 3ª posição da classificação final da fase classificatória; **não** é decidido em partida. |
-| **Amistoso** | Metadado `friendly` com data, horário, local e nota; card informativo na Fase final, antes da final. **Não é partida**: sem placar, eventos, cartões, estatísticas, suspensões ou efeito na classificação/pódio. |
+| **Fase final** | **Semifinal** (2º x 3º) e **final** (1º x vencedora da semifinal); não há disputa de 3º lugar. |
+| **Semifinal** | Partida única entre 2º e 3º; o 2º tem mando e vantagem do empate. Empate classifica o 2º. |
+| **Final** | Partida única entre 1º e vencedora da semifinal; o 1º tem mando e vantagem do empate. Empate dá o título ao 1º. |
+| **3ª colocada** | Perdedora da semifinal; **não** há partida de 3º lugar nem 4º lugar. |
+| **Vantagem do empate** | Regra do chaveamento: em caso de empate no tempo normal, avança ou vence o mandante do snapshot (`semifinalists[0]` ou `finalists[0]`). Não altera o placar nem V/E/D. |
 | **Evento** | `goal`, `ownGoal`, `yellow` ou `red`, aninhado na partida. |
 | **Gol contra** | `ownGoal` da jogadora que marcou contra o próprio time; credita o adversário; não entra na artilharia dela. |
 | **Assistência** | Jogadora do mesmo time da marcadora, diferente dela; opcional; proibida em pênalti e gol contra. |
 | **Pênalti do tempo normal** | `goal` com `penalty: true`; conta no placar e na artilharia. |
-| **Disputa de pênaltis** | `shootout` apenas na final, após empate no tempo normal; 5 cobranças alternadas e morte súbita; o site registra apenas o placar final e não conta para placar normal nem estatísticas. |
 | **W.O.** | Vitória administrativa por 1x0, registrada em `walkover`; sem gols/assistências; cartões permitidos conforme o motivo. Aplicado por partida; não há automação de desistência de time inteiro. |
-| **Suspensão** | Efeito de um vermelho (direto ou 2º amarelo) na próxima partida do time. Se o time joga duas vezes na mesma data, a próxima partida pode ser no mesmo dia. |
+| **Suspensão** | Efeito de um vermelho (direto ou 2º amarelo) na próxima partida real do time, considerando o chaveamento. Se o time joga duas vezes na mesma data, a próxima partida pode ser no mesmo dia. |
 | **Pontos disciplinares** | Amarelo = 1; vermelho = 2; segundo amarelo = 3 no total; menor é melhor. |
 | **Confronto direto** | Soma dos pontos dos **dois jogos** de grupo entre exatamente dois times empatados; se empatar, saldo agregado dos dois jogos. Só vale com os dois jogos `finished`; W.O. conta como 1x0. |
 | **Sorteio** | Critério final, registrado em `drawOrder` (permutação dos 3 times); badge textual “Sorteio”. |
-| **Finalistas** | Snapshot `finalists.final` com `[1º, 2º]`, validado contra a classificação. Não há snapshot de 3º/4º. |
-| **Pódio** | Campeã (vencedora da final), vice (perdedora da final) e 3ª (3ª da classificação). **Não há 4º lugar.** |
+| **Semifinalistas** | Snapshot `semifinalists` com `[2º, 3º]`, validado contra a classificação. A ordem define mando e vantagem. |
+| **Finalistas** | Snapshot `finalists` com `[1º, vencedora da semifinal]`, validado contra a classificação e o resultado da semifinal. A ordem define mando e vantagem. |
+| **Pódio** | Campeã (vencedora da final), vice-campeã (perdedora da final) e 3ª colocada (perdedora da semifinal). **Não há 4º lugar.** |
 | **Classificação provisória** | Situação em que nem todas as 6 partidas classificatórias estão `finished`. |
 | **Resultado pendente** | Partida `scheduled` cuja data/horário já passou; não é tratada como próximo jogo. |
 | **Build time** | Instante do build; `SOURCE_DATE_EPOCH` se definido, senão o relógio do executor. |
@@ -249,7 +251,7 @@ data/2026/copa.yaml
 [1] loader: yaml.parseDocument + Zod strict
         │  erros → DataValidationError (todos agregados)
         ▼
-[2] validação semântica (referências, elencos, calendário, W.O., finalistas)
+[2] validação semântica (referências, elencos, calendário, W.O., snapshots do mata-mata)
         │  erros → build falha; avisos → job summary
         ▼
 [3] domínio puro: placar, classificação, suspensões, estatísticas, pódio
@@ -283,7 +285,6 @@ O build **NÃO DEVE** consultar APIs, bancos, arquivos de outras edições ou o 
 │   │   ├── SiteFooter.astro
 │   │   ├── NoticeBanner.astro
 │   │   ├── MatchCard.astro
-│   │   ├── FriendlyCard.astro
 │   │   ├── Score.astro
 │   │   ├── StatusBadge.astro
 │   │   ├── StandingsTable.astro
@@ -441,7 +442,7 @@ const teamId = z.enum(['ta', 'tb', 'tc']);
 const playerId = z.string().regex(/^p-\d{3}$/, 'ID de jogadora inválido: esperado p-001.');
 const position = z.enum(['goleira', 'linha']).nullable();
 const status = z.enum(['scheduled', 'finished', 'postponed']);
-const stage = z.enum(['group', 'final']);
+const stage = z.enum(['group', 'semi', 'final']);
 const walkoverReason = z.enum(['no_show', 'insufficient_players', 'withdrawal']);
 const minute = z.number().int().min(0).nullable().optional();
 
@@ -507,11 +508,6 @@ const walkoverSchema = z.object({
   note: z.string().min(1).max(200).nullable().optional(),
 }).strict();
 
-const shootoutSchema = z.object({
-  home: z.number().int().min(0),
-  away: z.number().int().min(0),
-}).strict();
-
 const groupMatchSchema = z.object({
   id: z.enum(['g1', 'g2', 'g3', 'g4', 'g5', 'g6']),
   stage: z.literal('group'),
@@ -523,7 +519,18 @@ const groupMatchSchema = z.object({
   venue: z.string().min(1).max(120).nullable(),
   status,
   walkover: walkoverSchema.nullable(),
-  shootout: shootoutSchema.nullable(),
+  events: z.array(eventSchema),
+}).strict();
+
+const semiMatchSchema = z.object({
+  id: z.literal('semi'),
+  stage: z.literal('semi'),
+  round: z.null(),
+  date: dateOnly,
+  startsAt: isoDateTime.nullable(),
+  venue: z.string().min(1).max(120).nullable(),
+  status,
+  walkover: walkoverSchema.nullable(),
   events: z.array(eventSchema),
 }).strict();
 
@@ -536,27 +543,19 @@ const finalMatchSchema = z.object({
   venue: z.string().min(1).max(120).nullable(),
   status,
   walkover: walkoverSchema.nullable(),
-  shootout: shootoutSchema.nullable(),
   events: z.array(eventSchema),
 }).strict();
 
 const matchSchema = z.discriminatedUnion('stage', [
   groupMatchSchema,
+  semiMatchSchema,
   finalMatchSchema,
 ]);
 
 /* ---------- envelope ---------- */
 
-const finalistsSchema = z.object({
-  final: z.tuple([teamId, teamId]),
-}).strict();
-
-const friendlySchema = z.object({
-  date: dateOnly,
-  startsAt: isoDateTime,
-  venue: z.string().min(1).max(120),
-  note: z.string().min(1).max(300),
-}).strict();
+const semifinalistsSchema = z.tuple([teamId, teamId]);
+const finalistsSchema = z.tuple([teamId, teamId]);
 
 const noticeSchema = z.object({
   date: dateOnly,
@@ -567,10 +566,10 @@ export const competitionSchema = z.object({
   edition: z.literal(2026),
   timezone: z.literal('America/Sao_Paulo'),
   teams: z.array(teamSchema).length(3),
-  matches: z.array(matchSchema).length(7),
+  matches: z.array(matchSchema).length(8),
+  semifinalists: semifinalistsSchema.nullable(),
   finalists: finalistsSchema.nullable(),
   drawOrder: z.array(teamId).length(3).nullable(),
-  friendly: friendlySchema.nullable(),
   notices: z.array(noticeSchema),
 }).strict();
 ```
@@ -579,11 +578,13 @@ export const competitionSchema = z.object({
 
 - `leftAt` é obrigatório e explícito (`null` quando ativa).
 - `joinedAt`/`leftAt` são strings ISO, não objetos `Date` do YAML, para evitar ambiguidade de fuso.
-- `venue: null` é permitido em partidas; a UI mostra “Local a definir”. No `friendly`, `date`, `startsAt`, `venue` e `note` são obrigatórios.
+- `venue: null` é permitido em partidas; a UI mostra “Local a definir”.
 - `startsAt: null` é permitido em `scheduled`/`postponed`; `finished` exige valor.
 - `walkover.note` e `event.minute` são opcionais; o loader normaliza ausência para `null`.
-- `finalists`, `drawOrder` e `friendly` são obrigatórios no envelope, ainda que `null`.
-- `friendly` não tem `status`, `events`, `walkover`, `shootout`, `homeTeamId`/`awayTeamId`, times ou placar; é metadado informativo com data, horário, local e nota.
+- `semifinalists`, `finalists` e `drawOrder` são obrigatórios no envelope, ainda que `null`.
+- Partidas de mata-mata (`semi`, `final`) não têm `homeTeamId`/`awayTeamId`; usam os snapshots. `round` é `null`.
+- Não existe `shootout` em partida alguma. Não existe `friendly` no envelope.
+- Os campos antigos `friendly` e `shootout` são desconhecidos para o schema estrito e geram `VAL-002` com mensagem de migração explícita (“removido na v2.0”), nunca são ignorados.
 - `notices` é obrigatório (pode ser `[]`).
 - Não existe campo de placar, pontuação, classificação, suspensão ou estatística. Qualquer tentativa de incluí-los falha como campo desconhecido (`VAL-002`/`VAL-026`).
 
@@ -657,21 +658,24 @@ Além do schema, a validação semântica **DEVE** garantir:
 
 - `edition === 2026` e `timezone === "America/Sao_Paulo"`.
 - Exatamente **3 times** com IDs `ta`, `tb`, `tc`.
-- Exatamente **7 partidas** com IDs `g1`…`g6`, `final`.
+- Exatamente **8 partidas** com IDs `g1`…`g6`, `semi`, `final`.
 - `g1`…`g6` formam exatamente os seis confrontos do **turno e returno**:
   - `g1`: ta x tb; `g2`: tb x tc (rodada 1, 24/11/2026);
   - `g3`: ta x tc; `g4`: tb x ta (rodada 2, 26/11/2026);
   - `g5`: tc x ta; `g6`: tc x tb (rodada 3, 01/12/2026).
 - Cada time joga exatamente **4 partidas de grupo**; não há time contra si mesmo nem par de times sem os dois jogos.
-- `round` de `g1`/`g2` = 1; `g3`/`g4` = 2; `g5`/`g6` = 3.
-- `final` não tem `homeTeamId`/`awayTeamId`; usa `finalists`.
+- `round` de `g1`/`g2` = 1; `g3`/`g4` = 2; `g5`/`g6` = 3. `semi` e `final` têm `round: null`.
+- `semi` e `final` não têm `homeTeamId`/`awayTeamId`; usam `semifinalists` e `finalists`.
 - `date` é uma data de calendário válida; se `startsAt` existe, sua data local em `America/Sao_Paulo` é igual a `date`.
-- `finished` exige `startsAt`; `scheduled`/`postponed` não têm eventos, W.O. nem shootout.
-- A ordem cronológica de cada time respeita a ordem canônica (`g1` → `g2` → `g3` → `g4` → `g5` → `g6` → `final`), e a final ocorre depois das 6 partidas de grupo. Um time pode ter duas partidas na mesma data, desde que os horários sejam distintos e respeitem essa ordem.
-- `finalists` é `null` enquanto o grupo não termina; quando as 6 partidas terminam, é obrigatório e deve ser `[1º, 2º]` da classificação.
+- `finished` exige `startsAt`; `scheduled`/`postponed` não têm eventos nem W.O.
+- A ordem cronológica de cada time respeita a ordem canônica (`g1` → `g2` → `g3` → `g4` → `g5` → `g6` → `semi` → `final`): a semifinal ocorre depois das 6 partidas de grupo e a final depois da semifinal. Um time pode ter duas partidas na mesma data, desde que os horários sejam distintos e respeitem essa ordem.
+- O calendário oficial é: grupo em 24/11, 26/11 e 01/12; `semi` em 02/12; `final` em 03/12 (`VAL-W02` avisa sobre desvio).
+- `semifinalists` é `null` enquanto o grupo não termina; quando as 6 partidas terminam, é obrigatório e deve ser `[2º, 3º]` da classificação.
+- `finalists` é `null` enquanto a semifinal não termina; quando a semifinal termina, é obrigatório e deve ser `[1º, vencedora da semifinal]`. A vencedora considera W.O. e, em empate no tempo normal, a vantagem do empate do 2º colocado (mandante da semifinal).
+- A ordem de `semifinalists` e `finalists` define mando e vantagem; não há campo separado de vantagem.
 - `drawOrder` é uma permutação dos 3 times ou `null`; é obrigatório apenas se um empate chegar ao sorteio na classificação final (6 partidas de grupo `finished`).
-- `friendly` é `null` ou um metadado com data, horário, local e nota; quando existir, deve estar na mesma data da final e, se a final tiver `startsAt`, antes do horário da final. Se a final ainda não tiver horário, a ordem é validada quando ele for preenchido.
 - `notices` tem datas válidas e mensagens não vazias.
+- `friendly` e `shootout` não existem na v2.0; qualquer ocorrência é erro de schema com mensagem de migração.
 
 ---
 
@@ -682,8 +686,8 @@ Além do schema, a validação semântica **DEVE** garantir:
 ```ts
 export type TeamId = 'ta' | 'tb' | 'tc';
 export type PlayerId = `p-${string}`;
-export type MatchId = 'g1' | 'g2' | 'g3' | 'g4' | 'g5' | 'g6' | 'final';
-export type Stage = 'group' | 'final';
+export type MatchId = 'g1' | 'g2' | 'g3' | 'g4' | 'g5' | 'g6' | 'semi' | 'final';
+export type Stage = 'group' | 'semi' | 'final';
 export type MatchStatus = 'scheduled' | 'finished' | 'postponed';
 export type Position = 'goleira' | 'linha' | null;
 export type WalkoverReason = 'no_show' | 'insufficient_players' | 'withdrawal';
@@ -709,11 +713,6 @@ export interface Walkover {
   readonly note: string | null;
 }
 
-export interface Shootout {
-  readonly home: number;
-  readonly away: number;
-}
-
 export type Event =
   | { readonly type: 'goal'; readonly playerId: PlayerId;
       readonly assistPlayerId: PlayerId | null; readonly minute: number | null;
@@ -733,7 +732,6 @@ interface MatchBase {
   readonly venue: string | null;
   readonly status: MatchStatus;
   readonly walkover: Walkover | null;
-  readonly shootout: Shootout | null;
   readonly events: readonly Event[];
 }
 
@@ -744,28 +742,30 @@ export interface GroupMatch extends MatchBase {
   readonly awayTeamId: TeamId;
 }
 
+export interface SemiFinalMatch extends MatchBase {
+  readonly id: 'semi';
+  readonly stage: 'semi';
+  readonly round: null;
+}
+
 export interface FinalStageMatch extends MatchBase {
+  readonly id: 'final';
   readonly stage: 'final';
   readonly round: null;
 }
 
-export type Match = GroupMatch | FinalStageMatch;
+export type KnockoutMatch = SemiFinalMatch | FinalStageMatch;
+export type Match = GroupMatch | KnockoutMatch;
 
-// Partida com participantes resolvidos; a final usa o snapshot `finalists`.
+// Partida com participantes resolvidos; o mata-mata usa os snapshots.
 export type ResolvedMatch = Match & {
   readonly homeTeamId: TeamId;
   readonly awayTeamId: TeamId;
 };
 
-export interface Finalists {
-  readonly final: readonly [TeamId, TeamId];
-}
-
-export interface Friendly {
-  readonly date: string;              // AAAA-MM-DD; mesma data da final
-  readonly startsAt: string;          // ISO com offset; antes da final
-  readonly venue: string;
-  readonly note: string;              // texto informativo, sem placar
+export interface PlayoffSnapshots {
+  readonly semifinalists: readonly [TeamId, TeamId] | null;
+  readonly finalists: readonly [TeamId, TeamId] | null;
 }
 
 export interface Notice {
@@ -778,9 +778,9 @@ export interface Competition {
   readonly timezone: 'America/Sao_Paulo';
   readonly teams: readonly Team[];
   readonly matches: readonly Match[];
-  readonly finalists: Finalists | null;
+  readonly semifinalists: readonly [TeamId, TeamId] | null;
+  readonly finalists: readonly [TeamId, TeamId] | null;
   readonly drawOrder: readonly TeamId[] | null;
-  readonly friendly: Friendly | null;
   readonly notices: readonly Notice[];
 }
 ```
@@ -836,8 +836,6 @@ export interface TeamStats {
   readonly wins: number;
   readonly draws: number;
   readonly losses: number;
-  readonly shootoutWins: number;
-  readonly shootoutLosses: number;
   readonly goalsFor: number;
   readonly goalsAgainst: number;
   readonly goalDifference: number;
@@ -851,8 +849,8 @@ export interface Suspension {
   readonly teamId: TeamId;
   readonly reason: 'direct' | 'secondYellow';
   readonly sentOffIn: MatchId;
-  readonly suspendedFor: MatchId | null; // null = sem próxima partida ou fase final ainda indefinida
-  readonly pendingFinalists: boolean;    // true = próxima partida depende de finalists
+  readonly suspendedFor: MatchId | null; // null = sem próxima partida ou chaveamento ainda indefinido
+  readonly pendingFinalists: boolean;    // true = próxima partida real depende de snapshots futuros
 }
 
 export interface Podium {
@@ -860,48 +858,43 @@ export interface Podium {
   readonly runnerUp: TeamId | null;
   readonly third: TeamId | null;
 }
-
-export interface FriendlyCard {
-  readonly title: string;
-  readonly date: string;
-  readonly startsAt: string;
-  readonly venue: string;
-  readonly note: string;
-  readonly informational: true;
-}
 ```
 
 ### 6.3 Invariantes de domínio
 
 | ID | Invariante |
 |---|---|
-| DM-001 | A competição tem edição 2026, fuso `America/Sao_Paulo`, **3 times** e **7 partidas oficiais** (6 de grupo + final). |
+| DM-001 | A competição tem edição 2026, fuso `America/Sao_Paulo`, **3 times** e **8 partidas oficiais** (6 de grupo + semifinal + final). |
 | DM-002 | Cada time tem ID único, nome, abreviação única e elenco; nomes podem ser editáveis, IDs não. |
 | DM-003 | Jogadora tem ID opaco e único na edição, apelido único no time, posição opcional, `joinedAt` e `leftAt`. |
-| DM-004 | Partida tem `stage`, `date`, `status` e regras de `startsAt`; `finished` exige `startsAt`; `scheduled`/`postponed` não têm eventos/W.O./shootout. |
+| DM-004 | Partida tem `stage`, `date`, `status` e regras de `startsAt`; `finished` exige `startsAt`; `scheduled`/`postponed` não têm eventos/W.O. |
 | DM-005 | Evento é `goal`, `ownGoal`, `yellow` ou `red`; assistência é opcional, do mesmo time e diferente da marcadora; pênalti não tem assistência; gol contra não tem assistência/pênalti. |
 | DM-006 | Placar é sempre derivado dos eventos; não existe campo de placar. W.O. é a única exceção (1x0 administrativo). |
-| DM-007 | W.O. é `walkover` em partida `finished`, com vencedor e motivo; não tem gols/assistências nem shootout; cartões permitidos conforme o motivo. |
-| DM-008 | `shootout` só existe na **final** `finished`, sem W.O., após empate no tempo normal, com valores inteiros ≥0 e diferentes; não entra em placar normal, artilharia ou assistências. |
-| DM-009 | `finalists` é o snapshot oficial **apenas da final** (`[1º, 2º]`), `null` enquanto o grupo não termina, obrigatório e igual à classificação quando termina. |
+| DM-007 | W.O. é `walkover` em partida `finished`, com vencedor e motivo; não tem gols/assistências nem shootout; cartões permitidos conforme o motivo; é válido no grupo, na semifinal e na final. |
+| DM-008 | Empate encerra a partida no tempo normal. Não há prorrogação, pênaltis ou shootout: na semifinal o empate classifica o 2º (`semifinalists[0]`); na final o empate dá o título ao 1º (`finalists[0]`). O W.O. prevalece sobre a vantagem. |
+| DM-009 | `semifinalists` e `finalists` são snapshots oficiais (`[2º, 3º]` e `[1º, vencedora da semifinal]`), `null` enquanto a etapa anterior não termina, obrigatórios e iguais ao esperado quando ela termina. |
 | DM-010 | `drawOrder` é uma permutação dos **3 times**; só é exigido quando um empate chega ao sorteio na classificação final. |
 | DM-011 | `notices` é uma lista de avisos com data e mensagem; gera banner global. |
 | DM-012 | O vínculo da jogadora é temporal e imutável após o primeiro evento; `leftAt` preserva histórico e não ocupa vaga. |
-| DM-013 | Suspensão é derivada de vermelho direto ou segundo amarelo na partida anterior do time; sem acúmulo de amarelos. Se o time joga duas vezes na mesma data, a suspensão pode valer para a segunda partida do mesmo dia. |
+| DM-013 | Suspensão é derivada de vermelho direto ou segundo amarelo e vale para a próxima partida real do time no chaveamento, inclusive semifinal/final; sem acúmulo de amarelos. Se o time joga duas vezes na mesma data, a suspensão pode valer para a segunda partida do mesmo dia. |
 | DM-014 | Privacidade: apenas apelido, posição, time e estatísticas são públicos; IDs de jogadora e datas de elenco não são renderizados. |
 | DM-015 | Nenhuma classificação, estatística, suspensão ou pódio é armazenado como verdade editável. |
-| DM-016 | O amistoso é metadado informativo (`friendly`), não é partida e não tem placar, eventos, cartões, estatísticas, suspensões ou efeito na classificação/pódio. |
-| DM-017 | O pódio tem campeã, vice e 3ª; **não há 4º lugar** e o 3º não é decidido em partida. |
+| DM-016 | **OBSOLETO na v2.0:** não existe amistoso, `friendly` ou `shootout`; campos antigos são proibidos e geram mensagem de migração. |
+| DM-017 | O pódio tem campeã, vice-campeã e 3ª colocada; a 3ª é a **perdedora da semifinal**. **Não há 4º lugar** e não há partida de 3º lugar. |
+| DM-018 | Semifinal e final resolvem seus participantes pelos snapshots; a ordem define mando e vantagem do empate. W.O. prevalece sobre a vantagem. |
 
 ### 6.4 Regras de derivação
 
 - **Placar normal:** gols do time = gols de suas jogadoras + gols contra de jogadoras adversárias. Pênalti do tempo normal é `goal` com `penalty: true` e conta normalmente.
 - **W.O.:** placar fixo 1x0 para `winnerTeamId`; ignora eventos para fins de placar; cartões não alteram o placar.
 - **Scheduled/postponed:** sem placar; a UI mostra “—”, “A definir” ou “Adiada”.
-- **Classificação:** apenas as 6 partidas de grupo `finished`; a final e seus cartões não alteram a classificação.
-- **Suspensão:** um vermelho na partida N suspende na próxima partida canônica do time (N+1), que pode ser no mesmo dia. Sem próxima partida, sem efeito. Cartões da final contam para estatísticas e suspensão, mas não para a classificação.
-- **Pódio:** campeã = vencedora da final; vice = perdedora; 3ª = 3ª da classificação final do grupo. Empate no tempo normal na final exige shootout. Não há 4º lugar.
-- **Amistoso:** o `friendly` não entra em `deriveScore`, classificação, estatísticas, suspensões ou pódio; é apenas um card informativo.
+- **Classificação:** apenas as 6 partidas de grupo `finished`; a semifinal, a final e seus cartões não alteram a classificação.
+- **Semifinal:** participantes `[2º, 3º]`; o 2º é mandante e tem vantagem do empate. Empate no tempo normal classifica o 2º. W.O. define o vencedor administrativo.
+- **Final:** participantes `[1º, vencedora da semifinal]`; o 1º é mandante e tem vantagem do empate. Empate no tempo normal dá o título ao 1º. W.O. define o campeão administrativo.
+- **Suspensão:** um vermelho na partida N suspende na próxima partida real do time no chaveamento (N+1), que pode ser no mesmo dia, na semifinal ou na final. O 1º colocado não disputa a semifinal; o vermelho no último jogo de grupo é cumprido na final, quando ela existir. Sem próxima partida, sem efeito. Cartões da semifinal e da final contam para estatísticas e suspensão, mas não para a classificação.
+- **Pódio:** campeã = vencedora da final (incluindo vantagem do empate e W.O.); vice = perdedora; 3ª = perdedora da semifinal. Não há 4º lugar e não há partida de 3º lugar.
+- **Estatísticas coletivas:** agregam as 8 partidas oficiais; um empate na semifinal ou na final conta como empate em V/E/D; a vantagem do empate é informação separada e não altera o placar.
+- **Remoções:** `friendly` e `shootout` não entram em nenhuma derivação porque não existem no schema v2.0.
 
 ---
 
@@ -911,25 +904,29 @@ Todas as funções desta seção são puras: recebem `Competition` já validada 
 
 ### 7.1 ALG-001 — Derivação de placar
 
-Os algoritmos que precisam dos participantes de uma partida usam `resolveMatchTeams`; quando a partida já foi resolvida, recebem `ResolvedMatch`. Para partidas de grupo, os participantes já estão na fonte; para a **final**, são resolvidos a partir de `finalists`:
+Os algoritmos que precisam dos participantes de uma partida usam `resolveMatchTeams`; quando a partida já foi resolvida, recebem `ResolvedMatch`. Para partidas de grupo, os participantes já estão na fonte; para a **semifinal** e a **final**, são resolvidos a partir de `semifinalists` e `finalists`:
 
 ```text
-resolveMatchTeams(match, finalists):
+resolveMatchTeams(match, snapshots):
   se match.stage == 'group':
     retornar { homeTeamId: match.homeTeamId, awayTeamId: match.awayTeamId }
-  se finalists == null:
+  se match.stage == 'semi':
+    se snapshots.semifinalists == null:
+      lançar erro de invariante (VAL-017: semifinal sem semifinalistas)
+    retornar { homeTeamId: snapshot[0], awayTeamId: snapshot[1] }
+  se snapshots.finalists == null:
     lançar erro de invariante (VAL-017: final sem finalistas)
-  retornar { homeTeamId: finalists.final[0], awayTeamId: finalists.final[1] }
+  retornar { homeTeamId: finalists[0], awayTeamId: finalists[1] }
 
-toResolvedMatch(match, finalists):
-  times = resolveMatchTeams(match, finalists)
+toResolvedMatch(match, snapshots):
+  times = resolveMatchTeams(match, snapshots)
   retornar { ...match, ...times }
 ```
 
 ```text
-deriveScore(match, finalists):
+deriveScore(match, snapshots):
   se match.status != finished: retornar null
-  times = resolveMatchTeams(match, finalists)
+  times = resolveMatchTeams(match, snapshots)
   homeTeamId = times.homeTeamId; awayTeamId = times.awayTeamId
   se match.walkover != null:
     se walkover.winnerTeamId == homeTeamId: retornar { home:1, away:0, kind:'walkover' }
@@ -950,11 +947,16 @@ deriveScore(match, finalists):
 ```
 
 - Pênalti do tempo normal é `goal` e entra na contagem.
-- `shootout` **não** entra em `deriveScore`.
+- Não existe `shootout`; empate permanece empate no placar.
 - W.O. ignora eventos para placar; `walkover` é a única fonte do 1x0.
 - `teamOf` é resolvido pelo elenco do time na partida; a validação já garantiu que a jogadora pertence a um dos dois times.
-- `resolveMatchTeams` lança erro de invariante com `finalists == null`; a UI **DEVE** checar `finalists` antes de chamar funções de placar para a final e usar o fallback “Confrontos a definir”.
-- O amistoso não é match e **NÃO DEVE** ser passado para `deriveScore`.
+- `resolveMatchTeams` lança erro de invariante com snapshot `null`; a UI **DEVE** checar o snapshot antes de chamar funções de placar para a semifinal/final e usar o fallback “Confrontos a definir” (ou “Vencedora da semifinal” quando o 1º já é conhecido).
+- `winnerOf(match, snapshots)`:
+  - partida não `finished` → `null`;
+  - W.O. → `winnerTeamId`;
+  - `group` com empate → `null`;
+  - `semi`/`final` com empate → mandante do snapshot (`semifinalists[0]`/`finalists[0]`), por vantagem do empate;
+  - caso contrário, o time com mais gols.
 
 ### 7.2 ALG-002 — Linhas da classificação
 
@@ -967,7 +969,7 @@ buildStandingRow(team, groupMatches):
     se team != match.homeTeamId && team != match.awayTeamId: continuar
     se match.status != finished: continuar
     played += 1
-    score = deriveScore(match, null)   // grupo não depende de finalists
+    score = deriveScore(match, null)   // grupo não depende de snapshots
     home = match.homeTeamId; away = match.awayTeamId
     se score.home > score.away:
       se team == home: points+=3; wins+=1
@@ -1040,7 +1042,7 @@ resolveGroup(group, groupMatches, drawOrder, drawTeams):
     se h2h.length == 2 && h2h.every(m => m.status == finished):
       ptsA = 0; ptsB = 0; aggA = 0; aggB = 0
       para cada m em h2h:
-        score = deriveScore(m, null)   // grupo não depende de finalists; W.O. vira 1x0
+        score = deriveScore(m, null)   // grupo não depende de snapshots; W.O. vira 1x0
         se a.teamId == m.homeTeamId:
           aGoals = score.home; bGoals = score.away
         senão:
@@ -1184,21 +1186,23 @@ cardSummary(events, playerId):
 - Um vermelho direto com um amarelo no mesmo jogo é permitido e vale 3 pontos.
 - Não há suspensão nem bloqueio por acúmulo de amarelos entre partidas; `VAL-022` olha apenas a mesma partida.
 - Cartões de W.O. contam para estatísticas/suspensão, exceto `no_show`, que não tem eventos.
-- Cartões da final contam para estatísticas/suspensão, mas não para a classificação. Não há partida de 3º lugar; o amistoso (`friendly`) não tem cartões.
+- Cartões da semifinal e da final contam para estatísticas/suspensão, mas não para a classificação. Não há partida de 3º lugar.
 
 ### 7.5 ALG-005 — Suspensões
 
 ```text
 buildSuspensions(competition):
   resultado = []
+  snapshots = { semifinalists: competition.semifinalists,
+                finalists: competition.finalists }
   para cada time:
-    partidas = matchesDoTime(time, competition.finalists).sort(byCanonicalOrder)
+    partidas = matchesDoTime(time, snapshots).sort(byCanonicalOrder)
     para cada partida em partidas:
       reds = redCardsForTeamInMatch(time, partida)
       para cada red em reds:
-        proxima = próxima partida canônica do time após partida
-        pendente = proxima == null && competition.finalists == null &&
-          partida.stage == 'group'
+        proxima = próxima partida real do time após partida na lista
+        pendente = proxima == null && partida.stage == 'group' &&
+          competition.finalists == null
         resultado.push({
           playerId: red.playerId,
           teamId: time.id,
@@ -1211,16 +1215,20 @@ buildSuspensions(competition):
 ```
 
 - `redCardsForTeamInMatch` inclui vermelhos diretos e vermelhos derivados de dois amarelos.
-- `matchesDoTime(time, finalists)` inclui sempre as 4 partidas de grupo do time e inclui `final` somente quando `finalists != null` e o time é participante. Assim, a função não lança erro antes de a fase final estar definida.
-- “Próxima partida” é a próxima na ordem canônica: `g1` → `g2` → `g3` → `g4` → `g5` → `g6` → `final`, considerando apenas partidas em que o time participa. Como cada time joga duas vezes em algumas datas, a ordem canônica dentro da mesma data é a ordem dos IDs.
-- A validação impede ordem cronológica incompatível (`VAL-015`), então a ordem canônica coincide com a ordem real para partidas com `startsAt`.
-- Se o time não tem próxima partida e `finalists` ainda é `null` após a última partida de grupo, `suspendedFor = null` e `pendingFinalists = true`: a suspensão pode valer para a final, mas o confronto ainda não está definido. Quando `finalists` for preenchido, o build recalcula: se o time se classificou, a suspensão vale para a final; se não se classificou, a suspensão não tem efeito.
-- Se o time não tem próxima partida por não ter se classificado (`finalists != null`), `suspendedFor = null` e a suspensão não tem efeito.
+- `matchesDoTime(time, snapshots)` inclui sempre as 4 partidas de grupo do time, a `semi` quando `snapshots.semifinalists` existe e o time é participante, e a `final` quando `snapshots.finalists` existe e o time é participante. Assim, a função não lança erro antes de o chaveamento estar definido.
+- “Próxima partida real” é a próxima na ordem canônica: `g1` → `g2` → `g3` → `g4` → `g5` → `g6` → `semi` → `final`, considerando apenas partidas em que o time participa de fato:
+  - o 1º colocado não participa da `semi`; depois do grupo, sua próxima partida é a `final`;
+  - o 2º e o 3º participam da `semi`; um vermelho na última partida de grupo é cumprido na semifinal;
+  - um vermelho na semifinal é cumprido na final apenas se o time avançar; se for eliminado, não há partida seguinte;
+  - um vermelho na final não tem partida seguinte e não tem efeito.
+- Como cada time joga duas vezes em algumas datas, a ordem canônica dentro da mesma data é a ordem dos IDs. A validação impede ordem cronológica incompatível (`VAL-015`).
+- Se o time ainda não tem próxima partida definida e `finalists` é `null` após a última partida de grupo, `suspendedFor = null` e `pendingFinalists = true`: a suspensão pode valer para a semifinal ou para a final, mas o chaveamento ainda não está fechado. Quando os snapshots forem preenchidos, o build recalcula.
+- Se o time não tem próxima partida por ter sido eliminado na semifinal ou por ter disputado a final, `suspendedFor = null` e `pendingFinalists = false`; a suspensão não tem efeito.
 - Se a próxima partida é `postponed` ou `scheduled`, a suspensão permanece pendente para ela.
 - Se a próxima partida é `finished`, a suspensão foi cumprida e não se estende à seguinte.
 - A jogadora suspensa **NÃO DEVE** ter nenhum evento na partida `suspendedFor` (`VAL-023`).
-- Enquanto `pendingFinalists = true`, não há partida definida para bloquear; quando `finalists` for preenchido, o build recalcula e aplica `VAL-023` se o time estiver na final.
-- Cartões da disputa de pênaltis não existem no modelo; não geram suspensão.
+- Enquanto `pendingFinalists = true`, não há partida definida para bloquear; quando os snapshots forem preenchidos, o build recalcula e aplica `VAL-023` se o time estiver na partida.
+- Não há eventos de shootout; não há cartões de disputa de pênaltis.
 
 Status para a página do time:
 
@@ -1231,7 +1239,7 @@ suspensionStatus(player):
     match(s.suspendedFor).status != finished)
   se pendente: “Suspensa na partida {adversário} de {data}”
   senão se reds.some(s => s.pendingFinalists):
-    “Suspensão pendente — final a definir”
+    “Suspensão pendente — fase final a definir”
   senão se reds.some(s => s.suspendedFor == null):
     “Suspensão sem efeito — sem próxima partida”
   senão: “Sem suspensão”
@@ -1268,10 +1276,12 @@ buildPlayerStats(competition):
 buildTeamStats(competition):
   mapa = Map<TeamId, TeamStats>
   inicializar os 3 times com zeros
+  snapshots = { semifinalists: competition.semifinalists,
+                finalists: competition.finalists }
 
-  para cada partida oficial finished (stage 'group' ou 'final'):
-    times = resolveMatchTeams(partida, competition.finalists)
-    score = deriveScore(partida, competition.finalists)
+  para cada partida oficial finished (stage 'group', 'semi' ou 'final'):
+    times = resolveMatchTeams(partida, snapshots)
+    score = deriveScore(partida, snapshots)
 
     para cada (time, adversario) em [(times.homeTeamId, times.awayTeamId),
                                      (times.awayTeamId, times.homeTeamId)]:
@@ -1285,11 +1295,6 @@ buildTeamStats(competition):
         stats[time].losses += 1
       senão:
         stats[time].draws += 1
-        se partida.shootout != null:
-          se partida.shootout.winnerTeamId == time:
-            stats[time].shootoutWins += 1
-          senão:
-            stats[time].shootoutLosses += 1
 
     para cada jogadora em elencoDaPartida(times):   // home + away; inclui leftAt != null
       timeDaJogadora = time cujo elenco (team.players) contém jogadora.id   // elenco, não evento
@@ -1304,22 +1309,20 @@ buildTeamStats(competition):
   retornar os 3 times em ordem fixa ta, tb, tc
 ```
 
-- `buildTeamStats` usa apenas partidas oficiais `group` + `final`; o amistoso (`friendly`) não entra.
+- `buildTeamStats` usa as **8 partidas oficiais** (`group` + `semi` + `final`); não há amistoso.
 - O placar do W.O. já é 1x0 em `deriveScore`; ele conta como vitória/derrota e entra em GP/GC/SG. Cartões de W.O. contam, exceto `no_show` (que não tem eventos).
 - `timeDaJogadora` é resolvido pelo **elenco** (`team.players`), não pelo evento: eventos de cartão não carregam `teamId`. A busca considera apenas os dois participantes da partida (`times.homeTeamId` e `times.awayTeamId`); `VAL-006` garante que a jogadora não está em dois times e `VAL-019` garante que todo evento referencia jogadora de um dos dois elencos, então a resolução retorna exatamente um time; zero times é erro de invariante.
 - `elencoDaPartida(times)` é a união dos elencos dos dois participantes, incluindo jogadoras com `leftAt != null`: cartões registrados enquanto a jogadora era elegível continuam contando para o time, mesmo que ela tenha saído depois.
-- Em final decidida nos pênaltis, o tempo normal empatado conta como empate para os dois times; `shootoutWins`/`shootoutLosses` registram a campanha separadamente. O shootout não altera `goalsFor`, `goalsAgainst` nem `goalDifference`.
-- `shootoutWins`/`shootoutLosses` são 0 para times que não disputaram shootout; não existe “shootout draw”.
+- Uma semifinal ou final empatada conta como **empate** para os dois times em V/E/D. A vantagem do empate é uma informação separada: ela define quem avança ou é campeã, mas não transforma o empate em vitória.
+- Não existem `shootoutWins`, `shootoutLosses` nem colunas de pênaltis.
 - A classificação continua usando apenas as 6 partidas de grupo (`buildStandings`); `buildTeamStats` é para a página do time e não altera posições.
-
 - Jogadoras sem eventos aparecem no elenco com zeros, mas não nas tabelas de líderes.
 - Jogadoras com `leftAt != null` e eventos continuam nas estatísticas, com marca textual “fora do elenco ativo”.
 - Gols contra não entram em `goals`; entram em `ownGoals`.
-- Pênalti do tempo normal entra em `goals`; shootout não.
+- Pênalti do tempo normal entra em `goals`; não há gols de shootout.
 - Assistência em pênalti é inválida; assistência em gol contra é inválida.
-- Cartões da final entram nas estatísticas; não há cartões de 3º lugar.
+- Cartões da semifinal e da final entram nas estatísticas; não há cartões de 3º lugar.
 - Cartões de W.O. entram, exceto `no_show`.
-- `teamStats` agregam as partidas oficiais do time (`group` + `final`) para a página do time; a classificação usa apenas `group`. O amistoso (`friendly`) não entra em nenhuma estatística.
 
 **Ordenações normativas:**
 
@@ -1331,23 +1334,35 @@ buildTeamStats(competition):
 | Cartões por time | `disciplinaryPoints` desc, `red` desc, `yellow` desc, `compareText(team.name)` asc, `teamId` asc. Todos os 3 times. |
 | Gols contra | `ownGoals` desc, `compareText(nickname)` asc, `compareText(team.name)` asc, `playerId` asc. Somente `ownGoals ≥ 1`. |
 
-### 7.7 ALG-007 — Finalistas, pódio e correções
+### 7.7 ALG-007 — Snapshots do mata-mata, pódio e correções
 
 ```text
 groupComplete = todas as 6 partidas de grupo estão finished
 se groupComplete:
   ranking = rankTeams(competition)
-  esperado = { final: [ranking[0].teamId, ranking[1].teamId] }
+  esperadoSemifinal = [ranking[1].teamId, ranking[2].teamId]
+  se semifinalists == null: erro VAL-017
+  se semifinalists != esperadoSemifinal: erro VAL-017 com antigos e novos
+senão:
+  se semifinalists != null: erro VAL-017
+
+semiComplete = match('semi').status == finished
+se semiComplete:
+  se semifinalists == null: erro VAL-017 (sem cascata)
+  vencedorSemi = winnerOf(semi, snapshots)
+  esperadoFinal = [ranking[0].teamId, vencedorSemi]
   se finalists == null: erro VAL-017
-  se finalists.final != esperado.final: erro VAL-017 com antigos e novos
+  se finalists != esperadoFinal: erro VAL-017 com antigos e novos
 senão:
   se finalists != null: erro VAL-017
 ```
 
-- Se `rankTeams` lançar `DrawRequiredError` durante a validação de `finalists`, o erro reportado é `VAL-018`; `VAL-017` não é emitido em cascata.
-- `finalists.final[0]` é o mandante da final; `finalists.final[1]` é o visitante.
-- A partida `final` não tem `homeTeamId`/`awayTeamId`; usa os finalistas. Não existe partida de 3º lugar.
-- Se uma correção após a final mudar os finalistas, o build **DEVE** falhar listando os finalistas antigos e os novos. Atualizar `finalists` é a confirmação explícita.
+- Se `rankTeams` lançar `DrawRequiredError` durante a validação dos snapshots, o erro reportado é `VAL-018`; `VAL-017` não é emitido em cascata.
+- `semifinalists[0]` é o mandante da semifinal (2º colocado) e tem vantagem do empate; `semifinalists[1]` é o visitante (3º).
+- `finalists[0]` é o mandante da final (1º colocado) e tem vantagem do empate; `finalists[1]` é a vencedora da semifinal.
+- A partida `semi` não tem `homeTeamId`/`awayTeamId`; usa `semifinalists`. A `final` usa `finalists`. Não existe partida de 3º lugar.
+- Se uma correção após a semifinal mudar os semifinalistas esperados (por exemplo, correção de resultado de grupo), o build **DEVE** falhar listando os semifinalistas antigos e os novos. Atualizar `semifinalists` é a confirmação explícita; a organização também deve reconciliar eventos/resultado da semifinal e explicar a correção em `notices`.
+- Se uma correção após a final mudar os finalistas, o build **DEVE** falhar listando os finalistas antigos e os novos. Atualizar `finalists` é a confirmação explícita; a correção também deve ser explicada em `notices`.
 - `notices` é o canal público para explicar a correção; o aviso de build é o canal operacional. Nenhum dos dois é obrigatório para o build passar, mas ambos são recomendados.
 - Pódio:
 
@@ -1357,19 +1372,24 @@ buildPodium(competition):
     champion=null; runnerUp=null; third=null
   senão:
     ranking = rankTeams(competition)
-    third = ranking[2].teamId        // 3º da classificação, sem partida
-    se final.status != finished:
-      champion=null; runnerUp=null
+    se semi.status != finished:
+      champion=null; runnerUp=null; third=null
     senão:
-      finalists = competition.finalists
-      vencedor = winnerOf(final, finalists)
-      champion = vencedor
-      runnerUp = (vencedor == finalists.final[0]) ? finalists.final[1] : finalists.final[0]
+      snapshots = { semifinalists, finalists }
+      vencedorSemi = winnerOf(semi, snapshots)
+      third = (vencedorSemi == semifinalists[0]) ? semifinalists[1] : semifinalists[0]
+      se final.status != finished:
+        champion=null; runnerUp=null
+      senão:
+        champion = winnerOf(final, snapshots)
+        runnerUp = (champion == finalists[0]) ? finalists[1] : finalists[0]
 ```
 
-- `winnerOf(match, finalists)` usa W.O., shootout ou placar normal, nesta ordem de precedência: W.O. → shootout → placar normal. Para `final`, `finalists` é obrigatório.
-- `third` é o 3º colocado da classificação final do grupo; não depende do resultado da final e não existe `fourth`. O pódio completo (campeão, vice e 3º) só é exibido quando a `final` está `finished`.
+- `winnerOf(match, snapshots)` usa W.O. e placar normal, nesta ordem. Em empate no tempo normal de `semi`/`final`, retorna o mandante do snapshot por vantagem do empate. Em partida de grupo empatada, retorna `null`.
+- `third` é a **perdedora da semifinal**, não a 3ª da classificação. Não existe `fourth`.
+- O pódio completo (campeã, vice-campeã e 3ª colocada) só é exibido quando a `final` está `finished`.
 - A final encerrada não exige outra partida: não há disputa de 3º lugar (`VAL-016`).
+- W.O. na semifinal ou na final prevalece sobre a vantagem do empate: o vencedor administrativo avança ou é campeão.
 
 ### 7.8 ALG-008 — Próximo jogo, resultados e estados da Início
 
@@ -1377,10 +1397,13 @@ buildPodium(competition):
 homeState(competition, now):
   groupMatches = matches.filter(stage == group)
   groupComplete = groupMatches.every(m => m.status == finished)
+  semi = match('semi')
   final = match('final')
 
   se final.status == finished:
     retornar 'afterFinal'
+  se semi.status == finished:
+    retornar 'semiComplete'
   se groupComplete:
     retornar 'groupComplete'
   primeiroDia = min(groupMatches.date)
@@ -1414,8 +1437,9 @@ nextRoundMatches(competition, now):
 - Partida `scheduled` com data passada e sem `startsAt` é “Resultado pendente”; não é próximo jogo.
 - Partida `postponed` nunca é próximo jogo; aparece como “Adiada” na lista.
 - Se não há próximo jogo, mas há `scheduled` vencida, a Início mostra “Resultado pendente”.
-- Se o grupo terminou e a final ainda não encerrou, o próximo jogo é a final; o amistoso (`friendly`) não é partida e não entra em `nextMatch`.
-- Se a final terminou, a Início mostra campeão/pódio (estado 4).
+- Se o grupo terminou e a semifinal ainda não encerrou, o próximo jogo é a semifinal; a final já pode aparecer como card informativo com o 1º colocado e “Vencedora da semifinal”. Não há amistoso.
+- Se a semifinal terminou e a final ainda não encerrou, o próximo jogo é a final.
+- Se a final terminou, a Início mostra campeã/pódio (estado 5).
 - **NÃO DEVE** haver contagem regressiva nem cálculo de “agora” no navegador.
 
 ```text
@@ -1472,10 +1496,10 @@ validate(rawText):
     VAL-011 conjunto de partidas
     VAL-012 confrontos do grupo
     VAL-013 datas/horas
-    VAL-014 status × eventos/W.O./shootout
+    VAL-014 status × eventos/W.O.
     VAL-015 ordem canônica
-    VAL-016 fase final × grupo
-    VAL-017 finalistas
+    VAL-016 progressão do mata-mata
+    VAL-017 snapshots do mata-mata
     VAL-018 sorteio
     VAL-019 elenco da partida
     VAL-020 elegibilidade
@@ -1483,15 +1507,12 @@ validate(rawText):
     VAL-022 cartões
     VAL-023 suspensão
     VAL-024 W.O.
-    VAL-025 shootout
     VAL-026 placar materializado
-    VAL-027 times da final
+    VAL-027 times do mata-mata
     VAL-028 referências
     VAL-029 eventos de W.O.
-    VAL-030 shootout obrigatório
     VAL-031 notices
     VAL-032 privacidade
-    VAL-033 amistoso
     VAL-W01..W04 avisos
   retornar { erros, avisos }
 ```
@@ -1501,67 +1522,53 @@ validate(rawText):
 - O exit code é `1` se houver erro; `0` se houver apenas avisos.
 - O resumo em Markdown é gerado mesmo em falha e escrito em `GITHUB_STEP_SUMMARY` quando disponível.
 
-### 7.11 ALG-011 — W.O. e pênaltis: apresentação
+### 7.11 ALG-011 — Placar e resultado do mata-mata: apresentação
 
 ```text
-formatScore(match, finalists):
-  se match.stage != 'group' && finalists == null:
+formatScore(match, snapshots):
+  se match.stage == 'semi' && snapshots.semifinalists == null:
+    retornar “Confrontos a definir”
+  se match.stage == 'final' && snapshots.finalists == null:
     retornar “Confrontos a definir”
   se match.status == postponed: retornar “Adiada”
   se match.status == scheduled: retornar “A definir”
-  score = deriveScore(match, finalists)
+  score = deriveScore(match, snapshots)
   se match.walkover != null:
     retornar “{score.home} x {score.away} (W.O.)”
-  se match.shootout != null:
-    retornar “{score.home} ({shootout.home}) x ({shootout.away}) {score.away}”
   retornar “{score.home} x {score.away}”
 
-formatScoreAccessible(match, finalists, homeName, awayName):
-  se match.stage != 'group' && finalists == null:
-    retornar “Confrontos a definir; a fase final depende das 6 partidas da classificatória.”
+formatScoreAccessible(match, snapshots, homeName, awayName):
+  se snapshot necessário for null:
+    retornar “Confrontos a definir; a fase final depende da etapa anterior.”
   se match.status == postponed:
     retornar “Partida adiada.”
   se match.status == scheduled:
     retornar “Partida agendada; placar a definir.”
-  score = deriveScore(match, finalists)
-  times = resolveMatchTeams(match, finalists)
-  vencedor = winnerOf(match, finalists)
+  score = deriveScore(match, snapshots)
+  times = resolveMatchTeams(match, snapshots)
+  vencedor = winnerOf(match, snapshots)
   nomeVencedor = vencedor == times.homeTeamId ? homeName : awayName
   se match.walkover != null:
     motivo = rótulo(match.walkover.reason)   // “Não compareceu”, “Menos de 3 jogadoras em quadra” ou “Desistência”
     retornar “{homeName} {score.home} a {score.away} {awayName} por W.O. — {motivo}.”
-  se match.shootout != null:
-    retornar “{homeName} {score.home} a {score.away} {awayName} no tempo normal; {shootout.home} a {shootout.away} nos pênaltis; vitória de {nomeVencedor}.”
+  se match.stage != 'group' && score.home == score.away:
+    se match.stage == 'semi':
+      retornar “{homeName} {score.home} a {score.away} {awayName} no tempo normal; {nomeVencedor} avança pela vantagem do empate.”
+    senão:
+      retornar “{homeName} {score.home} a {score.away} {awayName} no tempo normal; {nomeVencedor} conquista o título pela vantagem do empate.”
   retornar “{homeName} {score.home} a {score.away} {awayName}.”
 ```
 
-- O placar de pênaltis usa a ordem mandante/visitante da partida (finalistas[0]/[1]).
-- O W.O. é exibido na ordem mandante/visitante: se o visitante venceu, o placar é `0 x 1 (W.O.)`, nunca um `1 x 0` fixo.
-- A UI **DEVE** incluir texto acessível: “{home} {homeScore} a {awayScore} {away} no tempo normal; {shootout.home} a {shootout.away} nos pênaltis; vitória de {winner}.”
+- O placar do mata-mata usa a ordem mandante/visitante do snapshot (`semifinalists[0]/[1]` ou `finalists[0]/[1]`).
+- O W.O. é exibido na ordem mandante/visitante: se o visitante venceu, o placar é `0 x 1 (W.O.)`, nunca um `1 x 0` fixo. O W.O. substitui a vantagem do empate.
+- Em empate no tempo normal da semifinal/final, o placar continua `N x N`; a definição pela vantagem é um texto separado e sempre visível. Não use cor como única indicação.
 - W.O. mostra o motivo: “Não compareceu”, “Menos de 3 jogadoras em quadra” ou “Desistência”.
-- Gols ocorridos antes de uma interrupção de W.O. não são registrados no MVP; a limitação é documentada na UI? Não: a UI apenas não inventa gols. A limitação fica na §16.
+- Gols ocorridos antes de uma interrupção de W.O. não são registrados no MVP; a UI não inventa gols. A limitação fica na §16.
+- Não há shootout, pênaltis ou texto de cobranças alternadas.
 
-### 7.12 ALG-012 — Cartão informativo do amistoso
+### 7.12 ALG-012 — OBSOLETO
 
-```text
-buildFriendlyCard(competition):
-  se competition.friendly == null: retornar null
-  retornar {
-    title: “Amistoso do 3º colocado”,
-    date: friendly.date,
-    startsAt: friendly.startsAt,
-    venue: friendly.venue,
-    note: friendly.note,
-    informational: true
-  }
-```
-
-- O cartão **DEVE** aparecer em `/fase-final/` antes do cartão da final e **NÃO DEVE** aparecer em `/jogos/`, na Início, na classificação, nas estatísticas ou no pódio.
-- O cartão **DEVE** conter o rótulo textual “Informativo — não é partida oficial” e a explicação “Não altera classificação, estatísticas, suspensões ou pódio.”
-- O cartão **NÃO DEVE** ter placar, status de partida, eventos, cartões, link para detalhe de partida, botão de resultado ou qualquer ação de edição.
-- O amistoso **NÃO DEVE** ser contado em `nextMatch`, `lastResults`, `groupComplete`, número de partidas, classificação, estatísticas, suspensões ou pódio (`SPEC-016`, `VAL-033`).
-- Se `friendly` for `null`, nenhum cartão ou placeholder é renderizado.
-- O cartão usa os mesmos tokens, tipografia e espaçamento dos cards de partida, mas com tratamento visual informativo (sem placar e sem estado competitivo).
+O algoritmo do cartão informativo do amistoso foi removido na v2.0. O ID fica reservado e **NÃO DEVE** ser reutilizado. Não há `FriendlyCard`, `buildFriendlyCard` ou card informativo de partida não oficial.
 
 ---
 
@@ -1582,7 +1589,7 @@ buildFriendlyCard(competition):
 | ID | Condição | Esperado | Encontrado | Ref |
 |---|---|---|---|---|
 | VAL-001 | YAML não parseia (sintaxe, indentação, âncora inválida). | YAML 1.2 válido. | Erro com linha/coluna. | §5.2 |
-| VAL-002 | Schema Zod falha: campo desconhecido, tipo errado, campo obrigatório ausente, enum inválido, string vazia/curta/longa, formato inválido. | Schema §5.4. | Issue com caminho e valor. | §5.4 |
+| VAL-002 | Schema Zod falha: campo desconhecido, tipo errado, campo obrigatório ausente, enum inválido, string vazia/curta/longa, formato inválido. Inclui campos removidos na v2.0 (`friendly`, `shootout`), com mensagem de migração explícita. | Schema §5.4. | Issue com caminho e valor. | §5.4 |
 | VAL-003 | `edition != 2026` ou `timezone != "America/Sao_Paulo"`. | `2026` / `America/Sao_Paulo`. | Valor encontrado. | DM-001 |
 | VAL-004 | Quantidade de times ≠ 3, IDs diferentes de `ta`…`tc` ou IDs duplicados. | Exatamente 3 times `ta`,`tb`,`tc`. | Lista encontrada. | DM-001/002 |
 | VAL-005 | Abreviação de time duplicada (comparação case-insensitive). | Abreviações únicas. | Duplicata e times. | DM-002 |
@@ -1591,29 +1598,26 @@ buildFriendlyCard(competition):
 | VAL-008 | `leftAt != null` e `leftAt <= joinedAt`. | `leftAt > joinedAt`. | Datas encontradas. | DM-012 |
 | VAL-009 | Mais de 8 jogadoras ativas simultaneamente em qualquer instante (inclui a 9ª ativa). | Máximo 8. | Instante e contagem. | DM-012 |
 | VAL-010 | Jogadora com evento em partida de time diferente do time atual (transferência após atuar). | Vínculo imutável após o primeiro evento. | Jogadora, time atual, partida. | DM-012 |
-| VAL-011 | Conjunto de partidas ≠ 7 IDs exatos; ID duplicado; `stage`/`round` incompatível com o ID. | `g1`…`g6`, `final`. | Lista encontrada. | DM-004 |
+| VAL-011 | Conjunto de partidas ≠ 8 IDs exatos; ID duplicado; `stage`/`round` incompatível com o ID; `semi` ou `final` ausente/duplicada. | `g1`…`g6`, `semi`, `final`. | Lista encontrada. | DM-004 |
 | VAL-012 | Confrontos de grupo diferentes dos seis do turno e returno; time repetido; time contra si mesmo; par sem os dois jogos. | `g1` ta×tb, `g2` tb×tc, `g3` ta×tc, `g4` tb×ta, `g5` tc×ta, `g6` tc×tb. | Confronto encontrado. | DM-004 |
 | VAL-013 | Data de calendário inválida; `startsAt` inválido; data local de `startsAt` em `America/Sao_Paulo` diferente de `date`; `notice.date` inválida. | Data real e coerente com o fuso. | Valores encontrados. | DM-004/011 |
-| VAL-014 | `finished` sem `startsAt`; `scheduled`/`postponed` com eventos, `walkover` ou `shootout`. | `finished` com `startsAt`; demais sem eventos/W.O./shootout. | Status e campos. | DM-004 |
-| VAL-015 | Time com duas partidas no mesmo `startsAt`; ordem canônica incompatível com `startsAt`. | Ordem canônica e cronologia coerentes, inclusive nas datas com dois jogos do mesmo time. | Partidas e horários. | DM-004 |
-| VAL-016 | Final encerrada antes de as 6 partidas de grupo terminarem; final com eventos sem `finalists`. | Grupo completo antes da final; final só com finalistas definidos. | Status e IDs. | DM-009 |
-| VAL-017 | `finalists` nulo com grupo completo; não nulo com grupo incompleto; `final` inválida; divergente da classificação; divergente após a final. | Snapshot `[1º, 2º]` válido e igual à classificação. | Antigos e novos finalistas. | DM-009 |
+| VAL-014 | `finished` sem `startsAt`; `scheduled`/`postponed` com eventos ou `walkover`. | `finished` com `startsAt`; demais sem eventos/W.O. | Status e campos. | DM-004 |
+| VAL-015 | Time com duas partidas no mesmo `startsAt`; ordem canônica incompatível com `startsAt`, inclusive `g6` → `semi` → `final`. | Ordem canônica e cronologia coerentes, inclusive nas datas com dois jogos do mesmo time. | Partidas e horários. | DM-004 |
+| VAL-016 | Semifinal encerrada antes de as 6 partidas de grupo terminarem; final encerrada antes de a semifinal terminar; partida de mata-mata com eventos/placar sem o snapshot necessário; semifinal/final ausente na progressão. | Grupo completo antes da semifinal; semifinal encerrada antes da final; snapshots definidos antes dos eventos. | Status e IDs. | DM-009/DM-018 |
+| VAL-017 | `semifinalists` nulo com grupo completo; não nulo com grupo incompleto; divergente de `[2º, 3º]`; `finalists` nulo com semifinal completa; não nulo com semifinal incompleta; divergente de `[1º, vencedora da semifinal]`; divergência após a semifinal/final. | Snapshots `[2º, 3º]` e `[1º, vencedora]` válidos, iguais ao esperado. | Antigos e novos snapshots. | DM-009/SPEC-019 |
 | VAL-018 | `drawOrder` inválido (não é permutação dos 3) ou ausente quando um empate chega ao sorteio na classificação final (6 partidas de grupo `finished`). | Permutação dos 3 ou `null`; presente quando necessário. | Valor e grupo. | DM-010 |
 | VAL-019 | Evento referencia jogadora fora do elenco dos dois times da partida. | Jogadora do elenco do time na partida. | Jogadora, times, partida. | DM-005 |
 | VAL-020 | Jogadora inelegível no início da partida: `joinedAt >= startsAt` ou (`leftAt != null` e `leftAt <= startsAt`). | `joinedAt < startsAt < leftAt` (ou `leftAt` nulo). | Datas e partida. | DM-012 |
 | VAL-021 | Assistência inválida: igual à marcadora; de outro time; em gol de pênalti; em gol contra; `ownGoal` com assistência/pênalti. | Assistência opcional, do mesmo time, diferente, só em `goal` normal. | Marcadora, assistente, tipo. | DM-005 |
 | VAL-022 | Terceiro amarelo **no mesmo jogo**; `red` explícito com dois amarelos; mais de um `red` explícito; `red` em evento de `ownGoal` (schema). | No máximo 2 amarelos e 1 vermelho direto por jogadora/partida; 2º amarelo é derivado. | Jogadora, partida, cartões. | DM-005 |
 | VAL-023 | Evento de jogadora suspensa na partida em que ela cumpre suspensão. | Nenhum evento da suspensa na partida `suspendedFor`. | Jogadora, partida, motivo. | DM-013 |
-| VAL-024 | W.O. inválido: partida não `finished`; vencedor fora dos participantes; motivo inválido; `shootout` presente; `winnerTeamId` ausente. | `walkover` em partida `finished`, vencedor participante, motivo válido, sem shootout. | Campos encontrados. | DM-007 |
-| VAL-025 | `shootout` inválido: stage diferente de `final`; partida não `finished`; W.O. presente; tempo normal não empatado; valores iguais ou negativos; eventos de shootout (schema). | Só `final`, finished, sem W.O., empate normal, valores ≥0 e diferentes. | Valores e partida. | DM-008 |
+| VAL-024 | W.O. inválido: partida não `finished`; vencedor fora dos participantes; motivo inválido; `winnerTeamId` ausente; W.O. na semifinal/final sem snapshot. | `walkover` em partida `finished`, vencedor participante, motivo válido; permitido no grupo, na semifinal e na final. | Campos encontrados. | DM-007 |
 | VAL-026 | Placar materializado: qualquer campo `score`, `homeScore`, `awayScore`, `result`, `points`, `standings` ou similar. | Placar/classificação sempre derivados. | Campo e caminho. | DM-006/015 |
-| VAL-027 | Partida `final` com `homeTeamId`/`awayTeamId` ou `round` diferente de `null`. | Times derivados de `finalists`; `round: null`. | Campos encontrados. | DM-009 |
+| VAL-027 | Partida `semi` ou `final` com `homeTeamId`/`awayTeamId` ou `round` diferente de `null`. | Times derivados de `semifinalists`/`finalists`; `round: null`. | Campos encontrados. | DM-009/DM-018 |
 | VAL-028 | Referência inexistente a time, jogadora, partida ou notice (além do schema). | IDs existentes na edição. | Referência e origem. | §5.3 |
 | VAL-029 | `no_show` com qualquer evento; `insufficient_players`/`withdrawal` com `goal`/`ownGoal`; W.O. com assistência. | `no_show` sem eventos; demais só cartões; W.O. sem gols/assistências. | Eventos encontrados. | DM-007 |
-| VAL-030 | `final` `finished` com empate no tempo normal sem `shootout`; `shootout` com tempo normal não empatado. | Empate normal ⇔ shootout presente. | Placar e shootout. | DM-008 |
 | VAL-031 | `notice` com data inválida ou mensagem vazia/longa. | Data real e mensagem 1..300. | Valores encontrados. | DM-011 |
 | VAL-032 | Campo de privacidade proibido: `fullName`, `photo`, `contact`, `shirtNumber`, `jersey`, `birthDate`, `phone`, `email`, `address`, `instagram`. | Nenhum campo pessoal além de `nickname`, `position`, `joinedAt`, `leftAt`. | Campo e caminho. | DM-014 |
-| VAL-033 | `friendly` inválido: data inexistente, data diferente da final, horário inválido ou não anterior à final quando ela tem horário, local vazio, nota vazia; qualquer campo de partida (`status`, `events`, `score`, `walkover`, `shootout`, `homeTeamId`, `awayTeamId`, times). | Metadado informativo na data da final; se a final tiver horário, antes dele; com local e nota; sem campos de partida. | Campos e valores encontrados. | DM-016/SPEC-016 |
 
 **Sobre “placar incompatível”:** como não existe placar armazenado, não há como divergir. A regra é garantida por `VAL-026` (campo de placar é proibido) e pelos testes de derivação (`TST-028`…`TST-037`). Se um campo de placar for adicionado no futuro, a validação de igualdade com `deriveScore` passa a ser obrigatória.
 
@@ -1622,7 +1626,7 @@ buildFriendlyCard(competition):
 | ID | Condição | Mensagem | Efeito |
 |---|---|---|---|
 | VAL-W01 | Time com menos de 7 jogadoras ativas. | “Time {nome} tem {n} jogadoras ativas; o alvo é 7 ou 8. A publicação não é bloqueada.” | Job summary; badge público só se `<5` (regra de UI, não de validação). |
-| VAL-W02 | Partida `scheduled`/`finished` fora da data original do calendário (24/11, 26/11, 01/12, 03/12). | “Partida {id} está em {data}, fora do calendário original. Confirme o adiamento.” | Job summary. `postponed` é isenta. |
+| VAL-W02 | Partida `scheduled`/`finished` fora da data original do calendário (24/11, 26/11, 01/12, 02/12, 03/12). | “Partida {id} está em {data}, fora do calendário original. Confirme o adiamento.” | Job summary. `postponed` é isenta. |
 | VAL-W03 | Nome de time duplicado após normalização. | “Os times {a} e {b} têm o mesmo nome; a abreviação distingue, mas confirme o nome público.” | Job summary. |
 | VAL-W04 | Partida `scheduled` com data/horário já passados no build. | “Partida {id} está agendada, mas a data passou. A UI mostrará ‘Resultado pendente’.” | Job summary; não bloqueia. |
 
@@ -1678,13 +1682,14 @@ A assistência deve ser do mesmo time da marcadora e não pode ser a própria ma
 
 ### 8.6 Exemplos de mensagens
 
+- `VAL-002`: “Campo `friendly` removido na v2.0: não existe amistoso. Remova o bloco e use apenas as 8 partidas oficiais (g1…g6, semi e final).”
+- `VAL-002`: “Campo `shootout` removido na v2.0: empates não têm pênaltis nem shootout. Remova o campo; a definição usa a vantagem do empate.”
 - `VAL-009`: “Elenco com 9 jogadoras ativas em 2026-11-24T19:00:00-03:00; máximo permitido: 8. A 9ª jogadora deve sair com `leftAt` ou ser registrada em outro time.”
-- `VAL-017`: “Finalistas divergentes da classificação. Antigos: final [ta, tb]. Novos: final [ta, tc]. Atualize `finalists` para confirmar a correção.”
+- `VAL-017`: “Semifinalistas divergentes da classificação. Antigos: [ta, tb]. Novos: [ta, tc]. Atualize `semifinalists` para confirmar a correção.”
+- `VAL-017`: “Finalistas divergentes do esperado. Antigos: [tc, ta]. Novos: [tc, tb]. Atualize `finalists` para confirmar a correção.”
 - `VAL-023`: “p-016 (tc) está suspensa por 2º amarelo em g3 e não pode ter eventos em g5.”
 - `VAL-024`: “W.O. inválido em g2: `no_show` não pode ter eventos; encontrados 2 cartões.”
-- `VAL-025`: “Shootout inválido em final: o tempo normal terminou 2x1; shootout só é permitido em empate.”
 - `VAL-032`: “Campo desconhecido em teams[0].players[0]: `fullName`. Remova o campo; a privacidade permite apenas id, nickname, position, joinedAt e leftAt.”
-- `VAL-033`: “Amistoso em 03/12/2026 às 21:00: o amistoso deve ocorrer na mesma data da final e antes do horário da final (20:30). Corrija `friendly.startsAt` ou remova o metadado.”
 
 ---
 
@@ -1699,11 +1704,11 @@ export function parseCompetition(rawText: string, source: string): Competition;
 export function validateCompetition(raw: unknown): ValidationResult;
 
 // lib/domain/score.ts
-export function resolveMatchTeams(match: Match, finalists: Finalists | null):
+export function resolveMatchTeams(match: Match, snapshots: PlayoffSnapshots | null):
   { readonly homeTeamId: TeamId; readonly awayTeamId: TeamId };
-export function toResolvedMatch(match: Match, finalists: Finalists | null): ResolvedMatch;
-export function deriveScore(match: Match, finalists?: Finalists | null): Score | null;
-export function winnerOf(match: Match, finalists?: Finalists | null): TeamId | null;
+export function toResolvedMatch(match: Match, snapshots: PlayoffSnapshots | null): ResolvedMatch;
+export function deriveScore(match: Match, snapshots?: PlayoffSnapshots | null): Score | null;
+export function winnerOf(match: Match, snapshots?: PlayoffSnapshots | null): TeamId | null;
 
 // lib/domain/standings.ts
 export function rankTeams(competition: Competition): RankingResult;
@@ -1720,15 +1725,16 @@ export function suspendedFor(match: Match, competition: Competition): ReadonlySe
 export function buildPlayerStats(competition: Competition): readonly PlayerStats[];
 export function buildTeamStats(competition: Competition): readonly TeamStats[];
 
-// lib/domain/finalists.ts
-export function buildExpectedFinalists(competition: Competition): Finalists | null;
+// lib/domain/playoffs.ts
+export function buildExpectedSemifinalists(competition: Competition):
+  readonly [TeamId, TeamId] | null;
+export function buildExpectedFinalists(competition: Competition):
+  readonly [TeamId, TeamId] | null;
 export function buildPodium(competition: Competition): Podium;
 
-// lib/domain/friendly.ts
-export function buildFriendlyCard(competition: Competition): FriendlyCard | null;
-
 // lib/domain/home.ts
-export type HomeState = 'beforeCup' | 'duringGroup' | 'groupComplete' | 'afterFinal';
+export type HomeState =
+  | 'beforeCup' | 'duringGroup' | 'groupComplete' | 'semiComplete' | 'afterFinal';
 export function getHomeState(competition: Competition, now: Date): HomeState;
 export function getNextMatch(competition: Competition, now: Date): Match | null;
 export function getNextRoundMatches(competition: Competition, now: Date): readonly Match[];
@@ -1740,10 +1746,10 @@ export function formatWeekday(date: string): string;              // terça-feir
 export function formatTime(iso: string): string;                   // 19:00
 export function formatDateTime(iso: string): string;               // 24/11/2026 às 19:00
 export function formatBuildTimestamp(now: Date): string;           // ... (horário de Brasília)
-export function formatScore(match: Match, finalists: Finalists | null): string;
+export function formatScore(match: Match, snapshots: PlayoffSnapshots | null): string;
 export function formatScoreAccessible(
   match: Match,
-  finalists: Finalists | null,
+  snapshots: PlayoffSnapshots | null,
   homeName: string,
   awayName: string,
 ): string;
@@ -1756,9 +1762,10 @@ export function formatStatus(match: Match, now: Date): string;
 - Funções que dependem de “agora” recebem `now`; não usam `Date.now()`.
 - Nenhuma função muta arrays/objetos de entrada. Retornos são novos arrays ou `readonly`.
 - `buildStandings` é um alias de `rankTeams(...).rows`, sem lógica duplicada.
-- `winnerOf` retorna `null` para empate normal sem shootout, para partida não finished e para partida sem vencedor.
+- `winnerOf` retorna `null` para partida não finished e para empate de grupo; em empate de `semi`/`final`, retorna o mandante do snapshot por vantagem do empate; W.O. tem precedência.
 - `formatStatus` retorna “Agendada”, “Encerrada”, “Adiada” ou “Resultado pendente”, nunca apenas uma classe CSS.
-- `formatScore` retorna o texto visual (“A definir”, “Adiada”, `1 x 0 (W.O.)`, `1 (4) x (3) 1` ou `2 x 1`); `formatScoreAccessible` retorna a frase completa com nomes e placar. Componentes não montam o formato manualmente.
+- `formatScore` retorna o texto visual (“A definir”, “Adiada”, `1 x 0 (W.O.)` ou `2 x 1`); `formatScoreAccessible` retorna a frase completa com nomes, placar e, no empate do mata-mata, quem avançou/foi campeã pela vantagem. Componentes não montam o formato manualmente.
+- `buildExpectedSemifinalists` retorna `[2º, 3º]` ou `null`; `buildExpectedFinalists` retorna `[1º, vencedora]` ou `null`. Ambos não lançam erro com etapa incompleta.
 
 ### 9.2 Contratos de páginas
 
@@ -1782,9 +1789,8 @@ Cada página **DEVE**:
 | `HomeShortcuts.astro` | `teams` | Atalhos para Jogos, Times e Classificação, mais os três times com links diretos. |
 | `SiteFooter.astro` | `buildTimestamp` | Nome público, “Atualizado em … (horário de Brasília)”, sem instituição/Airbnb/analytics. |
 | `NoticeBanner.astro` | `notices` | `<aside aria-labelledby="avisos-title">`, lista com `<time>`, nada só por cor. |
-| `MatchCard.astro` | `match`, `competition`, `now`, `showStage?` | Times, fase, data, horário/local com fallback, status textual, placar/W.O./shootout, link para detalhe. Nunca é usado para o amistoso. |
-| `FriendlyCard.astro` | `friendly` (`FriendlyCard`) | Cartão informativo na Fase final, antes da final; rótulo “Informativo — não é partida oficial”, data, horário, local e nota; sem placar, status, link de partida ou ação. |
-| `Score.astro` | `match`, `finalists`, `homeTeam`, `awayTeam` | Usa `formatScore` e `formatScoreAccessible`; nunca só parênteses sem explicação. |
+| `MatchCard.astro` | `match`, `competition`, `now`, `showStage?` | Times resolvidos pelo snapshot, fase, data, horário/local com fallback, status textual, placar/W.O., vantagem do empate quando aplicável e link para detalhe. |
+| `Score.astro` | `match`, `snapshots`, `homeTeam`, `awayTeam` | Usa `formatScore` e `formatScoreAccessible`; nunca só parênteses sem explicação; exibe texto de vantagem/W.O. |
 | `StatusBadge.astro` | `status`, `overdue?` | Texto visível; variantes não dependem de cor. |
 | `StandingsTable.astro` | `rows`, `provisional`, `caption` | Tabela semântica, caption, `th scope`, contêiner de rolagem focável e rotulado, badge “Sorteio” textual. |
 | `RosterTable.astro` | `players`, `suspensions`, `stats`, `mode` | Apelido, posição, gols, assistências, cartões, pontos, status de suspensão; marca “fora do elenco ativo”. |
@@ -1835,20 +1841,21 @@ export interface PageMeta {
 | `/jogos/` | `jogos/index.astro` | Lista por data | `jogos` | Jogos — Copa … |
 | `/jogos/g1/`…`/jogos/g6/` | `jogos/[matchId].astro` | Detalhe de partida | `jogos` | {TA} x {TB} — {data} — Copa … |
 | `/jogos/final/` | idem | Detalhe da final | `jogos` | Final — Copa … |
+| `/jogos/semi/` | idem | Detalhe da semifinal | `jogos` | Semifinal — Copa … |
 | `/classificacao/` | `classificacao/index.astro` | Tabela e critérios | `classificacao` | Classificação — Copa … |
 | `/times/` | `times/index.astro` | 3 times | `times` | Times — Copa … |
 | `/times/ta/`…`/times/tc/` | `times/[teamId].astro` | Elenco e histórico | `times` | {Time} ({abrev}) — Copa … |
 | `/estatisticas/` | `estatisticas/index.astro` | Artilharia, assistências, cartões, gols contra | `estatisticas` | Estatísticas — Copa … |
-| `/fase-final/` | `fase-final/index.astro` | Final, card do amistoso e pódio | `fase-final` | Fase final — Copa … |
+| `/fase-final/` | `fase-final/index.astro` | Semifinal, final e pódio | `fase-final` | Fase final — Copa … |
 | `/404.html` | `404.astro` | Página não encontrada | — | Página não encontrada — Copa … |
 | `/regulamento/` | **não existe** | 404 | — | — |
 
 - Todas as rotas usam barra final, exceto `404.html`.
 - URLs com IDs de time são estáveis; renomear o time não muda `/times/ta/`.
-- `/jogos/[matchId]` tem `getStaticPaths` fechado nos 7 IDs (`g1`…`g6`, `final`); qualquer outro caminho cai no 404. `/jogos/terceiro/` não existe.
+- `/jogos/[matchId]` tem `getStaticPaths` fechado nos 8 IDs (`g1`…`g6`, `semi`, `final`); qualquer outro caminho cai no 404. `/jogos/terceiro/` não existe.
 - `/times/[teamId]` tem `getStaticPaths` fechado em `ta`, `tb` e `tc`; `/times/td/` não existe.
 - Nenhuma rota, link, metadado ou placeholder de Regulamento.
-- Nenhuma rota para o amistoso; ele é apenas um card em `/fase-final/`.
+- Nenhuma rota para amistoso, disputa de 3º lugar ou pênaltis.
 - Nenhuma rota de admin, API, busca, filtro ou edição.
 
 ### 10.2 Layout global
@@ -1882,7 +1889,7 @@ Ordem do documento:
 - O rodapé contém o nome público e “Atualizado em {data} às {hora} (horário de Brasília)”. Não contém instituição, Airbnb, analytics, cookies ou links de terceiros.
 - O skip link é o primeiro elemento focável e fica visível ao receber foco.
 
-### 10.3 Início — quatro estados
+### 10.3 Início — cinco estados
 
 O estado é calculado no build por `getHomeState(competition, now)`. Não há contagem regressiva.
 
@@ -1910,25 +1917,39 @@ Condição: grupo incompleto e `hoje >= primeira data` (ou já há resultado).
 
 #### UI-HOME-03 — Classificatória encerrada
 
-Condição: as 6 partidas de grupo estão `finished`, final ainda não encerrada.
+Condição: as 6 partidas de grupo estão `finished`, semifinal ainda não encerrada.
 
-- Card “1º x 2º” da final com data, local, horário ou fallback, e link para o detalhe.
+- Card da **semifinal** “2º x 3º” com data, local, horário ou fallback, e link para o detalhe.
+- Card da **final** com o 1º colocado e “Vencedora da semifinal”; não usar “Confrontos a definir” quando o 1º já é conhecido.
+- Texto visível da vantagem do empate para o 2º na semifinal e para o 1º na final.
 - Link para Fase final.
 - Últimos resultados da última data encerrada.
-- Classificação final (sem “provisória”), com o 3º colocado já definido.
-- Se a final já estiver encerrada, o estado é o 4.
+- Classificação final (sem “provisória”); a 3ª colocada ainda não está definida.
+- Se a semifinal já estiver encerrada, o estado é o 4.
 
-#### UI-HOME-04 — Após a final
+#### UI-HOME-04 — Após a semifinal
+
+Condição: `semi` `finished`, final ainda não encerrada.
+
+- Card da **final** com o 1º colocado e a vencedora da semifinal, data/local/horário e link.
+- Texto visível da vantagem do empate para o 1º.
+- 3ª colocada já definida como perdedora da semifinal, com rótulo “3ª colocada”.
+- Link para Fase final.
+- Resultado da semifinal e últimos resultados.
+- Classificação final (sem “provisória”).
+- Se a final já estiver encerrada, o estado é o 5.
+
+#### UI-HOME-05 — Após a final
 
 Condição: `final` `finished`.
 
-- Campeão em destaque com texto “Campeã: {time}” (não só cor).
-- Pódio completo: 1º, 2º e 3º; não há 4º lugar.
+- Campeã em destaque com texto “Campeã: {time}” (não só cor).
+- Pódio completo: campeã, vice-campeã e 3ª colocada; não há 4º lugar.
 - Link para Fase final.
-- Resultado da final.
+- Resultado da final, com texto de vantagem do empate se aplicável.
 - Sem contagem regressiva; sem dados inventados.
 
-**Fallback de agenda:** se não houver próximo jogo e existirem partidas `postponed`, a Início mostra “Agenda em atualização” no bloco de próxima rodada e mantém últimos resultados/classificação. Isso não cria um quinto estado; é um conteúdo do estado 2/3.
+**Fallback de agenda:** se não houver próximo jogo e existirem partidas `postponed`, a Início mostra “Agenda em atualização” no bloco de próxima rodada e mantém últimos resultados/classificação. Isso não cria um sexto estado; é um conteúdo dos estados 2/3/4.
 
 ### 10.4 Jogos — lista e detalhe
 
@@ -1936,20 +1957,21 @@ Condição: `final` `finished`.
 
 - Agrupar por `date` em ordem ascendente.
 - Cada grupo tem `<h2>` com data e dia da semana: “Terça-feira, 24/11/2026”.
-- Cada card mostra: fase (“Rodada 1”, “Rodada 2”, “Rodada 3”, “Final”), times, horário ou “Horário a definir”, local ou “Local a definir”, status textual e placar quando aplicável.
-- O amistoso (`friendly`) **NÃO DEVE** aparecer na lista de jogos; ele existe apenas como card informativo na Fase final.
+- Cada card mostra: fase (“Rodada 1”, “Rodada 2”, “Rodada 3”, “Semifinal”, “Final”), times, horário ou “Horário a definir”, local ou “Local a definir”, status textual e placar quando aplicável.
+- A lista contém as **8 partidas oficiais**; não há amistoso, disputa de 3º lugar ou pênaltis.
 - Status: “Agendada”, “Encerrada”, “Adiada” ou “Resultado pendente” (derivado para `scheduled` vencida).
 - W.O.: placar derivado na ordem mandante/visitante (1x0 para o vencedor) + “(W.O.)” + motivo.
-- Shootout: “1 (4) x (3) 1” + texto acessível.
+- Em empate na semifinal/final, o placar permanece `N x N` e o card indica textualmente quem avançou/foi campeã pela vantagem do empate.
 - Partidas `postponed` aparecem na data cadastrada com “Adiada”; não somem da lista.
-- Partida `final` com `finalists: null` mostra “Confrontos a definir” no lugar dos times e não calcula placar.
+- `semi` com `semifinalists: null` mostra “Confrontos a definir” no lugar dos times e não calcula placar.
+- `final` com `finalists: null` mostra o 1º colocado e “Vencedora da semifinal” quando `semifinalists` já existe; sem `semifinalists`, mostra “Confrontos a definir”.
 - Link do card para `/jogos/{id}/`.
 
 **Detalhe (`/jogos/{id}/`)**
 
 - Cabeçalho: fase, times, data/hora, local, status, placar.
-- `final` com `finalists: null`: “Confrontos a definir”, explicação de que a fase final depende das 6 partidas e link para Classificação; sem placar/eventos e sem chamar `resolveMatchTeams`.
-- Placar normal, W.O. ou shootout com texto acessível.
+- `semi` com `semifinalists: null` ou `final` com `finalists: null`: “Confrontos a definir”, explicação de que a fase depende da etapa anterior e link para Classificação/Fase final; sem placar/eventos e sem chamar `resolveMatchTeams`.
+- Placar normal ou W.O. com texto acessível; em empate de mata-mata, indicar a vantagem do empate.
 - Eventos em ordem cronológica (ALG-009):
   - gol: “Gol de {apelido} ({time})”, tag “Pênalti” quando `penalty: true`, assistência quando houver;
   - gol contra: “Gol contra de {apelido} ({time}) — gol para {adversário}”;
@@ -1962,6 +1984,7 @@ Condição: `final` `finished`.
 - `no_show`: “Sem eventos registrados”.
 - Partida `scheduled`/`postponed`: sem seção de eventos; mostrar “Partida ainda não realizada” ou “Partida adiada”.
 - Partida `scheduled` vencida: “Resultado pendente”; sem placar.
+- Sem seção, texto ou link de shootout/pênaltis.
 
 ### 10.5 Classificação
 
@@ -1976,23 +1999,25 @@ Condição: `final` `finished`.
 - Tabela dentro de `.table-scroll` com `role="region"`, `aria-labelledby`, `tabindex="0"` e `overflow-x:auto`; a página não tem overflow horizontal em 320px.
 - Dica visível em telas estreitas: “Deslize horizontalmente para ver todas as colunas.”
 - Se não houver partidas encerradas, mostrar as 3 linhas zeradas e o aviso de classificação provisória.
+- Nota visível: “A semifinal e a final não alteram esta classificação.”
 
 ### 10.6 Times
 
 **Lista (`/times/`)**
 
-- 3 cards com nome, abreviação, posição/registro, número de atletas ativas, estatísticas coletivas (jogos, V/E/D no tempo normal, campanha nos pênaltis V/D, GP/GC/SG, cartões/pontos) e link.
+- 3 cards com nome, abreviação, posição/registro, número de atletas ativas, estatísticas coletivas (jogos, V/E/D no tempo normal, GP/GC/SG, cartões/pontos) e link.
 - Badge “Elenco em formação” somente quando ativas < 5.
 - Entre 5 e 6 ativas, não há badge público; a pendência aparece no CI (`VAL-W01`).
 - Nenhum card usa foto.
 
 **Detalhe (`/times/{id}/`)**
 
-- Cabeçalho com nome, abreviação, posição na classificação e estatísticas coletivas.
-- A campanha nos pênaltis é exibida separadamente (por exemplo, “Pênaltis: 1 V, 0 D”); ela não é somada a V/E/D. Uma final decidida nos pênaltis conta como empate no tempo normal para as duas equipes.
+- Cabeçalho com nome, abreviação, posição na classificação e estatísticas coletivas das **8 partidas oficiais**.
+- A vantagem do empate é exibida separadamente quando o time decidiu uma semifinal/final empatada; ela não é somada a V/E/D. A partida continua contando como empate.
+- Não há campanha, coluna ou texto de pênaltis/shootout.
 - Tabela do elenco ativo: Apelido, Posição, Gols, Assistências, Amarelos, Vermelhos, Pontos disciplinares, Suspensão.
 - Posição: “Goleira”, “Linha” ou “—”.
-- Status de suspensão textual: “Sem suspensão”, “Suspensa na partida {adversário} de {data}”, “Suspensão pendente — final a definir” ou “Suspensão sem efeito — sem próxima partida”.
+- Status de suspensão textual: “Sem suspensão”, “Suspensa na partida {adversário} de {data}”, “Suspensão pendente — fase final a definir” ou “Suspensão sem efeito — sem próxima partida”.
 - Badge “Elenco em formação” quando ativas < 5.
 - Seção separada “Atletas com histórico na edição” para jogadoras com `leftAt != null` e ao menos um evento; mostrar estatísticas e “fora do elenco ativo”.
 - Se não houver atletas no histórico, omitir a seção.
@@ -2002,7 +2027,7 @@ Condição: `final` `finished`.
 
 Seções, nesta ordem:
 
-1. **Artilharia** — Posição, Atleta, Time, Gols, Assistências. Nota: “Inclui pênaltis do tempo normal; não inclui a disputa de pênaltis.”
+1. **Artilharia** — Posição, Atleta, Time, Gols, Assistências. Nota: “Inclui pênaltis do tempo normal e as 8 partidas oficiais; não inclui gols contra nem shootout.”
 2. **Assistências** — Posição, Atleta, Time, Assistências, Gols.
 3. **Cartões por jogadora** — Posição, Atleta, Time, Amarelos, Vermelhos, Pontos disciplinares. Nota sobre segundo amarelo.
 4. **Cartões por time** — Time, Amarelos, Vermelhos, Pontos disciplinares.
@@ -2018,15 +2043,17 @@ Seções, nesta ordem:
 
 | Estado | Condição | Conteúdo |
 |---|---|---|
-| UI-FINAL-01 | Grupo incompleto | “Confrontos a definir” + explicação de que a fase final depende das 6 partidas; link para Classificação. Se `friendly` existir, card informativo antes do card da final. |
-| UI-FINAL-02 | Grupo completo, final não encerrada | Card “1º x 2º” com data/local/horário e link; card informativo do amistoso, se existir, antes do card da final. |
-| UI-FINAL-03 | Final encerrada | Pódio completo (campeã, vice e 3ª) + ficha da final + card informativo do amistoso, se existir, antes da ficha da final. |
+| UI-FINAL-01 | Grupo incompleto | “Confrontos a definir” + explicação de que a fase final depende das 6 partidas; link para Classificação. Sem card de semifinal/final com times inventados. |
+| UI-FINAL-02 | Grupo completo, semifinal não encerrada | Card “2º x 3º” com data/local/horário e link; card da final com o 1º colocado e “Vencedora da semifinal”; textos de vantagem do empate para o 2º e para o 1º. |
+| UI-FINAL-03 | Semifinal encerrada, final não encerrada | Card da final “1º x vencedora da semifinal” com data/local/horário; 3ª colocada (perdedora da semifinal) em destaque; texto de vantagem do empate para o 1º. |
+| UI-FINAL-04 | Final encerrada | Pódio completo (campeã, vice-campeã e 3ª colocada) + ficha da final + ficha da semifinal. |
 
-- Os cards usam `finalists`; não há times hardcoded.
-- Se a final foi W.O., mostrar o placar derivado na ordem mandante/visitante (1x0 para o vencedor), “(W.O.)” e o motivo.
-- Se a final foi shootout, mostrar `1 (4) x (3) 1` e o texto acessível.
-- “Campeã”, “Vice-campeã” e “3º lugar” são textos visíveis. **NÃO DEVE** existir “4º lugar” nem card de disputa de 3º lugar.
-- O card do amistoso vem de `buildFriendlyCard` e segue a §7.12; não é um `MatchCard` e não tem placar, status, eventos ou link de partida.
+- Os cards usam `semifinalists`/`finalists`; não há times hardcoded.
+- Se a semifinal ou a final foi W.O., mostrar o placar derivado na ordem mandante/visitante (1x0 para o vencedor), “(W.O.)” e o motivo; o W.O. prevalece sobre a vantagem.
+- Em empate no tempo normal, mostrar o placar `N x N` e o texto de quem avançou/foi campeã pela vantagem do empate.
+- “Campeã”, “Vice-campeã” e “3ª colocada” são textos visíveis. **NÃO DEVE** existir “4º lugar”, card de disputa de 3º lugar ou card de amistoso.
+- Antes da semifinal, a final deve exibir o 1º colocado e “Vencedora da semifinal”; **NÃO DEVE** usar “Confrontos a definir” quando o 1º já é conhecido.
+- Não há card, link ou texto de pênaltis/shootout.
 
 ### 10.9 404
 
@@ -2046,8 +2073,9 @@ Seções, nesta ordem:
 | UI-MATCH-03 | Adiada | “Adiada”; sem placar/eventos. |
 | UI-MATCH-04 | Resultado pendente | “Resultado pendente”; sem placar; não é próximo jogo. |
 | UI-MATCH-05 | W.O. | Placar derivado na ordem mandante/visitante (1x0 para o vencedor) + “(W.O.)” + motivo; sem gols fictícios. |
-| UI-MATCH-06 | Shootout | “1 (4) x (3) 1” + texto acessível. |
-| UI-MATCH-07 | Final sem finalistas | “Confrontos a definir”; sem placar/eventos; link para Classificação. |
+| UI-MATCH-06 | Vantagem do empate | Placar `N x N` + texto “{time} avança/conquista o título pela vantagem do empate”. |
+| UI-MATCH-07 | Mata-mata sem snapshot | “Confrontos a definir”; sem placar/eventos; link para Classificação/Fase final. |
+| UI-MATCH-08 | Final com 1º definido | 1º colocado + “Vencedora da semifinal”; não usar “Confrontos a definir”. |
 | UI-STANDINGS-01 | Provisória | Badge “Classificação provisória”. |
 | UI-STANDINGS-02 | Final | Sem badge de provisória. |
 | UI-STANDINGS-03 | Sorteio | Badge “Sorteio” na linha. |
@@ -2056,9 +2084,7 @@ Seções, nesta ordem:
 | UI-TEAM-03 | Histórico | Seção “Atletas com histórico na edição”. |
 | UI-STATS-01 | Sem dados | Mensagem de estado vazio. |
 | UI-STATS-02 | Fora do elenco | Marca textual “fora do elenco ativo”. |
-| UI-FINAL-01/02/03 | Fase final | Conforme §10.8. |
-| UI-FRIENDLY-01 | Amistoso presente | Card informativo antes da final, com “Informativo — não é partida oficial”; sem placar/status/link. |
-| UI-FRIENDLY-02 | Amistoso ausente | Nenhum card ou placeholder. |
+| UI-FINAL-01/02/03/04 | Fase final | Conforme §10.8. |
 | UI-404-01 | Não encontrada | 404 com link. |
 
 ### 10.11 SEO, metadados e favicon
@@ -2199,8 +2225,8 @@ Pares calculados com luminância relativa WCAG:
 - `aria-current="page"` no link ativo, uma única vez por navegação; no detalhe do time, o submenu marca o time e a seção Times permanece destacada.
 - Tabelas: `<caption>`, `<th scope="col">`, `<th scope="row">`, `<abbr title>`, sem tabela de layout.
 - Contêiner de rolagem: `role="region"`, `aria-labelledby`, `tabindex="0"`, instrução textual; foco visível.
-- Placar de pênaltis com texto acessível completo, não apenas “1 (4) x (3) 1”.
-- Suspensões, W.O., sorteio e elenco em formação sempre com texto.
+- Placar e definição por vantagem do empate com texto acessível completo; não depender de parênteses, cor ou posição.
+- Suspensões, W.O., sorteio, vantagem do empate e elenco em formação sempre com texto.
 - Ícones decorativos com `aria-hidden="true"`; ícones informativos com nome acessível.
 - `prefers-reduced-motion` respeitado.
 - Zoom 200% sem perda de conteúdo/funcionalidade.
@@ -2233,7 +2259,7 @@ Pares calculados com luminância relativa WCAG:
 - Nenhum ID de jogadora no HTML, em atributos, URLs ou JSON.
 - Nenhum logo da instituição ou da Airbnb; nenhuma marca de terceiros.
 - Textos públicos em pt-BR, com “você” e linguagem clara.
-- Textos livres (`friendly.note` e `notices[].message`) são públicos: use apelidos ou descrições genéricas; nunca inclua nome completo, contato ou outro dado pessoal.
+- Textos livres (`notices[].message`) são públicos: use apelidos ou descrições genéricas; nunca inclua nome completo, contato ou outro dado pessoal.
 - Datas por extenso quando ajudar (“Terça-feira, 24/11/2026”); horários em 24h.
 - “Horário de Brasília” no rodapé para explicar o fuso.
 
@@ -2582,23 +2608,24 @@ Os casos abaixo são derivados do AGENTS e do PRD. A matriz completa está no Ap
 - Amarelo = 1; vermelho = 2; 1 amarelo + 1 vermelho direto = 3; dois amarelos = 3 no total.
 - Dois amarelos no mesmo jogo geram vermelho derivado para estatísticas/suspensão.
 - Terceiro amarelo no mesmo jogo bloqueia; vermelho explícito com dois amarelos bloqueia.
-- Vermelho direto suspende a próxima partida canônica do time.
+- Vermelho direto suspende a próxima partida real do time, considerando o chaveamento.
+- 1º colocado sem semifinal: vermelho no último jogo de grupo é cumprido na final, quando definida.
+- 2º/3º: vermelho na última partida de grupo é cumprido na semifinal; vermelho na semifinal é cumprido na final apenas se o time avançar.
+- Vermelho na final não tem partida seguinte e não tem efeito.
 - Sem próxima partida, sem efeito.
 - Jogadora suspensa não pode ter eventos na partida que perde.
-- Cartões da final contam para estatísticas/suspensão, não para classificação; não há cartões de 3º lugar.
+- Cartões da semifinal e da final contam para estatísticas/suspensão, não para classificação; não há cartões de 3º lugar.
 - Cartões de W.O. contam, exceto `no_show`.
 - Não há suspensão por acúmulo de amarelos.
 
-**Gols, assistências e pênaltis**
+**Gols, assistências e pênaltis do tempo normal**
 
 - Placar derivado de gols normais, pênaltis do tempo normal e gols contra.
 - Gol contra credita o adversário e não entra na artilharia da jogadora.
 - Assistência opcional, do mesmo time, diferente da marcadora; proibida em pênalti e gol contra.
-- Pênalti do tempo normal conta na artilharia; shootout não conta.
-- Shootout só na final, após empate, valores diferentes.
-- Placar `1 (4) x (3) 1` e texto acessível.
+- Pênalti do tempo normal conta na artilharia; não há shootout.
 - W.O. sem gols/assistências; cartões permitidos conforme motivo.
-- Estatísticas coletivas: `buildTeamStats` agrega grupo + final; final decidida nos pênaltis conta como empate em V/E/D e soma `shootoutWins`/`shootoutLosses`; GP/GC/SG ignoram o shootout; W.O. conta 1x0; amistoso fora.
+- Estatísticas coletivas: `buildTeamStats` agrega grupo + semifinal + final (8 partidas); empate na semifinal/final conta como empate em V/E/D; não há `shootoutWins`/`shootoutLosses`; GP/GC/SG incluem o tempo normal; W.O. conta 1x0.
 - Simetria dos confrontos: cada par tem um jogo em casa para cada time; `g4` é `tb x ta`; trocar para `ta x tb` falha `VAL-012`.
 
 **Elenco e elegibilidade**
@@ -2613,14 +2640,17 @@ Os casos abaixo são derivados do AGENTS e do PRD. A matriz completa está no Ap
 
 **Fase final e correções**
 
-- `finalists` nulo com grupo incompleto; obrigatório e igual à classificação com grupo completo.
-- Apenas 1º x 2º na final; não há 3º x 4º nem partida de 3º lugar.
-- Pódio com campeã, vice e 3ª; 3ª é a 3ª da classificação; não há 4º lugar.
-- Correção que muda finalistas após a final falha listando antigos/novos.
+- 8 partidas oficiais: `g1`…`g6`, `semi`, `final`; conjunto diferente falha `VAL-011`.
+- `semifinalists` nulo com grupo incompleto; obrigatório e igual a `[2º, 3º]` com grupo completo.
+- `finalists` nulo com semifinal incompleta; obrigatório e igual a `[1º, vencedora da semifinal]` com semifinal completa.
+- Semifinal 2º x 3º e vantagem do empate para o 2º; final 1º x vencedora da semifinal e vantagem do empate para o 1º.
+- Empate na semifinal classifica o 2º; empate na final dá o título ao 1º; placar continua empate.
+- W.O. na semifinal e na final prevalece sobre a vantagem e define vencedor/campeão, inclusive quando o vencedor é o visitante.
+- Pódio com campeã, vice-campeã e 3ª colocada; a 3ª é a perdedora da semifinal; não há 4º lugar.
+- Correção que muda semifinalistas após a semifinal ou finalistas após a final falha listando antigos/novos.
 - `notices` gera banner global.
-- W.O. na final define campeão.
-- Amistoso (`friendly`) aparece só como card informativo na Fase final; não altera nada.
-- `friendly` inválido (data/horário/local/nota ou campo de partida) é bloqueado por `VAL-033`.
+- `friendly` e `shootout` são proibidos e geram `VAL-002` com mensagem de migração; ausência de amistoso, shootout e disputa de pênaltis em dados, UI e build.
+- Card da final antes da semifinal mostra o 1º colocado e “Vencedora da semifinal”, sem “Confrontos a definir”.
 
 **Validação**
 
@@ -2645,8 +2675,8 @@ Os casos abaixo são derivados do AGENTS e do PRD. A matriz completa está no Ap
 ### 13.3 Fixtures e factories
 
 - `tests/fixtures/valida.yaml`: temporada completa válida (pode ser a do Apêndice A); é a fixture do build de teste do E2E, não a fonte pública.
-- `tests/fixtures/invalida-*.yaml`: casos de schema (campo desconhecido, tipo, data, enum).
-- `tests/factories/competition.ts`: `buildValidCompetition()`, `withTeam()`, `withMatch()`, `withEvent()`, `withFinalists()`, `withDrawOrder()`.
+- `tests/fixtures/invalida-*.yaml`: casos de schema (campo desconhecido, tipo, data, enum, `friendly`/`shootout` legados).
+- `tests/factories/competition.ts`: `buildValidCompetition()`, `withTeam()`, `withMatch()`, `withEvent()`, `withSemifinalists()`, `withFinalists()`, `withDrawOrder()`.
 - Testes semânticos mutam a factory e esperam o código `VAL-*` exato.
 - O teste de fumaça carrega `data/2026/copa.yaml` real e exige validação sem erros (avisos permitidos).
 
@@ -2685,12 +2715,12 @@ npm run verify
 | FR-01 | Obrigatório | §5, §6, §9 | Schema único + build + varredura de dados hardcoded | MVP |
 | FR-02 | Obrigatório | §8, §12 | Fixtures inválidas; build falha; job summary | MVP |
 | FR-03 | Obrigatório | §5.6, §6, §10.6 | Testes de elenco + páginas de times | MVP |
-| FR-04 | Obrigatório | §6, §7.8, §10.4 | Testes de calendário + lista/detalhe | MVP |
+| FR-04 | Obrigatório | §6, §7.8, §10.4 | Testes de calendário + lista/detalhe das 8 partidas | MVP |
 | FR-05 | Obrigatório | §7.1, §7.9, §10.4 | Testes de eventos + detalhe | MVP |
 | FR-06 | Obrigatório | §7.2, §7.3 | Testes de desempate | MVP |
-| FR-07 | Obrigatório | §7.7, §10.8 | Testes de finalistas/pódio | MVP |
-| FR-08 | Obrigatório | §7.6, §10.7 | Testes de estatísticas | MVP |
-| FR-09 | Desejável | §10.3 | E2E dos quatro estados | MVP (desejável) |
+| FR-07 | Obrigatório | §7.7, §10.8 | Testes de semifinal, final, snapshots e pódio | MVP |
+| FR-08 | Obrigatório | §7.6, §10.7 | Testes de estatísticas das 8 partidas | MVP |
+| FR-09 | Desejável | §10.3 | E2E dos cinco estados | MVP (desejável) |
 | FR-10 | Desejável | §2.4 | Sem rota/nav/placeholder; 404 | **ADIADO** |
 | FR-11 | Obrigatório | §11, §13 | Playwright/axe + checklist | MVP |
 | FR-12 | Obrigatório | §12 | Workflow Pages | MVP |
@@ -2702,7 +2732,6 @@ npm run verify
 | FR-18 | Obrigatório | §2.1, §11, §13 | Teste de termos proibidos | MVP |
 | FR-19 | Desejável | §10.11 | Teste de meta tags/OG | MVP (desejável) |
 | FR-20 | Futuro | §2.4 | — | **FUTURO** |
-| FR-21 | Obrigatório (emenda v1.1; `friendly` opcional) | §2, §5.4, §7.12, §10.8 | `VAL-033`, testes de unidade e E2E do card informativo | MVP |
 
 ### 14.2 Requisitos não funcionais
 
@@ -2730,8 +2759,8 @@ npm run verify
 | Desempate entre 3+ | ALG-003, exemplos 4/5. |
 | Cartões | ALG-004, VAL-022, UI de cartões. |
 | Gols e assistências | ALG-001/006, VAL-021, UI de detalhe. |
-| Fase final | ALG-007, VAL-016/017, UI-FINAL (final única, pódio de 3). |
-| Amistoso | SPEC-016, ALG-012, VAL-033, UI-FRIENDLY. |
+| Fase final | ALG-007, VAL-016/017, SPEC-018/019, UI-FINAL (semifinal, final, vantagem e pódio de 3). |
+| Remoção do amistoso/shootout | SPEC-016 (obsoleto), VAL-002, §5.4/§7.12, ausência na UI. |
 | Elenco flexível | §5.6, VAL-020, UI-TEAM-03. |
 | Suspensão | ALG-005, VAL-023, UI-TEAM-02. |
 | Correções | ALG-007, VAL-017, notices. |
@@ -2744,83 +2773,56 @@ npm run verify
 
 ### 15.1 Emendas registradas
 
-| # | Tema | Decisão desta SPEC | Origem | Aplicação na v1.1 |
-|---|---|---|---|---|
-| 1 | Artilharia e pênalti | Pênalti do tempo normal conta para placar e artilharia; somente a disputa de pênaltis fica fora. | PRD §10.5 estava ambíguo (“excluindo pênaltis”). | PRD §10.5 ajustado para “exclui a disputa de pênaltis; inclui pênalti do tempo normal”. |
-| 2 | Assistência em pênalti | Assistência em gol de pênalti é bloqueada. | PRD §7.6 não explicitava. | PRD §7.6 e validação do PRD §8.1 atualizados. |
-| 3 | Limite de elenco | Máximo de 8 ativas; `leftAt` não ocupa vaga e preserva histórico; 9ª ativa bloqueada. | PRD §7.2. | PRD §7.2 e AGENTS (badge/limite) atualizados. |
-| 4 | Badge de elenco | Badge público “Elenco em formação” somente com <5 ativas; aviso de build com <7; 9ª bloqueada. | PRD §7.2 fala em sinalizar <7; briefing separa badge e CI. | PRD §7.2, §10.4 e AGENTS atualizados. |
-| 5 | Regulamento | FR-10 adiado: sem rota, link, página ou placeholder. | Briefing §2.10. | FR-10 marcado como ADIADO no PRD §6.1, §8, §10.7 e §12; removido da navegação no AGENTS. |
-| 6 | W.O. | 1x0 fixo; `walkover` administrativo; sem gols/assistências; cartões permitidos conforme motivo; conta classificação, não artilharia. | Briefing §2.7; PRD §7.8/§16 deixavam em aberto. | Exceção documentada no PRD §7.8, §8.1 e AGENTS. |
-| 7 | Confronto direto não realizado | Se a partida do confronto direto não está `finished`, o critério é ignorado e seguem os próximos. | Briefing §2.2. | PRD §7.4 atualizado. |
-| 8 | Finalistas | `finalists` é snapshot oficial validado contra a classificação; correção após a final bloqueia o build até atualizar. | Briefing §2.6. | PRD §7.7 e §11.5 atualizados. |
-| 9 | Estatísticas | Time como desempate final de ordenação; atletas fora do elenco ativo marcadas por texto. | Briefing §2.8. | PRD §10.5 atualizado. |
-| 10 | Correções e avisos | `notices` gera banner global além do aviso de build. | Briefing §2.6/§2.10. | PRD §11.5 e §10 atualizados. |
-| 11 | Status de partida | `scheduled`, `finished` e `postponed`; `date` obrigatória; `startsAt` opcional em `scheduled`; `finished` exige `startsAt`; `postponed` sem eventos/W.O./shootout. | Briefing §2.4 e §3.2. | PRD §7.3/§7.8 e AGENTS atualizados. |
-| 12 | Mínimo de 3 em quadra | É regra de jogo, não regra de elenco. O site não detecta jogadoras em quadra; W.O. é manual. | Briefing §2.7; PRD §7.3. | PRD §7.2/§7.3 e AGENTS atualizados. |
-| 13 | Sorteio | `drawOrder` só é exigido quando um empate chega ao sorteio; ausência falha; UI mostra badge textual “Sorteio”. | Briefing §2.2. | PRD §7.4 atualizado. |
-| 14 | Próximo jogo | Partida `scheduled` com data passada mostra “Resultado pendente” e não é próximo jogo; cálculo no build. | Briefing §2.9. | PRD §10.1 atualizado. |
-| 15 | Tokens de design | Não importar `airbnb-design-tokens.css` integralmente no CSS publicado; criar camada de tokens do projeto com os valores necessários e nomes sem marca. A referência permanece interna e não vai ao build. | AGENTS permite “importe ou estenda”; a importação literal publicaria nomes de fontes proprietárias/marca, violando o teste de termos proibidos. | Exceção registrada no AGENTS §Design e no README. |
-| 16 | Nome de time duplicado | É aviso (`VAL-W03`), não bloqueio; a abreviação distingue. | Decisão de spec para não inventar regra de produto. | Nenhuma alteração no PRD; a decisão ficou registrada nesta SPEC. |
-| 17 | Placar materializado | Não existe campo de placar; qualquer campo `score`/`result` é erro de schema. | PRD §7.6 + briefing §2.4. | Nenhuma alteração necessária; já coberto pelo PRD. |
-| 18 | Formato 2026 | 3 times fixos (`ta`, `tb`, `tc`); 6 partidas de grupo em turno e returno; final única 1º x 2º; sem 3º x 4º e sem 4º lugar. | Decisão de produto de 12/11/2026 (registro em `docs/decisoes-v1.1.md`). | PRD §3, §7.1, §7.3, §7.7, §8, §10.6–§10.8 e §12 e AGENTS §Visão geral, §Regras e §Calendário atualizados. |
-| 19 | Confronto direto em dois jogos | Soma dos pontos dos dois jogos; se empatar, saldo agregado dos dois jogos; só vale com os dois jogos `finished`; W.O. conta 1x0. | Decisão de produto de 12/11/2026. | PRD §7.4 e AGENTS §Desempate atualizados. |
-| 20 | Amistoso do 3º colocado | Metadado `friendly`, exibido como card informativo na Fase final antes da final; sem placar, eventos, cartões, estatísticas, suspensões, classificação ou pódio. | Decisão de produto de 12/11/2026. | FR-21 e regra adicionadas ao PRD §7/§10.8; AGENTS §Regras e §Validação atualizados. |
-| 21 | Pódio sem 4º | Pódio com 3 posições; o 3º é o 3º da classificação, sem partida decisiva. | Decisão de produto de 12/11/2026. | PRD §7.7, §10.8 e §12 e AGENTS §Regras atualizados. |
-| 22 | Retirada de time | A organização registra W.O. por partida; o site não automatiza retirada, remoção de elenco ou recálculo especial. | Decisão de spec para não inventar regra de produto. | Documentado no PRD §7.8/§16 e no AGENTS §Riscos/limitações. |
-| 23 | Estatísticas coletivas | `buildTeamStats` agrega grupo + final; V/E/D pelo tempo normal; final decidida nos pênaltis conta como empate; `shootoutWins`/`shootoutLosses` separados; shootout fora de GP/GC/SG; amistoso fora. | Decisão de produto de 12/11/2026. | PRD v1.1 §10.4/§10.6 e AGENTS v1.1 atualizados; teste TST-115. |
-| 24 | Simetria dos confrontos | Cada par tem um jogo em casa para cada time; `g4` é `tb x ta`. | Correção de consistência do calendário v1.1. | PRD v1.1 §7.8, AGENTS v1.1 §Calendário e Apêndice A atualizados; teste TST-116. |
+**Emendas vigentes da v2.0 (18/11/2026):**
 
-As emendas 1–24 foram refletidas no `PRD.md` v1.1 e no `AGENTS.md` v1.1. A coluna “Aplicação na v1.1” registra onde cada emenda foi aplicada; a aprovação formal do PRD (§18) está registrada no próprio PRD. As referências ao “briefing” nas emendas 1–17 são ao briefing original da v1.1, que não está versionado; `docs/decisoes-v1.1.md` é a reconstrução documentada e não normativa.
+| # | Tema | Decisão desta SPEC | Origem | Aplicação na v2.0 |
+|---|---|---|---|---|
+| 25 | Formato 2026 | 3 times, 6 jogos de grupo em turno e returno, **semifinal** e **final**: 8 partidas oficiais (`g1`…`g6`, `semi`, `final`). | PRD v2.0 §7.1/§7.8; `docs/decisoes-v2.0.md`. | Schema, validação, rotas, calendário e testes. |
+| 26 | Semifinal | 2º x 3º, partida única; o 2º é mandante e tem vantagem do empate; empate classifica o 2º; W.O. prevalece. | PRD v2.0 §7.1/§7.7. | `semifinalists`, ALG-001/007, UI e testes. |
+| 27 | Final | 1º x vencedora da semifinal; o 1º é mandante e tem vantagem do empate; empate dá o título ao 1º; W.O. prevalece. | PRD v2.0 §7.1/§7.7. | `finalists`, ALG-001/007, UI e testes. |
+| 28 | Empates | Não há prorrogação, pênaltis, shootout ou cobranças alternadas; o placar do tempo normal é o placar oficial. | PRD v2.0 §7.1/§7.7. | Remoção de `shootout`, validação, estatísticas e UI. |
+| 29 | 3ª colocada | É a **perdedora da semifinal**; não há disputa de 3º lugar nem 4º lugar. | PRD v2.0 §7.1/§7.7. | ALG-007, pódio e UI. |
+| 30 | Estatísticas coletivas | Agregam grupo + semifinal + final (8 partidas); empate no mata-mata conta como empate em V/E/D; sem `shootoutWins`/`shootoutLosses`. | PRD v2.0 §10.4/§10.5. | ALG-006, tipos, UI de times e testes. |
+| 31 | Suspensão no chaveamento | O vermelho suspende a próxima partida real: 1º vai direto à final; 2º/3º cumprem na semi; vermelho na semi só vale na final se avançar; vermelho na final não tem efeito. | PRD v2.0 §7.5. | ALG-005, `VAL-023` e UI. |
+| 32 | Snapshots e correções | `semifinalists`/`finalists` são snapshots validados; divergência após a respectiva partida bloqueia com antigos/novos e exige reconciliação/`notices`. | PRD v2.0 §7.7/§8.1. | Schema, ALG-007, `VAL-016/017` e testes. |
+| 33 | Remoções | `friendly`, card de amistoso, `shootout` e colunas de pênaltis foram removidos; campos antigos geram `VAL-002` com mensagem de migração. | PRD v2.0 §6.2/§7.9/§8. | Schema, validação, UI, build e testes. |
+| 34 | Interface da fase final | Rótulos “Semifinal” e “Final”; a final antes da semi mostra o 1º e “Vencedora da semifinal”; a vantagem do empate é sempre textual; “3ª colocada”. | PRD v2.0 §10.6; AGENTS v2.0. | §10.3/§10.8, componentes e E2E. |
+
+As emendas 1–24 foram as decisões históricas da v1.1 e permanecem registradas em `docs/decisoes-v1.1.md`, que não é normativo. Quando qualquer uma delas conflitar com a v2.0 (por exemplo, final única, amistoso ou shootout), prevalecem as emendas 25–34, o `PRD.md` v2.0 e o `AGENTS.md` v2.0.
 
 ### 15.2 Alinhamento aplicado ao PRD, AGENTS e README
 
 O alinhamento abaixo foi aplicado nesta entrega. A aprovação formal do PRD (§18) está registrada no próprio PRD; o commit `docs` é o registro final e só deve ser declarado concluído depois de existir.
 
-**PRD.md v1.1**
+**PRD.md v2.0**
 
-- [x] §1/§6.1/§7.1: substituir “4 times, turno único e 8 partidas” por 3 times (`ta`, `tb`, `tc`), 6 partidas de grupo em turno e returno e final única.
-- [x] §7.2: manter as regras de elenco; acrescentar `leftAt`, limite de 8 ativas simultâneas, badge <5, aviso <7 e distinção entre elenco e regra de 3 em quadra.
-- [x] §7.8: atualizar o calendário para 24/11 (g1/g2), 26/11 (g3/g4), 01/12 (g5/g6) e 03/12 (amistoso + final), com dois jogos por time em cada uma das três primeiras datas.
-- [x] §7.4: substituir o confronto direto de um jogo pela soma dos dois jogos (pontos e, se necessário, saldo agregado); exigir os dois jogos `finished`; W.O. conta 1x0; manter a regra de 3+ times e a reaplicação ao reduzir para dois.
-- [x] §7.6: explicitar assistência proibida em pênalti e em gol contra; pênalti do tempo normal conta.
-- [x] §7.7: `finalists` apenas para a final; pódio com 3 posições; remover 3º x 4º, disputa de 3º lugar e 4º lugar.
-- [x] §7.8: W.O. 1x0, motivos, cartões, sem gols/assistências; documentar a retirada de time como W.O. manual por partida, sem automação.
-- [x] §7.9/§10.6: adicionar o amistoso (`friendly`) como metadado informativo, com data, horário, local e nota, exibido antes da final e sem efeito competitivo; adicionar FR-21.
-- [x] §8: FR-10 ADIADO; FR-20 FUTURO; FR-21 amistoso; remover validações de 3º lugar; acrescentar `VAL-033` e as validações de W.O., `drawOrder`, badge e `finalists`.
-- [x] §10.1: próximo jogo/“Resultado pendente”.
-- [x] §10.5: “exclui a disputa de pênaltis”, não “excluindo pênaltis”; desempate por time; marca “fora do elenco ativo”.
-- [x] §10.4/§12: estatísticas coletivas com V/E/D no tempo normal, campanha separada nos pênaltis (`shootoutWins`/`shootoutLosses`) e GP/GC/SG sem shootout.
-- [x] §7.8/§15: `g4` como `tb x ta`, garantindo um jogo em casa para cada time em cada par.
-- [x] §10.2/§10.6: lista com 7 jogos, sem `/jogos/terceiro/`; Fase final com card informativo do amistoso antes da final; pódio de 3.
-- [x] §10.7: remover Regulamento da navegação/página.
-- [x] §11.5: `notices` e banner.
-- [x] §12: ajustar critérios de aceite para 3 times, 7 partidas, pódio de 3, amistoso informativo, badge <5, W.O., `drawOrder`, `finalists` e Regulamento adiado.
+- [x] §1/§3.1/§7.1: 3 times, 6 partidas de grupo em turno e returno, semifinal 2º x 3º e final 1º x vencedora; 8 partidas oficiais.
+- [x] §7.1/§7.7: vantagem do empate para o 2º na semifinal e para o 1º na final; sem prorrogação, pênaltis ou shootout; 3ª colocada é a perdedora da semifinal.
+- [x] §7.5: suspensão considera o caminho do time no chaveamento, incluindo o 1º colocado sem semifinal.
+- [x] §7.7/§8.1: `semifinalists` e `finalists` como snapshots validados; correções após semifinal/final bloqueiam com antigos/novos.
+- [x] §7.8: calendário com semifinal em 02/12 e final em 03/12.
+- [x] §7.9/§10.6: remover o amistoso e o card informativo; exibir semifinal/final com vantagem textual e 3ª colocada.
+- [x] §10.4/§10.5: estatísticas coletivas das 8 partidas, empate no mata-mata como empate, sem colunas de pênaltis.
+- [x] §8/§12: validação e critérios de aceite para snapshots, vantagem, W.O. no mata-mata, remoção de amistoso/shootout e pódio de 3.
 
-**AGENTS.md v1.1**
+**AGENTS.md v2.0**
 
-- [x] §Visão geral e §Calendário: 3 times, 7 partidas oficiais, datas 24/11, 26/11, 01/12 e 03/12; remover 4 times/8 partidas/17-11 e 19-11.
-- [x] §Regras da competição: turno e returno, final única, pódio de 3 sem 4º lugar, confronto direto de dois jogos, amistoso informativo e retirada de time via W.O. manual.
-- [x] §Design: registrar a exceção de não importar o arquivo de referência integralmente; tokens do projeto sem marca no CSS publicado; card informativo do amistoso sem tratamento de partida.
-- [x] §Validação: acrescentar as regras `VAL-*` novas, incluindo `VAL-033`.
-- [x] §Comandos: substituir “ainda não definidos” pelos comandos reais da §12.7.
-- [x] §Testes: acrescentar confronto direto de dois jogos, amistoso, 3 times/7 partidas, W.O., `finalists`, `drawOrder`, `notices`, estatísticas coletivas com shootout, simetria dos confrontos, orçamento e termos proibidos.
+- [x] §Visão geral, §Formato e §Calendário: 8 partidas, semifinal, final, vantagem do empate e 3ª colocada.
+- [x] §Regras da competição: chaveamento, snapshots, W.O. no mata-mata e suspensão pelo caminho real.
+- [x] §Validação: remoção de `VAL-025`/`VAL-030`/`VAL-033`, snapshots e migração de `friendly`/`shootout`.
+- [x] §Design e §Testes: rótulos “Semifinal”/“Final”, vantagem textual, 3ª colocada, ausência de amistoso/shootout e card da final antes da semi.
 
-**README.md**
+**README.md, PLAN.md e TASKS.md**
 
-- [x] Visão geral, stack, comandos, estrutura de dados e link do site; refletir 3 times, 7 partidas e amistoso informativo.
+- [x] Visão geral, comandos, estrutura de dados e checklist refletem a v2.0.
 
-**docs/decisoes-v1.1.md**
+**docs/decisoes-v2.0.md**
 
-- [x] Registro reconstruído das decisões da v1.1, marcado como reconstrução e não como briefing original.
-
-**PLAN.md e TASKS.md**
-
-- [x] Plano de execução e checklist criados, subordinados a esta SPEC.
+- [x] Registro histórico das decisões da v2.0, com rastreabilidade e pendências.
 
 **Commit**
 
-- [ ] Commit `docs: alinha PRD, AGENTS e SPEC com a v1.1` criado após a revisão final. Não declarar concluído antes de o commit existir.
+- [ ] Commits `docs(prd)`, `docs(agents)`, `docs(spec)` e `docs:` da v2.0 criados após a revisão final. Não declarar concluído antes de o commit existir.
 
 ### 15.3 Conflitos resolvidos
 
@@ -2833,7 +2835,9 @@ O alinhamento abaixo foi aplicado nesta entrega. A aprovação formal do PRD (§
 | PRD §7.8 não define W.O.; briefing define 1x0 | W.O. 1x0 administrativo, manual. Emenda 6. |
 | PRD §11.5 “alerta e exige confirmação” sem mecanismo | `finalists` divergente bloqueia o build; atualizar `finalists` é a confirmação. Emenda 8. |
 | PRD v1.0/AGENTS v1.0 descreviam 4 times, 8 partidas e disputa de 3º lugar | PRD v1.1 e AGENTS v1.1 foram atualizados: 3 times, 7 partidas e pódio de 3. Emendas 18, 21. |
-| PRD v1.0 não tinha amistoso nem confronto direto de dois jogos | PRD v1.1 e AGENTS v1.1 incorporam o `friendly` informativo e o confronto direto agregado dos dois jogos; emendas 19 e 20. |
+| PRD v1.0 não tinha amistoso nem confronto direto de dois jogos | PRD v1.1 e AGENTS v1.1 incorporaram o `friendly` informativo e o confronto direto agregado dos dois jogos; emendas 19 e 20. O `friendly` foi removido na v2.0. |
+| PRD v1.1/AGENTS v1.1 previam 7 partidas, final direta 1º x 2º, amistoso e shootout | A v2.0 adota 8 partidas, semifinal 2º x 3º, final 1º x vencedora, vantagem do empate, 3ª colocada como perdedora da semifinal e remoção de `friendly`/`shootout`. Emendas 25–34. |
+| PRD v1.1 definia a 3ª colocada pela classificação do grupo | A v2.0 define a 3ª colocada como perdedora da semifinal; a classificação do grupo define apenas semifinalistas e finalistas. Emenda 29. |
 
 ### 15.4 Regra de manutenção
 
@@ -2853,10 +2857,10 @@ O alinhamento abaixo foi aplicado nesta entrega. A aprovação formal do PRD (§
 | Prazo curto até 24/11/2026 | Alto | Escopo congelado; funções puras; implementação por fatias; testes desde o início. |
 | Carga física: um time joga duas vezes em 24/11, 26/11 e 01/12 | Alto | Calendário explícito na fonte; horários distintos e ordem canônica validada; a organização controla aquecimento/recuperação; a UI lista os dois jogos do dia. |
 | Retirada de um time no meio da competição | Alto | W.O. manual por partida restante, com motivo `withdrawal`; sem automação de remoção de elenco; classificação e estatísticas continuam derivadas dos eventos; limitação documentada na §16.3. |
-| Amistoso confundido com partida oficial | Médio | Rótulo “Informativo — não é partida oficial”; card sem placar/status/link; `VAL-033`; testes de UI e de ausência em listas/estatísticas. |
+| Empate no mata-mata confundido com shootout | Médio | Texto explícito de vantagem do empate; ausência de `shootout`; testes de UI e de build. |
 | Erro de lançamento de dados | Alto | Schema estrito, validação agregada, fixtures, revisão antes do commit. |
 | Interpretação errada do desempate | Alto | Algoritmo por grupos, exemplos trabalhados e matriz de testes. |
-| Correção após a final mudar finalistas | Alto | `finalists` snapshot; build falha com antigos/novos; `notices` para o público. |
+| Correção após a semifinal/final mudar snapshots | Alto | `semifinalists`/`finalists` validados; build falha com antigos/novos; `notices` para o público. |
 | W.O. mal registrado | Médio | Schema de `walkover`; validação de motivo/eventos; UI explícita. |
 | Elenco flexível gerar inconsistência | Médio | `joinedAt`/`leftAt`, máximo 8, apelido único, vínculo imutável. |
 | Suspensão aplicada à partida errada | Médio | Ordem canônica + validação de cronologia; testes. |
@@ -2873,8 +2877,8 @@ O alinhamento abaixo foi aplicado nesta entrega. A aprovação formal do PRD (§
 
 ### 16.2 Premissas
 
-- 3 times, 7 partidas oficiais (6 de grupo + final) e o calendário de 24/11, 26/11, 01/12 e 03/12.
-- O amistoso é metadado informativo na data da final, antes do horário da final.
+- 3 times, 8 partidas oficiais (6 de grupo + semifinal + final) e o calendário de 24/11, 26/11, 01/12, 02/12 e 03/12.
+- A semifinal é 2º x 3º e a final é 1º x vencedora da semifinal; ambos os mandantes têm vantagem do empate.
 - Nomes, horários e local exato são dados operacionais; a UI tem fallback.
 - O site é somente leitura; a edição é via Git.
 - O mapeamento de IDs é privado e fora do repositório.
@@ -2886,15 +2890,14 @@ O alinhamento abaixo foi aplicado nesta entrega. A aprovação formal do PRD (§
 ### 16.3 Limitações documentadas
 
 - Gols ocorridos antes de uma interrupção de W.O. não são registrados no MVP.
-- A disputa de pênaltis registra apenas o placar, sem cobradoras/defesas.
+- Não há prorrogação, pênaltis, shootout ou cobranças alternadas; empates encerram no tempo normal e são resolvidos pela vantagem do empate no mata-mata.
 - Não há placar ao vivo, cronômetro, faltas, escalação ou presença.
 - Não há histórico de edições anteriores nem comparação entre edições.
 - Não há área administrativa, login ou edição no site.
 - Não há modo escuro, impressão/PDF ou analytics.
 - Não há detecção automática de W.O. ou de quantidade de jogadoras em quadra.
 - A retirada de um time não é automatizada: a organização registra um W.O. `withdrawal` em cada partida restante e mantém o elenco/histórico como estão.
-- O amistoso não tem placar, eventos, cartões, estatísticas, suspensões ou efeito na classificação/pódio; a fonte guarda apenas data, horário, local e nota.
-- Não há partida de 3º lugar nem 4º lugar; o 3º é o 3º da classificação.
+- Não há partida de 3º lugar nem 4º lugar; a 3ª colocada é a perdedora da semifinal.
 - Não há imagens de jogadoras.
 - O site não substitui a organização/arbitragem.
 
@@ -2903,10 +2906,8 @@ O alinhamento abaixo foi aplicado nesta entrega. A aprovação formal do PRD (§
 Estas são **dados operacionais**, não decisões de spec:
 
 - Nomes definitivos dos times.
-- Horários exatos das partidas, incluindo os dois jogos do mesmo time em 24/11, 26/11 e 01/12.
+- Horários exatos das partidas, incluindo os dois jogos do mesmo time em 24/11, 26/11 e 01/12 e os horários da semifinal e da final.
 - Local/quadra exata a exibir.
-- Horário, local e texto do amistoso do 3º colocado.
-- Quem disputa o amistoso (o schema não guarda participantes; se necessário, a organização descreve na nota).
 - Critério de assistência em casos duvidosos (decisão da organização).
 - Como acomodar novas alunas quando todos os times estiverem com 8 (decisão da organização; o site bloqueia a 9ª ativa).
 - Data de habilitação do Pages.
@@ -2919,12 +2920,12 @@ Nenhuma questão bloqueia a implementação. A UI tem fallback para horário/loc
 - FR-10 está adiado; FR-20 é futuro.
 - W.O. é 1x0.
 - Badge público é <5; aviso de build é <7.
-- `finalists` é snapshot validado, apenas para a final.
+- `semifinalists` e `finalists` são snapshots validados; a ordem define mando e vantagem.
 - `drawOrder` é obrigatório apenas quando o sorteio é necessário.
-- O formato é 3 times, 6 jogos de grupo em turno e returno e final única; não há 3º x 4º.
-- O pódio tem 3 posições; não há 4º lugar.
+- O formato é 3 times, 6 jogos de grupo em turno e returno, semifinal 2º x 3º e final 1º x vencedora; não há 3º x 4º.
+- O pódio tem 3 posições; a 3ª é a perdedora da semifinal; não há 4º lugar.
 - O confronto direto usa os dois jogos e só vale com ambos `finished`.
-- O amistoso é informativo e não altera nada.
+- Empate no mata-mata é resolvido pela vantagem do mandante; não há shootout.
 - A retirada de time é W.O. manual por partida.
 - Não há JS de cliente.
 
@@ -2937,20 +2938,20 @@ Nenhuma questão bloqueia a implementação. A UI tem fallback para horário/loc
 - [x] `SPEC.md` na raiz, em pt-BR.
 - [x] Todos os blocos previstos da SPEC (1–17 + Apêndices A–G).
 - [x] Schema YAML completo e consistente.
-- [x] Algoritmos determinísticos de placar, desempate, cartões, suspensão, estatísticas, W.O., shootout e pódio.
+- [x] Algoritmos determinísticos de placar, desempate, cartões, suspensão, estatísticas, W.O., vantagem do empate e pódio.
 - [x] Catálogo de validação com bloqueantes e avisos.
-- [x] Catálogo de páginas/estados, incluindo os quatro estados da Início.
-- [x] Rotas sem Regulamento.
+- [x] Catálogo de páginas/estados, incluindo os cinco estados da Início.
+- [x] Rotas sem Regulamento e sem amistoso.
 - [x] Tokens, contraste, foco, teclado e 320px com critérios verificáveis.
 - [x] Build/CI/deploy com comandos npm reais.
-- [x] Matriz de testes por regra e rastreabilidade FR-01..FR-21, incluindo TST-115 (estatísticas coletivas com shootout) e TST-116 (simetria dos confrontos).
+- [x] Matriz de testes por regra e rastreabilidade FR-01..FR-21, incluindo TST-116 (simetria dos confrontos) e TST-117..TST-120 (semifinal, vantagem do empate, W.O. no mata-mata e 3ª colocada).
 - [x] Nenhuma questão bloqueante em aberto; apenas dados operacionais.
-- [x] Emendas registradas e alinhamento do PRD v1.1/AGENTS v1.1 aplicado.
-- [x] `PRD.md`, `AGENTS.md`, `README.md`, `docs/decisoes-v1.1.md`, `PLAN.md` e `TASKS.md` alinhados nesta entrega.
+- [x] Emendas registradas e alinhamento do PRD v2.0/AGENTS v2.0 aplicado.
+- [x] `PRD.md`, `AGENTS.md`, `docs/decisoes-v2.0.md`, `PLAN.md` e `TASKS.md` alinhados nesta entrega.
 
 ### 17.2 Implementação do MVP
 
-- [ ] `data/2026/copa.yaml` válido, com 3 times, 7 partidas e elencos.
+- [ ] `data/2026/copa.yaml` válido, com 3 times, 8 partidas e elencos.
 - [ ] `npm ci` funciona em ambiente limpo.
 - [ ] `npm run validate` passa sem erros; avisos revisados.
 - [ ] `npm run check` passa.
@@ -2961,13 +2962,13 @@ Nenhuma questão bloqueia a implementação. A UI tem fallback para horário/loc
 - [ ] `dist/404.html` existe e funciona.
 - [ ] `/regulamento/` não existe e não aparece em links.
 - [ ] 6 páginas na nav; menu mobile `<details>` funcional.
-- [ ] Início nos quatro estados, sem contagem regressiva.
-- [ ] Jogos agrupados por data; 7 partidas oficiais; sem card ou rota de 3º lugar.
-- [ ] Detalhe com placar, eventos, W.O., shootout e desfalques.
+- [ ] Início nos cinco estados, sem contagem regressiva.
+- [ ] Jogos agrupados por data; 8 partidas oficiais; sem card ou rota de 3º lugar.
+- [ ] Detalhe com placar, eventos, W.O. e desfalques; sem shootout.
 - [ ] Classificação com 13 colunas, 3 linhas, provisória, sorteio e critérios.
 - [ ] Times com elenco ativo, badge <5, suspensão e histórico.
-- [ ] Estatísticas com artilharia, assistências, cartões e gols contra.
-- [ ] Fase final com “a definir”, card do amistoso (se houver) antes da final e pódio de 3 sem 4º lugar.
+- [ ] Estatísticas com artilharia, assistências, cartões e gols contra das 8 partidas.
+- [ ] Fase final com semifinal, final, vantagem do empate textual e pódio de 3 sem 4º lugar.
 - [ ] Metadados, canonical, OG sem imagem, favicon e 404.
 - [ ] Nenhum nome da instituição/Airbnb, fonte proprietária, foto ou dado pessoal.
 - [ ] CI/publicação no GitHub Pages funcionando; site anterior preservado em falha.
@@ -2980,12 +2981,12 @@ Nenhuma questão bloqueia a implementação. A UI tem fallback para horário/loc
 2. Nenhum placar/classificação/estatística é editado manualmente.
 3. Nenhum evento referencia jogadora fora do elenco ou suspensa indevidamente.
 4. Nenhuma 9ª ativa, apelido duplicado, jogadora em dois times ou transferência após atuação.
-5. Nenhuma final sem `finalists` válido; correção bloqueia até confirmação. Não há partida de 3º lugar.
-6. Nenhuma rota/link/placeholder de Regulamento ou de 3º lugar.
+5. Nenhuma semifinal sem `semifinalists` válido e nenhuma final sem `finalists` válido; correção bloqueia até confirmação. Não há partida de 3º lugar.
+6. Nenhuma rota/link/placeholder de Regulamento, amistoso ou 3º lugar.
 7. Nenhum JS de cliente, fonte externa, imagem de pessoa ou analytics.
 8. Nenhum texto público com instituição, Airbnb ou dado pessoal.
 9. WCAG 2.2 AA verificado; 320px sem overflow da página.
-10. O amistoso é exibido apenas como card informativo e não altera classificação, estatísticas, suspensões ou pódio.
+10. Empate no mata-mata é comunicado com a vantagem do empate; não há shootout, prorrogação ou pênaltis.
 11. Publicação só após validação, testes, build e E2E.
 
 ---
@@ -3140,7 +3141,6 @@ matches:
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover: null
-    shootout: null
     events:
       - type: "yellow"
         playerId: "p-009"
@@ -3164,7 +3164,6 @@ matches:
       winnerTeamId: "tc"
       reason: "no_show"
       note: "TB não compareceu."
-    shootout: null
     events: []
     # W.O. 0x1 para TC na ordem mandante/visitante; sem gols ou assistências.
 
@@ -3178,7 +3177,6 @@ matches:
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover: null
-    shootout: null
     events:
       - type: "yellow"
         playerId: "p-005"
@@ -3206,7 +3204,6 @@ matches:
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover: null
-    shootout: null
     events:
       - type: "ownGoal"
         playerId: "p-005"
@@ -3228,7 +3225,6 @@ matches:
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover: null
-    shootout: null
     events:
       - type: "goal"
         playerId: "p-017"
@@ -3262,7 +3258,6 @@ matches:
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover: null
-    shootout: null
     events:
       - type: "goal"
         playerId: "p-020"
@@ -3280,7 +3275,33 @@ matches:
       - type: "red"
         playerId: "p-014"
         minute: 24
-        # Vermelho direto; TB não tem próxima partida.
+        # Vermelho direto; TB é 3ª e cumpre a suspensão na semifinal.
+
+  - id: "semi"
+    stage: "semi"
+    round: null
+    date: "2026-12-02"
+    startsAt: "2026-12-02T20:00:00-03:00"
+    venue: "Vila Mariana, São Paulo"
+    status: "finished"
+    walkover: null
+    events:
+      - type: "goal"
+        playerId: "p-004"
+        assistPlayerId: "p-002"
+        minute: 12
+        penalty: false
+      - type: "goal"
+        playerId: "p-012"
+        assistPlayerId: "p-013"
+        minute: 18
+        penalty: false
+      - type: "goal"
+        playerId: "p-013"
+        assistPlayerId: "p-012"
+        minute: 26
+        penalty: false
+    # TA (2ª) x TB (3ª), 1x2. p-014 (TB) está suspensa e não tem eventos.
 
   - id: "final"
     stage: "final"
@@ -3290,9 +3311,6 @@ matches:
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover: null
-    shootout:
-      home: 4
-      away: 3
     events:
       - type: "goal"
         playerId: "p-017"
@@ -3303,25 +3321,19 @@ matches:
         playerId: "p-019"
         minute: 12
       - type: "goal"
-        playerId: "p-002"
+        playerId: "p-012"
         assistPlayerId: null
         minute: 17
-        penalty: true
+        penalty: false
       - type: "yellow"
         playerId: "p-006"
         minute: 21
-      # 1x1 no tempo normal; TC venceu nos pênaltis por 4x3.
+      # 1x1 no tempo normal; TC é campeã pela vantagem do empate.
 
-finalists:
-  final: ["tc", "ta"]
+semifinalists: ["ta", "tb"]
+finalists: ["tc", "tb"]
 
 drawOrder: null
-
-friendly:
-  date: "2026-12-03"
-  startsAt: "2026-12-03T18:30:00-03:00"
-  venue: "Vila Mariana, São Paulo"
-  note: "Amistoso do 3º colocado contra um time convidado. Não vale pontos e não altera a competição."
 
 notices: []
 ```
@@ -3330,13 +3342,14 @@ notices: []
 
 - Grupo: TC 7 pts, 5 gols pró, 3 contra, saldo +2; TA 7 pts, 4 pró, 4 contra, saldo 0; TB 2 pts, 2 pró, 4 contra, saldo −2.
 - TC e TA empatam em pontos. O confronto direto soma os dois jogos: g3 TA 1x0 TC e g5 TC 3x1 TA. Pontos 3–3; saldo agregado TC 3x2, então TC é 1ª e TA é 2ª. TB é 3ª.
-- Finalistas: final `tc x ta`; não há 3º x 4º. O 3º lugar é TB, pela classificação.
+- `semifinalists: ["ta", "tb"]`: semifinal TA x TB, com TA como mandante e vantagem do empate. TA terminou em 2º e TB em 3º.
+- A semifinal terminou 1x2 para TB. `finalists: ["tc", "tb"]`: final TC x TB, com TC como mandante e vantagem do empate. A 3ª colocada é TA, perdedora da semifinal; **não há 4º lugar**.
 - g2 é W.O. 0x1 para TC na ordem mandante/visitante, sem gols/assistências; conta pontos, vitória, gols pró/contra e saldo.
 - p-016 (TC) recebe o 2º amarelo em g3 e cumpre suspensão em g5; não tem eventos em g5.
-- p-014 (TB) recebe vermelho direto em g6; como TB não tem próxima partida, a suspensão não tem efeito.
-- Final 1x1, shootout 4x3 para TC; campeã TC, vice TA, 3ª TB. **Não há 4º lugar.**
+- p-014 (TB) recebe vermelho direto em g6; como TB é 3ª e disputa a semifinal, a suspensão é cumprida na `semi`, onde p-014 não tem eventos.
+- A final terminou 1x1 no tempo normal. TC é campeã pela vantagem do empate; TB é vice-campeã e TA é 3ª colocada. Não há shootout, prorrogação ou pênaltis.
+- Gols, assistências e cartões da semifinal e da final entram nas estatísticas individuais e coletivas; a classificação considera apenas as 6 partidas de grupo.
 - p-007 (TA) saiu em 25/11 e tem assistência em g1; aparece como “fora do elenco ativo”.
-- O amistoso de 03/12 às 18:30 é anterior à final das 20:30 e não entra em classificação, estatísticas, suspensões ou pódio.
 - O exemplo não usa `drawOrder`; nenhum empate chegou ao sorteio.
 
 ---
@@ -3347,10 +3360,10 @@ Receitas operacionais. Sempre rode `npm run validate` antes de commitar. A ediç
 
 ### B.1 Antes da primeira partida
 
-1. Preencher `edition`, `timezone`, 3 times, elencos e 7 partidas oficiais (g1…g6 + final).
+1. Preencher `edition`, `timezone`, 3 times, elencos e 8 partidas oficiais (g1…g6 + `semi` + `final`).
 2. `date` obrigatória; `startsAt` pode ser `null`; `venue` pode ser `null` nas partidas.
-3. `status: "scheduled"`, `walkover: null`, `shootout: null`, `events: []`.
-4. `finalists: null`, `drawOrder: null`, `friendly: null`, `notices: []`.
+3. `status: "scheduled"`, `walkover: null`, `events: []`.
+4. `semifinalists: null`, `finalists: null`, `drawOrder: null`, `notices: []`.
 5. Rodar `npm run validate`, `npm test`, `npm run build`.
 6. Publicar. A Início deve mostrar o estado “Antes da copa”.
 
@@ -3395,34 +3408,34 @@ Receitas operacionais. Sempre rode `npm run validate` antes de commitar. A ediç
      reason: "no_show" # no_show | insufficient_players | withdrawal
      note: "O time adversário não compareceu."
    ```
-3. `shootout: null`.
-4. `events: []` para `no_show`.
-5. Para `insufficient_players`/`withdrawal`, permitir apenas cartões (`yellow`/`red`), nunca `goal`/`ownGoal`.
-6. O placar exibido será 1x0 para o vencedor; não criar gol fictício.
+3. `events: []` para `no_show`.
+4. Para `insufficient_players`/`withdrawal`, permitir apenas cartões (`yellow`/`red`), nunca `goal`/`ownGoal`.
+5. O placar exibido será 1x0 para o vencedor; não criar gol fictício.
+6. W.O. é permitido na fase classificatória, na semifinal e na final; prevalece sobre a vantagem do empate.
 7. `npm run validate` e commit.
 
-### B.6 Registrar fase final
+### B.6 Registrar semifinal e final
 
 1. Confirmar que as 6 partidas de grupo estão `finished`.
-2. Calcular a classificação com `npm run validate` (a validação aponta os finalistas esperados).
-3. Preencher `finalists.final` exatamente com `[1º, 2º]`; não existe `thirdPlace`.
-4. O 3º lugar é o 3º da classificação; não criar partida de 3º x 4º.
-5. Se houver empate no tempo normal, preencher `shootout` com valores inteiros ≥0 e diferentes; não criar eventos de pênaltis.
-6. Se não houver empate, `shootout: null`.
-7. Se houver amistoso, preencher `friendly` com `date` igual à data da final, `startsAt` anterior ao horário da final, `venue` e `note`; senão, `friendly: null`.
-8. `npm run validate` e commit.
+2. Rodar `npm run validate`; a validação aponta os semifinalistas esperados.
+3. Preencher `semifinalists` exatamente com `[2º, 3º]`; a ordem define mando e vantagem do empate para o 2º.
+4. Registrar a `semi` com `stage: "semi"`, `round: null`, sem `homeTeamId`/`awayTeamId`, e os eventos normalmente. A `semi` usa `semifinalists`.
+5. Quando a semifinal terminar, rodar `npm run validate`; a validação aponta os finalistas esperados.
+6. Preencher `finalists` exatamente com `[1º, vencedora da semifinal]`; a ordem define mando e vantagem do empate para o 1º. A vencedora considera W.O. e, em empate, a vantagem do 2º.
+7. Registrar a `final` com `stage: "final"`, `round: null`, sem `homeTeamId`/`awayTeamId`, e os eventos normalmente.
+8. Empate encerra no tempo normal: **não** preencher shootout, prorrogação ou pênaltis. Na semifinal avança o 2º; na final vence o 1º.
+9. A 3ª colocada é a perdedora da semifinal; não criar partida de 3º x 4º nem campo de 4º lugar.
+10. `npm run validate` e commit.
 
 ### B.7 Corrigir resultado
 
 1. Editar os eventos da partida.
 2. Rodar `npm run validate`.
-3. Se a classificação mudar e os finalistas já estiverem definidos, o build falha listando antigos/novos.
-4. Atualizar `finalists.final` para confirmar. Se a final já ocorreu:
-   - revisar os eventos da final e o `shootout`, se houver;
-   - se a correção mudar o pódio, o build falha até `finalists` ser atualizado;
-   - adicionar um `notice` explicando a correção.
-5. Se a correção alterar um empate que dependia de sorteio, revisar `drawOrder` (ver B.9) e registrar `notice`.
-6. `npm run validate`, `npm test`, `npm run build`.
+3. Se a classificação mudar e `semifinalists` já estiver preenchido, o build falha listando antigos/novos.
+4. Atualizar `semifinalists` para confirmar e reconciliar o resultado/eventos da semifinal. Se a semifinal já ocorreu, revisar também `finalists` e a final.
+5. Se a correção após a final mudar os finalistas ou o pódio, o build falha até `finalists` ser atualizado; adicionar um `notice` explicando a correção.
+6. Se a correção alterar um empate que dependia de sorteio, revisar `drawOrder` (ver B.9) e registrar `notice`.
+7. `npm run validate`, `npm test`, `npm run build`.
 
 ```yaml
 notices:
@@ -3434,7 +3447,7 @@ notices:
 
 1. Mudar `status` para `"postponed"`.
 2. `startsAt: null` (ou manter um horário provisório, se desejado).
-3. `events: []`, `walkover: null`, `shootout: null`.
+3. `events: []`, `walkover: null`.
 4. Atualizar `date` se a data também mudar.
 5. Quando remarcar: `status: "scheduled"`, nova `date`, novo `startsAt`.
 6. `npm run validate`.
@@ -3461,7 +3474,7 @@ notices:
 
 - Criar campo de placar, pontos ou classificação.
 - Criar partida de 3º lugar, `thirdPlace` ou campo de 4º lugar.
-- Tratar o amistoso como partida (placar, eventos, cartões, estatísticas ou link de jogo).
+- Criar `friendly`, `shootout`, prorrogação ou pênaltis; esses campos são proibidos com mensagem de migração.
 - Editar HTML/componentes para “corrigir” um resultado.
 - Apagar jogadora/evento para “limpar” histórico.
 - Registrar `red` explícito para segundo amarelo.
@@ -3488,29 +3501,26 @@ Templates em pt-BR. `{path}` é o caminho do campo; `{expected}` e `{found}` sã
 | VAL-008 | “Intervalo inválido para {playerId}: leftAt ({found}) deve ser posterior a joinedAt ({expected}).” |
 | VAL-009 | “Elenco com {found} jogadoras ativas em {instante}; máximo permitido: 8. A 9ª ativa deve sair com leftAt ou ser registrada em outro time.” |
 | VAL-010 | “Vínculo inválido de {playerId}: há evento em partida do time {timeAntigo}, mas a jogadora está no time {timeAtual}. Jogadora que já atuou não pode trocar de time.” |
-| VAL-011 | “Conjunto de partidas inválido: esperado g1..g6 e final; encontrado {found}. Verifique stage/round/ID.” |
+| VAL-011 | “Conjunto de partidas inválido: esperado g1..g6, semi e final; encontrado {found}. Verifique stage/round/ID.” |
 | VAL-012 | “Confronto de grupo inválido em {path}: esperado {expected}; encontrado {found}. O turno e returno têm seis confrontos definidos.” |
 | VAL-013 | “Data/hora inválida em {path}: esperado {expected}; encontrado {found}. Use data real e startsAt com fuso; a data local em America/Sao_Paulo deve ser igual a date.” |
-| VAL-014 | “Status {found} incompatível: finished exige startsAt; scheduled/postponed não podem ter eventos, walkover ou shootout.” |
-| VAL-015 | “Ordem de partidas inválida para {time}: {found}. A ordem canônica é g1, g2, g3, g4, g5, g6 e final; nas datas com dois jogos do mesmo time, os horários devem respeitar essa ordem.” |
-| VAL-016 | “Fase final inválida: {found}. As 6 partidas de grupo devem estar finished antes da final.” |
-| VAL-017 | “Finalistas divergentes da classificação. Antigos: {old}. Novos: {new}. Atualize finalists.final para confirmar a correção.” |
+| VAL-014 | “Status {found} incompatível: finished exige startsAt; scheduled/postponed não podem ter eventos nem walkover.” |
+| VAL-015 | “Ordem de partidas inválida para {time}: {found}. A ordem canônica é g1, g2, g3, g4, g5, g6, semi e final; nas datas com dois jogos do mesmo time, os horários devem respeitar essa ordem.” |
+| VAL-016 | “Fase final inválida: {found}. As 6 partidas de grupo devem estar finished antes da semifinal, e a semifinal antes da final.” |
+| VAL-017 | “Snapshots do mata-mata divergentes. Semifinalistas antigos: {oldSemi}; novos: {newSemi}. Finalistas antigos: {oldFinal}; novos: {newFinal}. Atualize semifinalists/finalists para confirmar a correção.” |
 | VAL-018 | “Sorteio necessário, mas drawOrder está {found}. Registre uma permutação dos 3 times ou resolva o empate.” |
 | VAL-019 | “Evento em {path} referencia {playerId}, que não está no elenco de {home} nem de {away} na partida {matchId}.” |
 | VAL-020 | “Jogadora {playerId} inelegível em {matchId}: joinedAt {joinedAt}, startsAt {startsAt}, leftAt {leftAt}. Esperado joinedAt < startsAt < leftAt (ou leftAt nulo).” |
 | VAL-021 | “Assistência inválida em {path}: esperado jogadora do time da marcadora, diferente dela, apenas em gol normal; encontrado {found}.” |
 | VAL-022 | “Cartões inválidos para {playerId} em {matchId}: encontrado {found}. Máximo de 2 amarelos por partida; o 2º amarelo é vermelho derivado; não registrar red explícito com 2 amarelos.” |
 | VAL-023 | “{playerId} ({team}) está suspensa por {reason} em {sentOffIn} e não pode ter eventos em {suspendedFor}.” |
-| VAL-024 | “W.O. inválido em {matchId}: {found}. Esperado partida finished, vencedor participante, motivo válido e sem shootout.” |
-| VAL-025 | “Shootout inválido em {matchId}: {found}. Só é permitido na final finished, sem W.O., após empate no tempo normal, com valores ≥0 e diferentes.” |
+| VAL-024 | “W.O. inválido em {matchId}: {found}. Esperado partida finished, vencedor participante, motivo válido e sem gols/assistências.” |
 | VAL-026 | “Campo de placar/classificação materializado em {path}: {found}. Placar, pontos e classificação são derivados; remova o campo.” |
-| VAL-027 | “Partida {matchId} não pode ter homeTeamId/awayTeamId nem round diferente de null; os times vêm de finalists.” |
+| VAL-027 | “Partida {matchId} não pode ter homeTeamId/awayTeamId nem round diferente de null; os times vêm de semifinalists/finalists.” |
 | VAL-028 | “Referência inexistente em {path}: {found}. Verifique times, jogadoras, partidas e notices.” |
 | VAL-029 | “Eventos incompatíveis com W.O. em {matchId}: {found}. no_show não tem eventos; insufficient_players/withdrawal só permitem cartões.” |
-| VAL-030 | “Final com empate no tempo normal exige shootout; ou shootout presente sem empate. Encontrado: {found}.” |
 | VAL-031 | “Notice inválido em {path}: esperado data real e mensagem de 1 a 300 caracteres; encontrado {found}.” |
 | VAL-032 | “Campo de privacidade proibido em {path}: {found}. Permitido apenas id, nickname, position, joinedAt e leftAt.” |
-| VAL-033 | “Amistoso inválido em {path}: esperado data igual à final, horário anterior à final (quando definido), local e nota preenchidos, sem campos de partida; encontrado {found}.” |
 | VAL-W01 | “Aviso: time {time} tem {n} jogadoras ativas; o alvo é 7 ou 8. A publicação não é bloqueada.” |
 | VAL-W02 | “Aviso: partida {matchId} está em {date}, fora do calendário original. Confirme o adiamento.” |
 | VAL-W03 | “Aviso: os times {a} e {b} têm o mesmo nome após normalização; a abreviação distingue, mas confirme o nome público.” |
@@ -3561,9 +3571,8 @@ Executar antes da publicação e após mudanças de UI. Registrar data e respons
 - [ ] Landmarks `header`, `nav`, `main`, `footer`, `aside` são anunciados.
 - [ ] Tabelas têm caption e cabeçalhos com `scope`.
 - [ ] Abreviações V/E/D/GP/GC/CA/CV/PD são expandidas.
-- [ ] Placar de pênaltis é lido por extenso, não só “1 (4) x (3) 1”.
+- [ ] A vantagem do empate é lida por extenso (“Em caso de empate, avança/vence o mandante”), não apenas por cor ou posição.
 - [ ] “Sorteio”, “Suspensa”, “W.O.”, “Resultado pendente” e “Elenco em formação” são lidos como texto.
-- [ ] O card do amistoso é lido como informativo, sem ser anunciado como partida ou resultado.
 - [ ] Links de partida/time têm nomes acessíveis claros.
 - [ ] Ícones decorativos são ignorados; ícones informativos têm nome.
 
@@ -3603,12 +3612,12 @@ Executar antes da publicação e após mudanças de UI. Registrar data e respons
 - [ ] Nome público correto; nenhuma ocorrência da instituição.
 - [ ] Nenhuma ocorrência de “Airbnb”/marcas.
 - [ ] Nenhum nome completo, foto, contato, camisa ou data de nascimento.
-- [ ] Notas do amistoso e avisos usam apelidos/descrições genéricas, sem nome completo ou dado pessoal.
+- [ ] Avisos usam apelidos/descrições genéricas, sem nome completo ou dado pessoal.
 - [ ] Nenhum ID de jogadora no HTML/URL.
 - [ ] Nenhum analytics/cookie/terceiros.
 - [ ] 404 funciona e volta para a Início.
-- [ ] Nenhum link/rota de Regulamento ou de 3º lugar.
-- [ ] O amistoso aparece só na Fase final, com o rótulo “Informativo — não é partida oficial”.
+- [ ] Nenhum link/rota de Regulamento, amistoso ou 3º lugar.
+- [ ] A 3ª colocada aparece como “3ª colocada”, sem 4º lugar e sem card de disputa de 3º lugar.
 
 ### D.7 Assinatura
 
@@ -3643,7 +3652,7 @@ Os IDs `TST-*` são estáveis. Casos removidos na v1.1 (por exemplo, disputa de 
 | TST-013 | FR-06/VAL-018 | Sorteio sem drawOrder | Grupo completo, empate total + null | `DrawRequiredError`/VAL-018 | U/D |
 | TST-014 | FR-06 | Classificação provisória | Uma partida scheduled | `provisional=true` | U |
 | TST-015 | FR-06 | W.O. na classificação | g2 W.O. 1x0 | Pontos/gols/saldo como 1x0 | U |
-| TST-016 | FR-06 | Final fora da classificação | Cartões/gols na final | Classificação inalterada | U |
+| TST-016 | FR-06 | Mata-mata fora da classificação | Gols/cartões na semifinal e na final | Classificação inalterada | U |
 | TST-105 | FR-06/VAL-018 | Empate total provisório | Grupo incompleto, empate total, `drawOrder: null` | Ordem fixa ta…tc; sem erro/badge | U |
 | TST-110 | FR-06 | H2H agregado com W.O. | Dois jogos, um deles W.O. 1x0 | W.O. conta como 1x0 no agregado | U |
 
@@ -3657,12 +3666,15 @@ Os IDs `TST-*` são estáveis. Casos removidos na v1.1 (por exemplo, disputa de 
 | TST-020 | VAL-022 | Terceiro amarelo no mesmo jogo | 3 yellow na mesma partida | Erro bloqueante | D |
 | TST-021 | VAL-022 | Red explícito com 2 amarelos | 2 yellow + red | Erro bloqueante | D |
 | TST-022 | FR-13 | Suspensão próxima partida | Red em g1; g3 do time | Suspensa em g3 | U |
-| TST-023 | FR-13 | Sem próxima partida | Red na final ou na última partida do time | `suspendedFor=null` | U |
+| TST-023 | FR-13 | Sem próxima partida | Red na final | `suspendedFor=null`; sem efeito | U |
 | TST-024 | VAL-023 | Evento de suspensa | Red em g1; evento em g3 | Erro bloqueante | D/U |
 | TST-025 | FR-13 | Sem acúmulo de amarelos | 1 yellow em jogos diferentes | Sem suspensão | U |
 | TST-026 | FR-13 | Cartões na final | Yellow/red na final | Contam stats; não classificação | U |
 | TST-027 | FR-13 | Cartões em W.O. | Cards em W.O. | Contam stats; `no_show` não tem | U/D |
 | TST-112 | FR-13 | Suspensão no mesmo dia | Red em g3; time joga g4 na mesma data | Suspensa em g4, a próxima canônica | U |
+| TST-121 | FR-13 | 1º colocado sem semifinal | Red no último jogo de grupo do 1º; finalists ainda nulo | `pendingFinalists=true`; quando a final é definida, cumpre na final | U |
+| TST-122 | FR-13 | Vermelho na semifinal | Red na semi; time avança ou é eliminado | Cumpre na final só se avançar; eliminado não tem partida seguinte | U |
+| TST-123 | FR-13 | 2º/3º com vermelho no grupo | Red no último jogo de grupo do 2º ou 3º | Cumpre na semifinal | U |
 
 ### E.3 Gols, assistências, pênaltis e estatísticas
 
@@ -3673,13 +3685,13 @@ Os IDs `TST-*` são estáveis. Casos removidos na v1.1 (por exemplo, disputa de 
 | TST-030 | FR-05 | Gol contra | ownGoal de TB em TA x TB | TA +1; ownGoals TB +1; goals TB 0 | U |
 | TST-031 | FR-05 | Assistência válida | goal + assist mesmo time | Assistência +1 | U |
 | TST-032 | VAL-021 | Assistência inválida | Mesma marcadora/outro time/pênalti/ownGoal | Erro bloqueante | D |
-| TST-033 | FR-08 | Shootout fora das estatísticas | Final 1x1, 4x3 | Gols normais só; shootout não conta | U |
+| TST-033 | FR-08 | Sem shootout nas estatísticas | Final 1x1, sem shootout | Gols normais contam; não há coluna/campo de shootout | U |
 | TST-034 | FR-08 | Ordem da artilharia | Gols/assistências/nomes | Ordem normativa | U |
 | TST-035 | FR-08 | Ordem de assistências | Assistências/gols/nomes | Ordem normativa | U |
 | TST-036 | FR-08 | Ordem de cartões | Pontos/red/yellow/nomes | Ordem normativa | U |
 | TST-037 | FR-08 | Gols contra | Seção separada | Fora da artilharia | U/E |
 | TST-038 | FR-17 | Fora do elenco ativo | p-007 leftAt + assist | Marca textual “fora do elenco ativo” | U/E |
-| TST-115 | FR-08 | Estatísticas coletivas com shootout | Final 1x1, 4x3; grupo + final | Ambos +1 empate; vencedor +1 `shootoutWins`; perdedor +1 `shootoutLosses`; GP/GC/SG sem shootout | U |
+| TST-115 | FR-08 | Estatísticas coletivas das 8 partidas | Grupo + semi + final; empates no mata-mata | Ambas +1 empate em V/E/D; GP/GC/SG incluem as 8 partidas; sem `shootoutWins`/`shootoutLosses` | U |
 
 ### E.4 Elenco e elegibilidade
 
@@ -3709,16 +3721,21 @@ Os IDs `TST-*` são estáveis. Casos removidos na v1.1 (por exemplo, disputa de 
 | TST-055 | VAL-028 | Referência inexistente | p-999/time x/match z | Erro bloqueante | D |
 | TST-056 | VAL-002 | Agregação | Vários erros no mesmo YAML | Todos listados | D |
 | TST-057 | VAL-W02 | Aviso não bloqueia | Data fora do calendário | Exit 0 + aviso | D |
-| TST-058 | VAL-017 | finalists nulo incompleto | Grupo incompleto | Válido | D |
-| TST-059 | VAL-017 | finalists divergente | Grupo completo, snapshot errado | Erro com antigos/novos | D |
-| TST-060 | VAL-016 | Final antes do grupo | Final finished, grupo incompleto | Erro bloqueante | D |
+| TST-058 | VAL-017 | Snapshots nulos com etapa incompleta | Grupo incompleto e semifinal incompleta | `semifinalists`/`finalists` nulos são válidos | D |
+| TST-059 | VAL-017 | `finalists` divergente | Semifinal completa, snapshot errado | Erro com antigos/novos | D |
+| TST-060 | VAL-016 | Mata-mata antes da etapa anterior | Final finished com grupo ou semifinal incompleta | Erro bloqueante | D |
 | TST-061 | VAL-024/029 | W.O. inválido | no_show com gol/cartão; winner inválido | Erro bloqueante | D |
-| TST-062 | VAL-025/030 | Shootout inválido | Não empate, valores iguais, grupo | Erro bloqueante | D |
+| TST-062 | VAL-017 | `semifinalists` divergente | Grupo completo, snapshot errado | Erro com antigos/novos | D |
 | TST-063 | VAL-026 | Placar materializado | Campo `score` | Erro de schema | D |
 | TST-064 | VAL-031 | Notice inválido | Data inválida/mensagem vazia | Erro bloqueante | D |
-| TST-065 | VAL-027 | Final com homeTeamId | Campo presente | Erro de schema | D |
-| TST-107 | VAL-033 | Amistoso inválido | Data diferente da final, horário depois da final, local/nota vazio ou campo de partida | Erro bloqueante | D |
-| TST-109 | SPEC-017 | 3 times e 7 partidas | Fonte com 3 times e g1…g6 + final | Válido; `td`/`terceiro` falham | D |
+| TST-065 | VAL-027 | Semifinal/final com homeTeamId | Campo presente em `semi` ou `final` | Erro de schema | D |
+| TST-107 | VAL-002 | Campos removidos | `friendly` ou `shootout` presentes | Erro de migração explícito | D |
+| TST-109 | SPEC-017 | 3 times e 8 partidas | Fonte com 3 times e g1…g6 + semi + final | Válido; `td`/`terceiro` falham | D |
+| TST-124 | VAL-017 | Semifinalistas obrigatórios | Grupo completo, `semifinalists: null` | Erro bloqueante | D |
+| TST-125 | VAL-017 | Finalistas obrigatórios | Semifinal completa, `finalists: null` | Erro bloqueante | D |
+| TST-126 | VAL-016 | Semifinal antes do grupo | `semi` finished, grupo incompleto | Erro bloqueante | D |
+| TST-127 | VAL-017 | Correção após a final | `finalists` antigos ≠ novos | Erro com antigos/novos; exige `notices` | D |
+| TST-128 | VAL-024 | W.O. no mata-mata | `semi`/`final` com W.O. para o visitante | Vencedor administrativo avança/vence | D/U |
 | TST-116 | FR-06/VAL-012 | Simetria dos confrontos | g1…g6 com g4 `tb x ta` | Cada par tem um jogo em casa para cada time; g4 `ta x tb` falha | D/U |
 
 ### E.6 Interface e estados
@@ -3727,21 +3744,22 @@ Os IDs `TST-*` são estáveis. Casos removidos na v1.1 (por exemplo, disputa de 
 |---|---|---|---|---|---|
 | TST-066 | FR-09 | Início antes da copa | Nenhum resultado, data anterior | Estado 1; classificação zerada | E |
 | TST-067 | FR-09 | Início durante | Grupo incompleto | Próxima rodada, últimos, resumo | E |
-| TST-068 | FR-09 | Início grupo completo | 6 finished | Card da final; link | E |
-| TST-069 | FR-09 | Início após final | 7 finished | Campeão + pódio de 3 | E |
+| TST-068 | FR-09 | Início grupo completo | 6 finished | Card da semifinal 2º x 3º e card da final com 1º + “Vencedora da semifinal” | E |
+| TST-069 | FR-09 | Início após final | 8 finished | Campeã + pódio de 3 | E |
 | TST-070 | FR-04 | Próximo jogo/pendente | Scheduled vencida | “Resultado pendente”; não é próximo | U/E |
-| TST-071 | FR-04 | Lista por data | 7 partidas oficiais | Grupos por data; sem 3º lugar; amistoso fora da lista | E |
+| TST-071 | FR-04 | Lista por data | 8 partidas oficiais | Grupos por data (5 datas); sem 3º lugar; sem amistoso | E |
 | TST-072 | FR-05 | Ordem de eventos | Minutos 10, null, 10 | 10,10,null; empate por arquivo | U/E |
 | TST-073 | FR-05 | W.O. na UI | g2 | “0 x 1 (W.O.)” na ordem mandante/visitante + motivo; sem gol | E |
-| TST-074 | FR-05 | Shootout na UI | Final | “1 (4) x (3) 1” + texto acessível | E |
+| TST-074 | FR-05 | Empate no mata-mata na UI | Final/semi 1x1 | Placar “1 x 1” + texto de vantagem do empate; sem shootout | E |
 | TST-075 | FR-06 | Tabela classificação | Página | 13 colunas; provisória; sorteio | E |
 | TST-076 | FR-03/13 | Time | Página TA | Badge/suspensão/histórico | E |
 | TST-077 | FR-08 | Estatísticas | Página | 5 seções; estados vazios | E |
-| TST-078 | FR-07 | Fase final | 3 estados | “A definir”, card da final, pódio de 3 | E |
-| TST-106 | FR-21 | Card do amistoso | `friendly` presente | Card antes da final, rótulo informativo, sem placar/status/link | E |
-| TST-108 | FR-21 | Amistoso fora do competitivo | `friendly` presente | Ausente da Início, jogos, classificação, estatísticas e pódio | U/E |
+| TST-078 | FR-07 | Fase final | 5 estados | Semifinal, final, vantagem do empate textual e pódio de 3 | E |
 | TST-113 | FR-07 | Pódio de 3 | Final finished | Campeã, vice e 3ª; sem 4º lugar | U/E |
-| TST-114 | FR-21 | Sem amistoso | `friendly: null` | Nenhum card ou placeholder | E |
+| TST-129 | FR-07 | Card da final antes da semi | Grupo completo, semi pendente | Mostra 1º colocado e “Vencedora da semifinal” | E |
+| TST-130 | FR-07 | Card da semifinal | Grupo completo | Mostra 2º x 3º e vantagem do empate para o 2º | E |
+| TST-131 | FR-07 | Título por vantagem | Final 1x1 | Texto explícito de campeã pela vantagem; sem pênaltis | E |
+| TST-132 | FR-07 | Terceira colocada | Semifinal e final finished | “3ª colocada” é a perdedora da semi; sem 4º lugar | U/E |
 | TST-079 | FR-10 | Sem Regulamento | Nav/rotas | 6 seções + 3 links de times no submenu; `/regulamento/` 404 | E/B |
 | TST-080 | FR-11 | Menu mobile | 320px | `<details>` “Menu” por teclado; 3 links de times visíveis ao abrir | E |
 | TST-081 | FR-19 | 404 | URL inexistente | 404.html + link Início | E/B |
@@ -3930,7 +3948,7 @@ Executar antes da primeira partida e a cada inclusão/remoção:
 
 ## Apêndice G — ADRs resumidos
 
-ADRs registram decisões de arquitetura e o porquê. O status de cada uma é **Aceito** nesta SPEC v1.1; mudanças exigem nova ADR ou emenda na §15.
+ADRs registram decisões de arquitetura e o porquê. O status de cada uma é **Aceito** nesta SPEC v2.0; mudanças exigem nova ADR ou emenda na §15. As ADRs 015 e 016 foram reescritas na v2.0; o histórico da v1.1 permanece em `docs/decisoes-v1.1.md`.
 
 ### G.1 ADR-001 — Astro estático com zero JS de cliente
 
@@ -3968,7 +3986,7 @@ ADRs registram decisões de arquitetura e o porquê. O status de cada uma é **A
 
 - **Contexto:** placar, classificação, cartões, suspensões e estatísticas precisam ser determinísticos e nunca editados à mão.
 - **Decisão:** funções puras recebem a competição validada e `now`; todo derivado é calculado no build. A fonte não tem campo de placar, pontos ou classificação.
-- **Consequências:** fonte única de verdade; recálculo a cada build; funções precisam ser testadas com entradas congeladas e ordem embaralhada; o custo é irrelevante para 7 partidas.
+- **Consequências:** fonte única de verdade; recálculo a cada build; funções precisam ser testadas com entradas congeladas e ordem embaralhada; o custo é irrelevante para 8 partidas.
 - **Alternativas rejeitadas:** gravar classificação/placar no YAML (drift e edição manual), views de banco (backend), cache incremental (complexidade sem ganho).
 - **Rastreabilidade:** §6, §7; SPEC-005, SPEC-006, VAL-026.
 
@@ -3988,13 +4006,13 @@ ADRs registram decisões de arquitetura e o porquê. O status de cada uma é **A
 - **Alternativas rejeitadas:** comparador único com h2h (errado para 3+), h2h entre todos os empatados (contraria o PRD), sorteio sempre (não determinístico).
 - **Rastreabilidade:** §7.3; ALG-003, VAL-018, TST-003…TST-013.
 
-### G.8 ADR-008 — `finalists` é snapshot validado
+### G.8 ADR-008 — `semifinalists` e `finalists` são snapshots validados
 
-- **Contexto:** a final depende da classificação, mas uma correção posterior pode mudar os finalistas; o PRD exige alerta e confirmação.
-- **Decisão:** `finalists.final` registra explicitamente `[1º, 2º]`; o build compara com a classificação calculada. Divergência bloqueia e lista antigos/novos. Atualizar o snapshot é a confirmação. Não há `thirdPlace`.
-- **Consequências:** mudança de finalista nunca é silenciosa; uma correção após a final pode exigir atualização do snapshot e um `notice`; o build falha até a confirmação.
-- **Alternativas rejeitadas:** derivar finalistas automaticamente (mudaria o passado), congelar os dados de grupo (impediria correções), confirmação só manual sem validação (erro silencioso).
-- **Rastreabilidade:** §7.7; ALG-007, VAL-017, TST-058, TST-059.
+- **Contexto:** semifinal e final dependem da classificação e do resultado anterior, mas uma correção posterior pode mudar os participantes; o PRD exige alerta e confirmação.
+- **Decisão:** `semifinalists` registra `[2º, 3º]` e `finalists` registra `[1º, vencedora da semifinal]`. O build compara cada snapshot com o esperado. Divergência bloqueia e lista antigos/novos. Atualizar o snapshot é a confirmação. A ordem define mando e vantagem; não há `thirdPlace`.
+- **Consequências:** mudança de participante nunca é silenciosa; uma correção após a semifinal/final pode exigir atualização dos snapshots e um `notice`; o build falha até a confirmação.
+- **Alternativas rejeitadas:** derivar participantes automaticamente (mudaria o passado), congelar os dados de grupo (impediria correções), confirmação só manual sem validação (erro silencioso).
+- **Rastreabilidade:** §7.7; ALG-007, VAL-017, TST-058, TST-059, TST-062, TST-124…TST-127.
 
 ### G.9 ADR-009 — W.O. é 1x0 administrativo
 
@@ -4042,22 +4060,22 @@ ADRs registram decisões de arquitetura e o porquê. O status de cada uma é **A
 - **Decisão:** funções puras testadas com Vitest; schema/validações com fixtures; `check-build` para `dist/`; Playwright + axe para E2E/acessibilidade; checklist manual para leitor de tela, zoom e navegadores. A matriz do Apêndice E é obrigatória.
 - **Consequências:** feedback rápido na camada mais baixa; E2E mais lento e dependente de browser; sem meta de cobertura, mas todos os `TST-*` devem existir; bugs ganham teste na camada mais baixa possível.
 - **Alternativas rejeitadas:** só E2E (lento e frágil), só unitários (não cobre layout/axe), snapshot visual (ruído e manutenção).
-- **Rastreabilidade:** §13, Apêndice E; TST-001…TST-116.
+- **Rastreabilidade:** §13, Apêndice E; TST-001…TST-132.
 
-### G.15 ADR-015 — Amistoso como metadado informativo
+### G.15 ADR-015 — Remoção do amistoso e do shootout na v2.0
 
-- **Contexto:** a organização realiza um amistoso do 3º colocado no dia da final, mas ele não faz parte da competição e não deve alterar classificação, estatísticas, suspensões ou pódio.
-- **Decisão:** representar o amistoso como `friendly` (`date`, `startsAt`, `venue`, `note`), sem status, eventos, placar, W.O., shootout, times ou cartões. Exibir um card informativo na Fase final, antes da final, com o rótulo “Informativo — não é partida oficial”.
-- **Consequências:** o schema é estrito e `VAL-033` valida data/horário/local/nota; o amistoso não entra em `Match`, `nextMatch`, `lastResults`, classificação, estatísticas, suspensões ou pódio; participantes podem ser descritos na nota por apelido ou descrição genérica, sem dados estruturados ou dados pessoais.
-- **Alternativas rejeitadas:** modelar como partida `stage: friendly` (contaminaria algoritmos e estatísticas), não exibir (perde informação operacional), criar página própria (escopo e navegação desnecessários).
-- **Rastreabilidade:** §5.4, §7.12, §10.8; SPEC-016, DM-016, VAL-033.
+- **Contexto:** a v1.1 previa um amistoso informativo e shootout na final. A v2.0 removeu ambos: o amistoso não faz parte da competição e empates no mata-mata são resolvidos pela vantagem do empate.
+- **Decisão:** não existe `friendly`, `stage: friendly`, card informativo, `shootout` ou cobranças alternadas. Campos antigos são desconhecidos no schema estrito e geram `VAL-002` com mensagem de migração. A Fase final exibe apenas semifinal, final, vantagem textual e pódio.
+- **Consequências:** o schema fica menor; não há rota, card ou estatística de amistoso/shootout; uma fonte v1.1 precisa ser migrada removendo esses campos; a UI e os testes verificam a ausência.
+- **Alternativas rejeitadas:** manter `friendly` opcional (contaminaria a lista de partidas), manter `shootout` (contradiz a regra de empate), ignorar campos antigos silenciosamente (migração invisível).
+- **Rastreabilidade:** §5.4, §7.12, §10.8; SPEC-016, DM-016, VAL-002, TST-107.
 
-### G.16 ADR-016 — Formato de 3 times e 7 partidas
+### G.16 ADR-016 — Formato de 3 times, semifinal e final na v2.0
 
-- **Contexto:** a decisão de produto de 12/11/2026 substituiu o formato de 4 times/8 partidas por 3 times, 6 jogos de grupo em turno e returno e final única.
-- **Decisão:** fixar `ta`, `tb`, `tc`; 6 partidas `g1`…`g6`; final `1º x 2º`; 3º lugar pela classificação; sem semifinais, sem 3º x 4º e sem 4º lugar.
-- **Consequências:** schema com 3 times e 7 partidas; 7 rotas de jogo e 3 de time; pódio de 3; calendário com dois jogos do mesmo time em 24/11, 26/11 e 01/12; PRD/AGENTS atualizados na v1.1.
-- **Alternativas rejeitadas:** manter 4 times (contraria a decisão), turno único (menos jogos), semifinais (formato não previsto), partida de 3º lugar (contraria a decisão).
+- **Contexto:** a decisão de produto de 18/11/2026 substituiu o formato de 7 partidas por 8 partidas oficiais, com semifinal e final, mantendo 3 times e turno e returno no grupo.
+- **Decisão:** fixar `ta`, `tb`, `tc`; 6 partidas `g1`…`g6`; semifinal `2º x 3º` com vantagem do empate para o 2º; final `1º x vencedora da semifinal` com vantagem do empate para o 1º; 3ª colocada é a perdedora da semifinal; sem 3º x 4º e sem 4º lugar.
+- **Consequências:** schema com 3 times e 8 partidas; 8 rotas de jogo e 3 de time; pódio de 3; calendário com grupo em 24/11, 26/11 e 01/12, semifinal em 02/12 e final em 03/12; PRD/AGENTS atualizados na v2.0.
+- **Alternativas rejeitadas:** manter final direta 1º x 2º (formato v1.1), turno único (menos jogos), partida de 3º lugar (contraria a decisão), prorrogação/pênaltis (contraria a regra de empate).
 - **Rastreabilidade:** §2, §5.4, §6.3, §7.7, §10; SPEC-017, DM-001, DM-017.
 
 ### G.17 Rastreabilidade das ADRs
@@ -4071,15 +4089,15 @@ ADRs registram decisões de arquitetura e o porquê. O status de cada uma é **A
 | ADR-005 | §6, §7 | 1, 17 |
 | ADR-006 | §8 | — |
 | ADR-007 | §7.3 | 7, 13, 19 |
-| ADR-008 | §7.7 | 8, 21 |
+| ADR-008 | §7.7 | 8, 21, 25–34 |
 | ADR-009 | §7.11 | 6 |
 | ADR-010 | §5.3, §11.10, Apêndice F | — |
 | ADR-011 | §11.4, §11.6 | 15 |
 | ADR-012 | §12 | — |
 | ADR-013 | §2.4, §10.1 | 5 |
 | ADR-014 | §13, Apêndice E | — |
-| ADR-015 | §7.12, §10.8 | 20 |
-| ADR-016 | §2, §5.4, §7.7, §10 | 18, 21 |
+| ADR-015 | §7.12, §10.8 | 25–34 |
+| ADR-016 | §2, §5.4, §7.7, §10 | 25–34 |
 
 ---
 
