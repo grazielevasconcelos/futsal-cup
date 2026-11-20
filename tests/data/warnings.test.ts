@@ -34,7 +34,7 @@ describe('avisos não bloqueantes', () => {
 
   it('VAL-W03: avisa nomes de time duplicados sem bloquear', () => {
     const data = validData();
-    team(data, 'tb').name = 'Time A';
+    team(data, 'tb').displayName = 'Time A';
 
     const result = validateCompetition(data);
     expect(result.errors).toEqual([]);

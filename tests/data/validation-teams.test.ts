@@ -13,9 +13,17 @@ function addPlayer(
 }
 
 describe('validação semântica de times e elencos', () => {
+  it('VAL-002: mantém os nomes-base associados aos IDs estáveis', () => {
+    const data = validData();
+    team(data, 'ta').name = 'De primeira FC';
+    expect(codes(validateCompetition(data))).toContain('VAL-002');
+  });
+
   it('VAL-004: bloqueia IDs de time duplicados', () => {
     const data = validData();
-    team(data, 'tc').id = 'ta';
+    const tc = team(data, 'tc');
+    tc.id = 'ta';
+    tc.name = 'Time A';
     expect(codes(validateCompetition(data))).toContain('VAL-004');
   });
 
@@ -23,6 +31,12 @@ describe('validação semântica de times e elencos', () => {
     const data = validData();
     team(data, 'tb').abbreviation = 'TA';
     expect(codes(validateCompetition(data))).toContain('VAL-005');
+  });
+
+  it('VAL-002: rejeita logo em URL externa', () => {
+    const data = validData();
+    team(data, 'ta').logo = 'https://example.com/logo.webp';
+    expect(codes(validateCompetition(data))).toContain('VAL-002');
   });
 
   it('VAL-006: bloqueia ID de jogadora em dois times', () => {

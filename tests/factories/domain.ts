@@ -45,7 +45,9 @@ export function domainTeam(id: TeamId, players?: readonly Player[]): Team {
   return {
     id,
     name: `Time ${id.toUpperCase()}`,
+    displayName: null,
     abbreviation: id.toUpperCase(),
+    logo: null,
     players: players ?? [domainPlayer(id)],
   };
 }

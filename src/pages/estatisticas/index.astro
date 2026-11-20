@@ -13,6 +13,7 @@ import {
   rankTopScorers,
 } from '../../lib/domain/stats';
 import type { PlayerStats, TeamId } from '../../lib/domain/types';
+import { formatTeamLabel } from '../../lib/format/team';
 
 const competition = loadCompetition();
 const teams = buildTeamMap(competition);
@@ -26,7 +27,8 @@ const teamCards = rankTeamCards(teamStats, teams);
 const ownGoals = rankOwnGoals(playerStats, teams);
 
 function teamName(teamId: TeamId): string {
-  return teams.get(teamId)?.name ?? '';
+  const team = teams.get(teamId);
+  return team === undefined ? '' : formatTeamLabel(team);
 }
 
 function playerLabel(item: PlayerStats): string {

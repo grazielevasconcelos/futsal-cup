@@ -32,6 +32,11 @@ test.describe('páginas da competição', () => {
     const links = page.locator('.team-grid a');
     await expect(links).toHaveCount(3);
     await expect(links.first()).toHaveAttribute('href', /\/times\/ta\/$/);
+    await expect(page.locator('.team-grid img.team-logo')).toHaveCount(1);
+    await expect(page.locator('.team-grid img.team-logo')).toHaveAttribute(
+      'src',
+      /\/images\/times\/ta\.webp$/,
+    );
   });
 
   test('TST-071: a lista de jogos agrupa as oito partidas oficiais por data', async ({
@@ -117,6 +122,10 @@ test.describe('páginas da competição', () => {
     await page.goto('times/ta/');
 
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(page.locator('.page-header img.team-logo')).toHaveAttribute(
+      'src',
+      /\/images\/times\/ta\.webp$/,
+    );
     await expect(
       page.getByRole('heading', { level: 2, name: 'Estatísticas coletivas' }),
     ).toBeVisible();
@@ -129,10 +138,10 @@ test.describe('páginas da competição', () => {
     await expect(roster.locator('tbody tr')).not.toHaveCount(0);
   });
 
-  test('TST-076: a página do time mostra badge, suspensão e histórico', async ({ page }) => {
+  test('TST-076: a página do time mostra nome público, suspensão e histórico', async ({ page }) => {
     await page.goto('times/ta/');
 
-    await expect(page.locator('.page-header .badge', { hasText: 'TA' })).toBeVisible();
+    await expect(page.locator('.page-header')).not.toContainText('TA');
     await expect(page.locator('.page-header')).not.toContainText('Elenco em formação');
 
     const roster = page.locator('table.data-table').first();

@@ -62,10 +62,29 @@ const teamSchema = z
   .object({
     id: teamId,
     name: z.string().min(1).max(60),
+    displayName: z.string().trim().min(1).max(60).nullable().default(null),
     abbreviation: z
       .string()
       .regex(/^[A-Z0-9]{1,5}$/, 'Abreviação inválida: use 1 a 5 caracteres A-Z ou 0-9.'),
+    logo: z
+      .string()
+      .regex(
+        /^\/images\/times\/[a-z0-9-]+\.(?:webp|png|jpe?g)$/i,
+        'Logo inválido: use um caminho local em /images/times/.',
+      )
+      .nullable()
+      .default(null),
     players: z.array(playerSchema),
+  })
+  .superRefine((team, context) => {
+    const expectedName = `Time ${team.id.slice(-1).toUpperCase()}`;
+    if (team.name !== expectedName) {
+      context.addIssue({
+        code: 'custom',
+        path: ['name'],
+        message: `O nome-base do time ${team.id} deve permanecer "${expectedName}". Use displayName para o nome público.`,
+      });
+    }
   })
   .strict();
 

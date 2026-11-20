@@ -103,7 +103,7 @@ No MVP não existem contas, login, níveis de permissão ou área administrativa
 
 ### 6.1 No escopo
 
-- **3 times:** TA, TB e TC, com nomes editáveis.
+- **3 times:** TA, TB e TC, com IDs estáveis (`ta`, `tb`, `tc`), nomes-base fixos, nome de exibição e logo opcionais. URLs são baseadas nos IDs; a interface mostra apenas o nome de exibição ou o nome-base.
 - Elencos de 7 a 9 jogadoras ativas.
 - Cadastro de jogadoras com apelido obrigatório, posição opcional e time.
 - Calendário com **6 jogos classificatórios em turno e returno + 1 semifinal + 1 final**.
@@ -303,7 +303,7 @@ Observações:
 |---|---|---|---|
 | FR-01 | Fonte de dados única e versionada com edição, times, jogadoras, partidas e eventos | Obrigatório | O site é gerado a partir de uma única fonte; não há dados duplicados ou editados manualmente no HTML |
 | FR-02 | Validação automática dos dados | Obrigatório | Dados inválidos bloqueiam a publicação com mensagem clara e indicação do problema |
-| FR-03 | Times e elencos | Obrigatório | Exibir 3 times, elencos com apelido e posição, e permitir nomes editáveis |
+| FR-03 | Times e elencos | Obrigatório | Exibir 3 times, elencos com apelido e posição; nome de exibição e logo opcionais sem mudar ID/URL |
 | FR-04 | Calendário de jogos | Obrigatório | Exibir as 8 partidas oficiais agrupadas por data, com status, placar e local |
 | FR-05 | Detalhe da partida | Obrigatório | Exibir placar derivado dos gols, eventos de gol, assistência e cartões |
 | FR-06 | Classificação automática | Obrigatório | Aplicar 3/1/0 e todos os critérios de desempate na ordem definida, apenas nas 6 partidas de grupo |
@@ -396,7 +396,7 @@ Observações:
 
 ### 10.4 Times
 
-- 3 times com nome, abreviação e elenco.
+- 3 times com ID estável, nome-base (`Time A`, `Time B`, `Time C`), nome de exibição opcional, abreviação, logo opcional e elenco. A interface usa o nome de exibição quando existe; caso contrário, usa o nome-base. O nome e o logo podem ser atualizados sem alterar IDs ou URLs.
 - Cada jogadora: apelido, posição, gols, assistências, cartões e status de suspensão.
 - Estatísticas coletivas: jogos, V/E/D no tempo normal, GP/GC/SG, cartões e pontos disciplinares nas 8 partidas oficiais.
 - Uma semifinal ou final empatada conta como empate em V/E/D; a definição por vantagem do empate é exibida separadamente e não altera o placar.
@@ -633,6 +633,7 @@ Observações:
 - Fonte de dados versionada e validada; site somente leitura.
 - Apenas a edição 2026, com estrutura preparada para edições futuras.
 - **3 times** (`ta`, `tb`, `tc`), **6 partidas de grupo em turno e returno**, **1 semifinal** e **1 final**, totalizando **8 partidas oficiais**.
+- Os IDs e URLs dos times são estáveis e independentes dos nomes de exibição; a interface mostra apenas o nome de exibição ou o nome-base. Logos locais dos times são opcionais.
 - Calendário: 24/11, 26/11, 01/12 e 03/12/2026; horários a definir.
 - Cada par de times tem um jogo em casa para cada lado; `g4` é `tb x ta`.
 - A semifinal é **2º x 3º**, com vantagem do empate para o 2º colocado.
@@ -663,7 +664,7 @@ Observações:
 Estas questões não bloqueiam o MVP e podem ser resolvidas pela organização durante a implementação:
 
 - Horários exatos das partidas, incluindo os dois jogos do mesmo time em 24/11, 26/11 e 01/12 e os horários da semifinal e da final.
-- Nomes definitivos dos times.
+- Nomes definitivos dos times B e C.
 - Local/quadra exata a exibir publicamente.
 - Como acomodar novas alunas se todos os times estiverem com 9 ativas.
 - Critério de assistência em casos duvidosos.
@@ -674,7 +675,7 @@ Estas questões não bloqueiam o MVP e podem ser resolvidas pela organização d
 
 ## 17. Glossário
 
-- **TA, TB, TC:** abreviações provisórias dos três times.
+- **TA, TB, TC:** abreviações estáveis dos três times; os IDs (`ta`, `tb`, `tc`) e as URLs correspondentes não dependem do nome público editável.
 - **Fase classificatória:** todos contra todos, em turno e returno, com 6 partidas.
 - **Semifinal:** partida única entre o 2º e o 3º colocados, com vantagem do empate para o 2º.
 - **Final:** partida única entre o 1º colocado e a vencedora da semifinal, com vantagem do empate para o 1º.

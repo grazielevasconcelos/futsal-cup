@@ -10,6 +10,7 @@ import type {
 import { buildTeamMap } from '../domain/players';
 import { resolveMatchTeams } from '../domain/score';
 import { formatDate } from './date';
+import { formatTeamLabel } from './team';
 
 function opponentOf(match: Match, teamId: TeamId, competition: Competition): TeamId | null {
   try {
@@ -69,7 +70,7 @@ export function buildSuspensionLabels(
         if (match !== undefined && opponent !== undefined) {
           labels.set(
             player.id,
-            `Suspensa na partida contra ${opponent.name} de ${formatDate(match.date)}`,
+            `Suspensa na partida contra ${formatTeamLabel(opponent)} de ${formatDate(match.date)}`,
           );
           continue;
         }

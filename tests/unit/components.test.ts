@@ -6,6 +6,7 @@ import HomeShortcuts from '../../src/components/HomeShortcuts.astro';
 import NavList from '../../src/components/NavList.astro';
 import PodiumList from '../../src/components/PodiumList.astro';
 import TeamBadges from '../../src/components/TeamBadges.astro';
+import TeamLogo from '../../src/components/TeamLogo.astro';
 import { parseCompetition } from '../../src/lib/data/load';
 import { buildTeamMap } from '../../src/lib/domain/players';
 import { buildPodium } from '../../src/lib/domain/playoffs';
@@ -56,8 +57,13 @@ function currentPageCount(html: string): number {
 async function renderBadges(activeCount: number): Promise<string> {
   const container = await AstroContainer.create();
   return container.renderToString(TeamBadges, {
-    props: { abbreviation: 'TA', activeCount },
+    props: { activeCount },
   });
+}
+
+async function renderTeamLogo(logo: string | null): Promise<string> {
+  const container = await AstroContainer.create();
+  return container.renderToString(TeamLogo, { props: { logo } });
 }
 
 async function renderFinalPhase(competition: Competition): Promise<string> {
@@ -105,13 +111,26 @@ describe('badge de elenco', () => {
   it('TST-042: mostra “Elenco em formação” com 4 ativas', async () => {
     const html = await renderBadges(4);
     expect(html).toContain('Elenco em formação');
-    expect(html).toContain('TA');
+    expect(html).not.toContain('TA');
   });
 
   it('TST-042: não mostra o badge com 6 ativas', async () => {
     const html = await renderBadges(6);
     expect(html).not.toContain('Elenco em formação');
-    expect(html).toContain('TA');
+    expect(html).not.toContain('TA');
+  });
+});
+
+describe('logo de time', () => {
+  it('usa o asset local com base URL do site', async () => {
+    const html = await renderTeamLogo('/images/times/ta.webp');
+    expect(html).toContain(`src="${withBase('/images/times/ta.webp')}"`);
+    expect(html).toContain('alt=""');
+  });
+
+  it('não renderiza imagem quando não há logo', async () => {
+    const html = await renderTeamLogo(null);
+    expect(html).not.toContain('<img');
   });
 });
 

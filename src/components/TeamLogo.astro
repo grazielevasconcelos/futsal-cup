@@ -1,0 +1,24 @@
+---
+import { withBase } from '../lib/site';
+
+interface Props {
+  logo: string | null;
+}
+
+const { logo } = Astro.props;
+---
+
+{
+  logo !== null && (
+    <img
+      class="team-logo"
+      src={withBase(logo)}
+      alt=""
+      aria-hidden="true"
+      width="548"
+      height="600"
+      loading="lazy"
+      decoding="async"
+    />
+  )
+}

@@ -3,11 +3,13 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import EmptyState from '../../components/EmptyState.astro';
 import TeamBadges from '../../components/TeamBadges.astro';
 import TeamStatsList from '../../components/TeamStatsList.astro';
+import TeamLogo from '../../components/TeamLogo.astro';
 import { loadCompetition } from '../../lib/data/load';
 import { activePlayers } from '../../lib/domain/players';
 import { rankTeams } from '../../lib/domain/standings';
 import { buildTeamStats } from '../../lib/domain/stats';
 import { withBase } from '../../lib/site';
+import { formatTeamLabel } from '../../lib/format/team';
 
 const competition = loadCompetition();
 const ranking = rankTeams(competition);
@@ -50,9 +52,10 @@ const positionByTeam = new Map(ranking.rows.map((row) => [row.teamId, row.positi
               return (
                 <li>
                   <article class="card">
-                    <TeamBadges abbreviation={team.abbreviation} activeCount={active} />
+                    <TeamBadges activeCount={active} />
+                    <TeamLogo logo={team.logo} />
                     <h3 class="card__title">
-                      <a href={withBase(`/times/${team.id}/`)}>{team.name}</a>
+                      <a href={withBase(`/times/${team.id}/`)}>{formatTeamLabel(team)}</a>
                     </h3>
                     <p class="meta">
                       {position === undefined ? 'Sem posição' : `${position}º na classificação`} ·{' '}

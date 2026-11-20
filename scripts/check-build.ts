@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { extname, join, relative } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
@@ -77,9 +77,18 @@ if (fontFiles.length > 0) {
   fail(`Arquivo de fonte encontrado em dist/: ${fontFiles.join(', ')}`);
 }
 
-const photoFiles = relativeFiles.filter((file) => /\.(?:png|jpe?g|gif|webp|avif)$/i.test(file));
-if (photoFiles.length > 0) {
-  fail(`Imagem raster encontrada em dist/: ${photoFiles.join(', ')}`);
+const rasterFiles = relativeFiles.filter((file) => /\.(?:png|jpe?g|gif|webp|avif)$/i.test(file));
+const unsupportedRasterFiles = rasterFiles.filter(
+  (file) => !/^images\/times\/[a-z0-9-]+\.(?:png|jpe?g|webp)$/i.test(file),
+);
+if (unsupportedRasterFiles.length > 0) {
+  fail(`Imagem raster fora dos logos locais de times em dist/: ${unsupportedRasterFiles.join(', ')}`);
+}
+for (const file of rasterFiles) {
+  const size = statSync(join(distDirectory, file)).size;
+  if (size > 200 * 1024) {
+    fail(`Logo raster acima de 200 KB em dist/${file}: ${size} bytes`);
+  }
 }
 
 const forbiddenPaths = relativeFiles.filter((file) =>

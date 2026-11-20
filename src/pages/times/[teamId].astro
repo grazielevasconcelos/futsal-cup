@@ -3,12 +3,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import RosterTable from '../../components/RosterTable.astro';
 import TeamBadges from '../../components/TeamBadges.astro';
 import TeamStatsList from '../../components/TeamStatsList.astro';
+import TeamLogo from '../../components/TeamLogo.astro';
 import { loadCompetition } from '../../lib/data/load';
 import { activePlayers } from '../../lib/domain/players';
 import { rankTeams } from '../../lib/domain/standings';
 import { buildPlayerStats, buildTeamStats } from '../../lib/domain/stats';
 import { buildSuspensionLabels } from '../../lib/format/suspension';
 import { withBase } from '../../lib/site';
+import { formatTeamLabel } from '../../lib/format/team';
 
 export function getStaticPaths() {
   const competition = loadCompetition();
@@ -40,13 +42,14 @@ const history = team.players.filter((player) => {
   );
 });
 
-const caption = `Elenco ativo do ${team.name} — Copa de Futsal Feminino Vila Mariana 2026`;
-const historyCaption = `Atletas com histórico na edição — ${team.name} — Copa de Futsal Feminino Vila Mariana 2026`;
+const teamLabel = formatTeamLabel(team);
+const caption = `Elenco ativo do ${teamLabel} — Copa de Futsal Feminino Vila Mariana 2026`;
+const historyCaption = `Atletas com histórico na edição — ${teamLabel} — Copa de Futsal Feminino Vila Mariana 2026`;
 ---
 
 <BaseLayout
-  title={`${team.name} (${team.abbreviation})`}
-  description={`Elenco ativo, suspensões e estatísticas coletivas do ${team.name} na Copa de Futsal Feminino Vila Mariana 2026.`}
+  title={teamLabel}
+  description={`Elenco ativo, suspensões e estatísticas coletivas do ${teamLabel} na Copa de Futsal Feminino Vila Mariana 2026.`}
   activeNav="times"
   notices={competition.notices}
 >
@@ -54,8 +57,9 @@ const historyCaption = `Atletas com histórico na edição — ${team.name} — 
     <p class="meta"><a href={withBase('/times/')}>Todos os times</a></p>
 
     <div class="page-header">
-      <TeamBadges abbreviation={team.abbreviation} activeCount={active.length} />
-      <h1>{team.name}</h1>
+      <TeamBadges activeCount={active.length} />
+      <TeamLogo logo={team.logo} />
+      <h1>{teamLabel}</h1>
       <p class="lead">
         {row === undefined ? 'Sem posição na classificação' : `${row.position}º na classificação`} ·{' '}
         {active.length} atletas ativas

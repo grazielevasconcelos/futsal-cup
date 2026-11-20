@@ -10,6 +10,7 @@ import {
   walkoverReasonLabel,
 } from '../lib/format/match';
 import { withBase } from '../lib/site';
+import { formatTeamLabel } from '../lib/format/team';
 import Score from './Score.astro';
 import StatusBadge from './StatusBadge.astro';
 
@@ -37,22 +38,33 @@ try {
 }
 
 let homeName =
-  resolved === null ? 'A definir' : teams.get(resolved.homeTeamId)?.name ?? 'A definir';
+  resolved === null
+    ? 'A definir'
+    : teams.get(resolved.homeTeamId) === undefined
+      ? 'A definir'
+      : formatTeamLabel(teams.get(resolved.homeTeamId)!);
 let awayName =
-  resolved === null ? 'A definir' : teams.get(resolved.awayTeamId)?.name ?? 'A definir';
+  resolved === null
+    ? 'A definir'
+    : teams.get(resolved.awayTeamId) === undefined
+      ? 'A definir'
+      : formatTeamLabel(teams.get(resolved.awayTeamId)!);
 
 if (resolved === null && match.stage === 'final') {
   const ranking = rankTeams(competition);
   const leader = ranking.rows[0];
-  homeName = leader === undefined ? '1º colocado' : teams.get(leader.teamId)?.name ?? '1º colocado';
+  const leaderTeam = leader === undefined ? undefined : teams.get(leader.teamId);
+  homeName = leaderTeam === undefined ? '1º colocado' : formatTeamLabel(leaderTeam);
   awayName = 'Vencedora da semifinal';
 }
 
 if (resolved === null && match.stage === 'semi') {
   const expected = buildExpectedSemifinalists(competition);
   if (expected !== null) {
-    homeName = teams.get(expected[0])?.name ?? '2º colocado';
-    awayName = teams.get(expected[1])?.name ?? '3º colocado';
+    const expectedHome = teams.get(expected[0]);
+    const expectedAway = teams.get(expected[1]);
+    homeName = expectedHome === undefined ? '2º colocado' : formatTeamLabel(expectedHome);
+    awayName = expectedAway === undefined ? '3º colocado' : formatTeamLabel(expectedAway);
   } else {
     homeName = '2º colocado';
     awayName = '3º colocado';

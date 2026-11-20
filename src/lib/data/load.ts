@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 import { parseDocument, type Document } from 'yaml';
 
@@ -109,8 +110,11 @@ export function loadCompetition(
   filePath = defaultDataFile(),
   options: Omit<ValidationOptions, 'source'> = {},
 ): Competition {
-  const rawText = readFileSync(filePath, 'utf8');
-  return parseCompetition(rawText, filePath, options);
+  const result = loadCompetitionResult(filePath, options);
+  if (result.errors.length > 0 || result.competition === null) {
+    throw new DataValidationError(filePath, result.errors);
+  }
+  return result.competition;
 }
 
 export function loadCompetitionResult(
@@ -118,7 +122,30 @@ export function loadCompetitionResult(
   options: Omit<ValidationOptions, 'source'> = {},
 ): ValidationResult {
   const rawText = readFileSync(filePath, 'utf8');
-  return validateSource(rawText, filePath, options);
+  const result = validateSource(rawText, filePath, options);
+  if (result.competition === null) return result;
+
+  const logoErrors = result.competition.teams.flatMap((team, index) => {
+    if (team.logo === null) return [];
+    const publicFile = resolve(process.cwd(), 'public', team.logo.slice(1));
+    if (existsSync(publicFile) && statSync(publicFile).isFile()) return [];
+    return [
+      issue(
+        'VAL-002',
+        ['teams', index, 'logo'],
+        `Arquivo local existente em public${team.logo}.`,
+        team.logo,
+        `O logo do time ${team.id} aponta para ${team.logo}, mas o arquivo não existe em ${publicFile}. Adicione o asset ou use null.`,
+      ),
+    ];
+  });
+
+  if (logoErrors.length === 0) return result;
+  return {
+    ...result,
+    errors: [...result.errors, ...logoErrors],
+    competition: null,
+  };
 }
 
 function deepFreeze<T>(value: T): T {

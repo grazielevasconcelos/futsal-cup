@@ -1,4 +1,8 @@
 import { readFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { stringify } from 'yaml';
 
 import { describe, expect, it } from 'vitest';
 
@@ -41,6 +45,32 @@ describe('pipeline de dados', () => {
     expect(result.errors).toEqual([]);
     expect(result.competition?.teams).toHaveLength(3);
     expect(result.competition?.matches).toHaveLength(8);
+    expect(result.competition?.teams.find((item) => item.id === 'ta')).toMatchObject({
+      name: 'Time A',
+      displayName: 'De primeira FC',
+      logo: '/images/times/ta.webp',
+    });
+    expect(result.competition?.teams.find((item) => item.id === 'tb')).toMatchObject({
+      name: 'Time B',
+      displayName: null,
+      logo: null,
+    });
+  });
+
+  it('VAL-002: bloqueia logo local que não existe em public/', () => {
+    const data = validData();
+    data.teams[0].logo = '/images/times/nao-existe.webp';
+    const directory = mkdtempSync(join(tmpdir(), 'copa-logo-'));
+    const file = join(directory, 'copa.yaml');
+    writeFileSync(file, stringify(data), 'utf8');
+
+    try {
+      const result = loadCompetitionResult(file);
+      expect(codes(result)).toContain('VAL-002');
+      expect(result.competition).toBeNull();
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
   });
 
   it('congela a competição validada', () => {

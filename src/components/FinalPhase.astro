@@ -3,6 +3,7 @@ import type { Competition } from '../lib/domain/types';
 import { buildPodium, isGroupComplete, isSemiComplete } from '../lib/domain/playoffs';
 import { buildTeamMap } from '../lib/domain/players';
 import { withBase } from '../lib/site';
+import { formatTeamLabel } from '../lib/format/team';
 import EmptyState from './EmptyState.astro';
 import MatchCard from './MatchCard.astro';
 import PodiumList from './PodiumList.astro';
@@ -24,7 +25,9 @@ const teams = buildTeamMap(competition);
 const thirdName =
   podium?.third === null || podium?.third === undefined
     ? null
-    : teams.get(podium.third)?.name ?? podium.third;
+    : teams.get(podium.third) === undefined
+      ? podium.third
+      : formatTeamLabel(teams.get(podium.third)!);
 ---
 
 {

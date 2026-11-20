@@ -2,6 +2,7 @@
 import type { Team, TeamId } from '../lib/domain/types';
 import { NAV_ITEMS, withBase } from '../lib/site';
 import type { NavKey } from '../lib/site';
+import { formatTeamLabel } from '../lib/format/team';
 
 interface Props {
   activeNav?: NavKey | undefined;
@@ -41,7 +42,7 @@ const { activeNav, activeTeamId = null, teams } = Astro.props;
                     href={withBase(`/times/${team.id}/`)}
                     aria-current={activeTeamId === team.id ? 'page' : undefined}
                   >
-                    {team.name}
+                    {formatTeamLabel(team)}
                   </a>
                 </li>
               ))}

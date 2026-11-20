@@ -2,9 +2,11 @@
 # Privacidade: apenas apelido, posição, time e estatísticas.
 # O mapeamento p-XXX -> pessoa fica FORA do repositório.
 # Não inclua nome completo, foto, contato, camisa ou data de nascimento.
+# IDs e nomes-base dos times são estáveis; a UI usa displayName quando preenchido.
+# Logos são opcionais e devem apontar para assets locais em public/images/times/.
 #
-# Estado atual: pré-competição. Elencos definidos em 17/11/2026 com nomes de
-# times provisórios (Time A/B/C). Horários confirmados pela organização:
+# Estado atual: pré-competição. Elencos definidos em 17/11/2026; nomes públicos
+# dos times B e C ainda provisórios. IDs e URLs são estáveis. Horários confirmados:
 # primeiro jogo do dia às 18h45 e segundo às 19h20, no 7º andar. Vi é a única goleira; as demais jogadoras atuam na linha.
 # Não registre resultados fictícios.
 #
@@ -16,8 +18,10 @@ timezone: "America/Sao_Paulo"
 
 teams:
   - id: "ta"
-    name: "Time A" # provisório até a organização confirmar o nome público
+    name: "Time A" # nome-base estável; não usar para renomear publicamente
+    displayName: "De primeira FC"
     abbreviation: "TA"
+    logo: "/images/times/ta.webp"
     players:
       - id: "p-001"
         nickname: "Aline"
@@ -61,8 +65,10 @@ teams:
         leftAt: null
 
   - id: "tb"
-    name: "Time B" # provisório até a organização confirmar o nome público
+    name: "Time B"
+    displayName: null
     abbreviation: "TB"
+    logo: null
     players:
       - id: "p-009"
         nickname: "Ani"
@@ -111,8 +117,10 @@ teams:
         leftAt: null
 
   - id: "tc"
-    name: "Time C" # provisório até a organização confirmar o nome público
+    name: "Time C"
+    displayName: null
     abbreviation: "TC"
+    logo: null
     players:
       - id: "p-017"
         nickname: "Camila Arana"

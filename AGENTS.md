@@ -40,6 +40,7 @@ Leia antes de implementar qualquer mudança:
 - **Sem JavaScript no cliente:** o MVP não usa scripts, hidratação, frameworks de cliente ou chamadas externas.
 - **Somente leitura:** não existe área administrativa nem edição pelo site no MVP. A edição ocorre apenas na fonte de dados versionada.
 - **Fonte única de dados:** times, jogadoras, partidas e eventos vêm de um único arquivo versionado. Não duplique dados no HTML nem edite resultados/classificação manualmente.
+- **Identidade estável dos times:** preserve os IDs `ta`, `tb` e `tc`, os nomes-base “Time A/B/C” e as URLs derivadas dos IDs; nomes de exibição e logos são opcionais e editáveis. Exiba somente o nome de exibição quando informado, senão o nome-base.
 - **Privacidade:** exibir apenas apelido, posição, time e estatísticas. Nunca nome completo, foto, contato, camisa ou data de nascimento.
 - **Idioma:** português do Brasil em toda a interface e nos textos públicos.
 - **Mobile-first e acessível:** WCAG 2.2 AA, tabelas semânticas, contraste adequado, navegação por teclado, foco visível e textos alternativos.
@@ -92,6 +93,7 @@ Os arquivos `airbnb-design-design.md` e `airbnb-design-tokens.css` são uma refe
 - O DLS é otimizado para fotografia e produtos de viagem. Este site é orientado a dados e não exibe fotos de jogadoras (privacidade e desempenho em 4G).
 - Adapte a intenção, não clone: aproveite a paleta coral/pink, a tipografia arredondada, o espaçamento generoso e os cards de 12px; priorize a leitura de tabelas, resultados e estatísticas.
 - Não exiba fotos de jogadoras. Evite imagens de pessoas reais; prefira composição tipográfica, cor e ícones discretos. Imagens decorativas, se existirem, devem ser leves, licenciadas, com `alt` adequado e sem marcas da Airbnb.
+- Logos fornecidos pela organização para representar os times podem ser publicados como assets locais após confirmação de autorização; use campos opcionais na fonte de dados, sem imagens remotas.
 - Não use o gradiente coral→pink em grandes áreas ou atrás de tabelas; reserve-o para pequenos acentos.
 - Não sacrifique densidade, contraste ou clareza para reproduzir o estilo. Em dúvida, acessibilidade e legibilidade vencem.
 - A fase final deve indicar textualmente a vantagem do empate e quem avançou ou foi campeã em caso de empate; não use apenas cor ou posição na tabela.

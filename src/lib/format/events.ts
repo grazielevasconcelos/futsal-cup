@@ -8,6 +8,7 @@ import type {
   Team,
   TeamId,
 } from '../domain/types';
+import { formatTeamLabel } from './team';
 
 export type MatchEventKind = 'goal' | 'ownGoal' | 'yellow' | 'secondYellow' | 'red';
 
@@ -45,7 +46,7 @@ export function buildEventViews(
     const playerTeam = playerTeams.get(event.playerId);
     const playerName = playerTeam?.player.nickname ?? 'Atleta';
     const teamId = playerTeam?.team.id;
-    const teamName = playerTeam?.team.name ?? '';
+    const teamName = playerTeam === undefined ? '' : formatTeamLabel(playerTeam.team);
     const minute =
       event.minute === null ? 'Minuto não informado' : `${event.minute} min`;
 
@@ -56,7 +57,9 @@ export function buildEventViews(
       if (event.assistPlayerId !== null) {
         const assistant = playerTeams.get(event.assistPlayerId);
         if (assistant !== undefined) {
-          tags.push(`Assistência de ${assistant.player.nickname} (${assistant.team.name})`);
+          tags.push(
+            `Assistência de ${assistant.player.nickname} (${formatTeamLabel(assistant.team)})`,
+          );
         }
       }
 
@@ -76,7 +79,11 @@ export function buildEventViews(
       return {
         kind: 'ownGoal',
         minute,
-        description: `Gol contra de ${playerName} (${teamName}) — gol para ${opponent?.name ?? 'o adversário'}`,
+        description: `Gol contra de ${playerName} (${teamName}) — gol para ${
+          opponentId === null || opponent === null || opponent === undefined
+            ? 'o adversário'
+            : formatTeamLabel(opponent)
+        }`,
         tags: [],
       };
     }

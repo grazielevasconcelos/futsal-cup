@@ -200,7 +200,8 @@ export function buildTeamStats(competition: Competition): readonly TeamStats[] {
 }
 
 function teamName(stats: PlayerStats, teams: ReadonlyMap<TeamId, Team>): string {
-  return teams.get(stats.teamId)?.name ?? '';
+  const team = teams.get(stats.teamId);
+  return team === undefined ? '' : (team.displayName ?? team.name);
 }
 
 export function rankTopScorers(
@@ -264,7 +265,10 @@ export function rankTeamCards(
       b.disciplinaryPoints - a.disciplinaryPoints ||
       b.red - a.red ||
       b.yellow - a.yellow ||
-      compareText(teams.get(a.teamId)?.name ?? '', teams.get(b.teamId)?.name ?? '') ||
+      compareText(
+        teams.get(a.teamId)?.displayName ?? teams.get(a.teamId)?.name ?? '',
+        teams.get(b.teamId)?.displayName ?? teams.get(b.teamId)?.name ?? '',
+      ) ||
       compareText(a.teamId, b.teamId),
   );
 }

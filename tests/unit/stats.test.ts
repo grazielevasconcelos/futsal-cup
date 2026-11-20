@@ -216,7 +216,9 @@ describe('estatísticas coletivas', () => {
         {
           id: 'ta',
           name: 'Time A',
+          displayName: null,
           abbreviation: 'TA',
+          logo: null,
           players: [
             {
               id: 'p-ta1',
@@ -227,8 +229,22 @@ describe('estatísticas coletivas', () => {
             },
           ],
         } satisfies Team,
-        teams.get('tb') ?? { id: 'tb', name: 'Time B', abbreviation: 'TB', players: [] },
-        teams.get('tc') ?? { id: 'tc', name: 'Time C', abbreviation: 'TC', players: [] },
+        teams.get('tb') ?? {
+          id: 'tb',
+          name: 'Time B',
+          displayName: null,
+          abbreviation: 'TB',
+          logo: null,
+          players: [],
+        },
+        teams.get('tc') ?? {
+          id: 'tc',
+          name: 'Time C',
+          displayName: null,
+          abbreviation: 'TC',
+          logo: null,
+          players: [],
+        },
       ],
       matches: [
         makeGroupMatch({

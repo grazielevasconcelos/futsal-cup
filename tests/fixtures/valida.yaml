@@ -10,6 +10,7 @@ teams:
   - id: "ta"
     name: "Time A"
     abbreviation: "TA"
+    logo: "/images/times/ta.webp"
     players:
       - id: "p-001"
         nickname: "Ana"

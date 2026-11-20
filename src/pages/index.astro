@@ -23,6 +23,7 @@ import {
 } from '../lib/domain/stats';
 import type { PlayerStats } from '../lib/domain/types';
 import { formatDate, formatDateHeading } from '../lib/format/date';
+import { formatTeamLabel } from '../lib/format/team';
 import { getBuildDate, SITE_DESCRIPTION, SITE_NAME, withBase } from '../lib/site';
 
 const competition = loadCompetition();
@@ -60,11 +61,15 @@ const podium =
 const championName =
   podium === null || podium.champion === null
     ? null
-    : teams.get(podium.champion)?.name ?? null;
+    : teams.get(podium.champion) === undefined
+      ? null
+      : formatTeamLabel(teams.get(podium.champion)!);
 const thirdName =
   podium === null || podium.third === null
     ? null
-    : teams.get(podium.third)?.name ?? null;
+    : teams.get(podium.third) === undefined
+      ? null
+      : formatTeamLabel(teams.get(podium.third)!);
 
 const scorers = rankTopScorers(playerStats, teams);
 const assists = rankAssists(playerStats, teams);
@@ -232,7 +237,11 @@ const standingsCaption =
                   {ranking.rows.map((row) => (
                     <tr>
                       <td>{row.position}º</td>
-                      <th scope="row">{teams.get(row.teamId)?.name ?? row.teamId}</th>
+                      <th scope="row">
+                        {teams.get(row.teamId) === undefined
+                          ? row.teamId
+                          : formatTeamLabel(teams.get(row.teamId)!)}
+                      </th>
                       <td class="data-table__numeric">{row.points}</td>
                       <td class="data-table__numeric">{row.played}</td>
                     </tr>
@@ -254,7 +263,9 @@ const standingsCaption =
                 <div>
                   <h3>Artilharia</h3>
                   <p>
-                    {topScorer.nickname} ({teams.get(topScorer.teamId)?.name ?? topScorer.teamId})
+                    {topScorer.nickname} ({teams.get(topScorer.teamId) === undefined
+                      ? topScorer.teamId
+                      : formatTeamLabel(teams.get(topScorer.teamId)!)})
                     — {topScorer.goals} gols
                   </p>
                   {leaderNote(scorers, (item) => item.goals) !== null && (
@@ -267,7 +278,9 @@ const standingsCaption =
                   <h3>Assistências</h3>
                   <p>
                     {assistLeader.nickname} (
-                    {teams.get(assistLeader.teamId)?.name ?? assistLeader.teamId}) —{' '}
+                    {teams.get(assistLeader.teamId) === undefined
+                      ? assistLeader.teamId
+                      : formatTeamLabel(teams.get(assistLeader.teamId)!)}) —{' '}
                     {assistLeader.assists} assistências
                   </p>
                   {leaderNote(assists, (item) => item.assists) !== null && (

@@ -147,7 +147,7 @@ O nome da instituição **NÃO DEVE** aparecer em interface, título, metadados,
 - Notificações, chat, pagamentos, streaming, ingressos.
 - W.O. automático, detecção de jogadoras em quadra, automação de desistência de time inteiro.
 - Regulamento (FR-10, adiado), modo escuro, impressão/PDF, analytics.
-- Tema escuro, fontes proprietárias, imagens de pessoas, logotipos de terceiros.
+- Tema escuro, fontes proprietárias, imagens de pessoas e logotipos sem relação com os times. Logos dos times enviados pela organização são opcionais e servidos localmente.
 - `PLAN.md` e `TASKS.md` nesta etapa.
 
 ### 2.4 Adiado e futuro
@@ -165,7 +165,7 @@ Não há questão técnica bloqueante. Os itens abaixo são **dados** a preenche
 
 | Dado | Campo | Fallback público |
 |---|---|---|
-| Nomes definitivos dos 3 times | `teams[].name` | O valor cadastrado (“Time A” etc.). |
+| Nomes de exibição dos times B e C | `teams[].displayName` | Nome-base de `teams[].name` quando o campo for `null`. |
 | Horários das partidas | `matches[].startsAt` | “Horário a definir”. |
 | Local/quadra das partidas | `matches[].venue` | “Local a definir”. |
 | Horário e local da semifinal | `semi.startsAt`, `semi.venue` | “Horário a definir” / “Local a definir”. |
@@ -467,8 +467,10 @@ const playerSchema = z.object({
 
 const teamSchema = z.object({
   id: teamId,
-  name: z.string().min(1).max(60),
+  name: z.string().min(1).max(60), // deve corresponder a Time A/B/C conforme o id
+  displayName: z.string().trim().min(1).max(60).nullable().default(null),
   abbreviation: z.string().regex(/^[A-Z0-9]{1,5}$/, 'Abreviação inválida: use 1 a 5 caracteres A-Z ou 0-9.'),
+  logo: z.string().regex(/^\/images\/times\/[a-z0-9-]+\.(?:webp|png|jpe?g)$/i).nullable().default(null),
   players: z.array(playerSchema),
 }).strict();
 
@@ -573,6 +575,8 @@ export const competitionSchema = z.object({
   notices: z.array(noticeSchema),
 }).strict();
 ```
+
+`name` é o nome-base fixo correspondente ao ID (`ta` = “Time A”, `tb` = “Time B”, `tc` = “Time C”); não deve ser usado para renomear o time. `displayName` e `logo` são opcionais e assumem `null` quando omitidos. A UI exibe `displayName ?? name`, sem abreviação. Um logo deve ser um asset local em `public/images/times/`; `npm run validate` e o build bloqueiam caminho externo ou arquivo inexistente.
 
 **Decisões de schema:**
 
@@ -703,7 +707,9 @@ export interface Player {
 export interface Team {
   readonly id: TeamId;
   readonly name: string;
+  readonly displayName: string | null;
   readonly abbreviation: string;
+  readonly logo: string | null;
   readonly players: readonly Player[];
 }
 
@@ -865,7 +871,7 @@ export interface Podium {
 | ID | Invariante |
 |---|---|
 | DM-001 | A competição tem edição 2026, fuso `America/Sao_Paulo`, **3 times** e **8 partidas oficiais** (6 de grupo + semifinal + final). |
-| DM-002 | Cada time tem ID único, nome, abreviação única e elenco; nomes podem ser editáveis, IDs não. |
+| DM-002 | Cada time tem ID, nome-base (`Time A/B/C`), nome de exibição opcional, abreviação única, logo opcional e elenco. IDs e URLs `/times/{id}/` são estáveis; UI usa `displayName ?? name`. |
 | DM-003 | Jogadora tem ID opaco e único na edição, apelido único no time, posição opcional, `joinedAt` e `leftAt`. |
 | DM-004 | Partida tem `stage`, `date`, `status` e regras de `startsAt`; `finished` exige `startsAt`; `scheduled`/`postponed` não têm eventos/W.O. |
 | DM-005 | Evento é `goal`, `ownGoal`, `yellow` ou `red`; assistência é opcional, do mesmo time e diferente da marcadora; pênalti não tem assistência; gol contra não tem assistência/pênalti. |
@@ -1328,11 +1334,11 @@ buildTeamStats(competition):
 
 | Tabela | Ordem |
 |---|---|
-| Artilharia | `goals` desc, `assists` desc, `compareText(nickname)` asc, `compareText(team.name)` asc, `playerId` asc. Somente `goals ≥ 1`. |
-| Assistências | `assists` desc, `goals` desc, `compareText(nickname)` asc, `compareText(team.name)` asc, `playerId` asc. Somente `assists ≥ 1`. |
-| Cartões por jogadora | `disciplinaryPoints` desc, `red` desc, `yellow` desc, `compareText(nickname)` asc, `compareText(team.name)` asc, `playerId` asc. Somente quem tem ao menos um cartão. |
-| Cartões por time | `disciplinaryPoints` desc, `red` desc, `yellow` desc, `compareText(team.name)` asc, `teamId` asc. Todos os 3 times. |
-| Gols contra | `ownGoals` desc, `compareText(nickname)` asc, `compareText(team.name)` asc, `playerId` asc. Somente `ownGoals ≥ 1`. |
+| Artilharia | `goals` desc, `assists` desc, `compareText(nickname)` asc, `compareText(displayName ?? name)` asc, `playerId` asc. Somente `goals ≥ 1`. |
+| Assistências | `assists` desc, `goals` desc, `compareText(nickname)` asc, `compareText(displayName ?? name)` asc, `playerId` asc. Somente `assists ≥ 1`. |
+| Cartões por jogadora | `disciplinaryPoints` desc, `red` desc, `yellow` desc, `compareText(nickname)` asc, `compareText(displayName ?? name)` asc, `playerId` asc. Somente quem tem ao menos um cartão. |
+| Cartões por time | `disciplinaryPoints` desc, `red` desc, `yellow` desc, `compareText(displayName ?? name)` asc, `teamId` asc. Todos os 3 times. |
+| Gols contra | `ownGoals` desc, `compareText(nickname)` asc, `compareText(displayName ?? name)` asc, `playerId` asc. Somente `ownGoals ≥ 1`. |
 
 ### 7.7 ALG-007 — Snapshots do mata-mata, pódio e correções
 
@@ -1589,7 +1595,7 @@ O algoritmo do cartão informativo do amistoso foi removido na v2.0. O ID fica r
 | ID | Condição | Esperado | Encontrado | Ref |
 |---|---|---|---|---|
 | VAL-001 | YAML não parseia (sintaxe, indentação, âncora inválida). | YAML 1.2 válido. | Erro com linha/coluna. | §5.2 |
-| VAL-002 | Schema Zod falha: campo desconhecido, tipo errado, campo obrigatório ausente, enum inválido, string vazia/curta/longa, formato inválido. Inclui campos removidos na v2.0 (`friendly`, `shootout`), com mensagem de migração explícita. | Schema §5.4. | Issue com caminho e valor. | §5.4 |
+| VAL-002 | Schema Zod falha: campo desconhecido, tipo errado, campo obrigatório ausente, enum inválido, string vazia/curta/longa, formato inválido; inclui logo externo/inválido ou caminho local inexistente. Inclui campos removidos na v2.0 (`friendly`, `shootout`), com mensagem de migração explícita. | Schema §5.4 e asset local em `public/images/times/`. | Issue com caminho e valor. | §5.4 |
 | VAL-003 | `edition != 2026` ou `timezone != "America/Sao_Paulo"`. | `2026` / `America/Sao_Paulo`. | Valor encontrado. | DM-001 |
 | VAL-004 | Quantidade de times ≠ 3, IDs diferentes de `ta`…`tc` ou IDs duplicados. | Exatamente 3 times `ta`,`tb`,`tc`. | Lista encontrada. | DM-001/002 |
 | VAL-005 | Abreviação de time duplicada (comparação case-insensitive). | Abreviações únicas. | Duplicata e times. | DM-002 |
@@ -1627,7 +1633,7 @@ O algoritmo do cartão informativo do amistoso foi removido na v2.0. O ID fica r
 |---|---|---|---|
 | VAL-W01 | Time com menos de 7 jogadoras ativas. | “Time {nome} tem {n} jogadoras ativas; o alvo é 7 a 9. A publicação não é bloqueada.” | Job summary; badge público só se `<5` (regra de UI, não de validação). |
 | VAL-W02 | Partida `scheduled`/`finished` fora da data original do calendário (24/11, 26/11, 01/12, 03/12). | “Partida {id} está em {data}, fora do calendário original. Confirme o adiamento.” | Job summary. `postponed` é isenta. |
-| VAL-W03 | Nome de time duplicado após normalização. | “Os times {a} e {b} têm o mesmo nome; a abreviação distingue, mas confirme o nome público.” | Job summary. |
+| VAL-W03 | Nome público duplicado após normalização (`displayName ?? name`). | “Os times {a} e {b} têm o mesmo nome público; confirme o nome de exibição.” | Job summary. |
 | VAL-W04 | Partida `scheduled` com data/horário já passados no build. | “Partida {id} está agendada, mas a data passou. A UI mostrará ‘Resultado pendente’.” | Job summary; não bloqueia. |
 
 - Avisos **NÃO DEVEM** alterar a classificação, o placar, o pódio ou as estatísticas.
@@ -1878,7 +1884,7 @@ Ordem do documento:
 ```
 
 - Nav: Início, Jogos, Classificação, Times, Estatísticas, Fase final. Sem Regulamento.
-- Times tem um submenu com um link por time, gerado a partir de `competition.teams`: href `/times/{id}/` e nome público vindos da fonte oficial, sem IDs ou nomes fixos no HTML.
+- Times tem um submenu com um link por time, gerado a partir de `competition.teams`: href `/times/{id}/` usando o ID estável e rótulo `displayName ?? name`, sem IDs ou nomes fixos no HTML.
 - No desktop, o submenu abre com `:hover` e `:focus-within`, sem JavaScript, posicionado sobre o conteúdo com `--shadow-floating` e `--z-nav-submenu`; fecha quando o ponteiro sai ou o foco tabula para fora.
 - No mobile, ao abrir `<details>` “Menu”, os três links de times ficam sempre visíveis como lista indentada, sem um segundo toque.
 - `aria-current="page"` no link ativo, uma única vez por navegação, com indicador visual que não depende só de cor (sublinhado + peso). Em `/times/`, marca Times; em `/times/{id}/`, marca o time no submenu e mantém Times destacado como seção, sem segundo `aria-current`.
@@ -2005,14 +2011,15 @@ Condição: `final` `finished`.
 
 **Lista (`/times/`)**
 
-- 3 cards com nome, abreviação, posição/registro, número de atletas ativas, estatísticas coletivas (jogos, V/E/D no tempo normal, GP/GC/SG, cartões/pontos) e link.
+- 3 cards com nome de exibição ou nome-base (sem abreviação), logo opcional, posição/registro, número de atletas ativas, estatísticas coletivas (jogos, V/E/D no tempo normal, GP/GC/SG, cartões/pontos) e link.
 - Badge “Elenco em formação” somente quando ativas < 5.
 - Entre 5 e 6 ativas, não há badge público; a pendência aparece no CI (`VAL-W01`).
-- Nenhum card usa foto.
+- Não há fotos de pessoas. Logo opcional do time é exibido quando informado.
 
 **Detalhe (`/times/{id}/`)**
 
-- Cabeçalho com nome, abreviação, posição na classificação e estatísticas coletivas das **8 partidas oficiais**.
+- Cabeçalho com nome de exibição ou nome-base (sem abreviação), logo opcional, posição na classificação e estatísticas coletivas das **8 partidas oficiais**.
+- O logo tem texto alternativo vazio quando acompanhado pelo nome visível; se `logo` for `null`, não renderizar imagem nem placeholder.
 - A vantagem do empate é exibida separadamente quando o time decidiu uma semifinal/final empatada; ela não é somada a V/E/D. A partida continua contando como empate.
 - Não há campanha, coluna ou texto de pênaltis/shootout.
 - Tabela do elenco ativo: Apelido, Posição, Gols, Assistências, Amarelos, Vermelhos, Pontos disciplinares, Suspensão.
@@ -2247,7 +2254,7 @@ Pares calculados com luminância relativa WCAG:
 | Requisições de terceiros | 0 | Playwright |
 | Lighthouse mobile (Início e partida) | ≥ 90 em Performance, Acessibilidade, Boas práticas e SEO | auditoria manual no checklist |
 
-- Sem imagens raster; favicon SVG pequeno.
+- Sem fotos de pessoas. A única exceção raster são logos de times em `public/images/times/`, cada um com no máximo 200 KB e referenciado na fonte. Favicon SVG pequeno.
 - CSS crítico inline? **NÃO** no MVP; um único CSS externo cacheável é suficiente. Evitar `style` inline.
 - Sem prefetch de rotas, sem service worker, sem fontes.
 - O site deve carregar em 4G com uma única requisição HTML + CSS (e favicon opcional).
@@ -3522,7 +3529,7 @@ Templates em pt-BR. `{path}` é o caminho do campo; `{expected}` e `{found}` sã
 | VAL-032 | “Campo de privacidade proibido em {path}: {found}. Permitido apenas id, nickname, position, joinedAt e leftAt.” |
 | VAL-W01 | “Aviso: time {time} tem {n} jogadoras ativas; o alvo é 7 a 9. A publicação não é bloqueada.” |
 | VAL-W02 | “Aviso: partida {matchId} está em {date}, fora do calendário original. Confirme o adiamento.” |
-| VAL-W03 | “Aviso: os times {a} e {b} têm o mesmo nome após normalização; a abreviação distingue, mas confirme o nome público.” |
+| VAL-W03 | “Aviso: os times {a} e {b} têm o mesmo nome público após normalização; confirme o nome de exibição.” |
 | VAL-W04 | “Aviso: partida {matchId} está agendada, mas a data/horário já passou. A UI mostrará ‘Resultado pendente’.” |
 
 **Resumo do job:**

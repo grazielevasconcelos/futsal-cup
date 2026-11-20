@@ -1095,14 +1095,16 @@ export function validateSemantics(
     for (let second = first + 1; second < competition.teams.length; second += 1) {
       const b = competition.teams[second];
       if (b === undefined) continue;
-      if (uniqueKey(a.name) !== uniqueKey(b.name)) continue;
+      const aPublicName = a.displayName ?? a.name;
+      const bPublicName = b.displayName ?? b.name;
+      if (uniqueKey(aPublicName) !== uniqueKey(bPublicName)) continue;
       warnings.push(
         warning(
           'VAL-W03',
-          ['teams', second, 'name'],
+          ['teams', second, b.displayName === null ? 'name' : 'displayName'],
           'Nomes públicos distintos.',
-          formatValue(b.name),
-          `Os times ${a.id} e ${b.id} têm o mesmo nome; a abreviação distingue, mas confirme o nome público.`,
+          formatValue(bPublicName),
+          `Os times ${a.id} e ${b.id} têm o mesmo nome público (${bPublicName}); confirme o nome de exibição.`,
         ),
       );
     }

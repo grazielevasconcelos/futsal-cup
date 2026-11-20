@@ -18,7 +18,9 @@ export interface Player {
 export interface Team {
   readonly id: TeamId;
   readonly name: string;
+  readonly displayName: string | null;
   readonly abbreviation: string;
+  readonly logo: string | null;
   readonly players: readonly Player[];
 }
 
