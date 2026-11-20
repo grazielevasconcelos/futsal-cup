@@ -7,6 +7,9 @@
 # times provisórios (Time A/B/C). Horários confirmados pela organização:
 # primeiro jogo do dia às 18h45 e segundo às 19h20, no 7º andar. Vi é a única goleira; as demais jogadoras atuam na linha.
 # Não registre resultados fictícios.
+#
+# Atualizando pelo celular? Siga docs/guia-atualizacao-mobile.md:
+# um jogo por commit, placar derivado dos gols em "events" e IDs no topo do arquivo.
 
 edition: 2026
 timezone: "America/Sao_Paulo"
