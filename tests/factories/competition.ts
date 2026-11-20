@@ -52,16 +52,20 @@ export function makeAllGroupDraws(data: MutableCompetition): void {
     const item = match(data, id);
     item.status = 'finished';
     item.walkover = null;
-    item.shootout = null;
     item.events = [];
   }
+
+  const semi = match(data, 'semi');
+  semi.status = 'scheduled';
+  semi.walkover = null;
+  semi.events = [];
 
   const final = match(data, 'final');
   final.status = 'scheduled';
   final.walkover = null;
-  final.shootout = null;
   final.events = [];
 
+  data.semifinalists = null;
   data.finalists = null;
   data.drawOrder = null;
 }

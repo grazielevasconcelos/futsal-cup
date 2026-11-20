@@ -34,7 +34,7 @@ test.describe('páginas da competição', () => {
     await expect(links.first()).toHaveAttribute('href', /\/times\/ta\/$/);
   });
 
-  test('TST-071: a lista de jogos agrupa as sete partidas oficiais por data', async ({
+  test('TST-071: a lista de jogos agrupa as oito partidas oficiais por data', async ({
     page,
   }) => {
     await page.goto('jogos/');
@@ -42,18 +42,20 @@ test.describe('páginas da competição', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Jogos' })).toBeVisible();
 
     const days = page.locator('section.section');
-    await expect(days).toHaveCount(4);
+    await expect(days).toHaveCount(5);
     await expect(days.nth(0)).toContainText('24/11/2026');
     await expect(days.nth(1)).toContainText('26/11/2026');
     await expect(days.nth(2)).toContainText('01/12/2026');
-    await expect(days.nth(3)).toContainText('03/12/2026');
+    await expect(days.nth(3)).toContainText('02/12/2026');
+    await expect(days.nth(4)).toContainText('03/12/2026');
 
     const cards = page.locator('.match-card');
-    await expect(cards).toHaveCount(7);
+    await expect(cards).toHaveCount(8);
     await expect(cards.filter({ hasText: 'Amistoso' })).toHaveCount(0);
     await expect(page.getByText('3º lugar')).toHaveCount(0);
+    await expect(page.getByText('4º lugar')).toHaveCount(0);
 
-    for (const id of ['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'final']) {
+    for (const id of ['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'semi', 'final']) {
       await expect(page.locator(`a[href$="/jogos/${id}/"]`)).toHaveCount(1);
     }
   });
@@ -83,11 +85,21 @@ test.describe('páginas da competição', () => {
     await expect(page.getByText('Sem eventos registrados.')).toBeVisible();
   });
 
-  test('TST-074: o detalhe da final mostra o placar dos pênaltis', async ({ page }) => {
+  test('TST-074: o detalhe da final mostra o empate e a vantagem do 1º colocado', async ({
+    page,
+  }) => {
     await page.goto('jogos/final/');
 
-    await expect(page.locator('.score span[aria-hidden="true"]')).toHaveText('1 (4) x (3) 1');
-    await expect(page.locator('.score .visually-hidden')).toContainText('4 a 3 nos pênaltis');
+    await expect(page.locator('.score span[aria-hidden="true"]')).toHaveText('1 x 1');
+    await expect(page.locator('.score .visually-hidden')).toContainText(
+      'Time C 1 a 1 Time B no tempo normal; Time C conquista o título pela vantagem do empate.',
+    );
+    await expect(
+      page.getByText('O 1º colocado tem mando de campo e vantagem do empate', { exact: false }),
+    ).toBeVisible();
+    await expect(page.getByText(/\(\d+\) x \(\d+\)/)).toHaveCount(0);
+    await expect(page.getByText('nos pênaltis')).toHaveCount(0);
+    await expect(page.getByText('disputa de pênaltis')).toHaveCount(0);
     await expect(page.getByText('Pênalti', { exact: true })).toBeVisible();
   });
 
@@ -136,9 +148,9 @@ test.describe('páginas da competição', () => {
     await expect(gabi.getByRole('cell').nth(2)).toHaveText('1');
 
     await page.goto('times/tb/');
-    await expect(page.getByRole('row', { name: /Mari/ })).toContainText(
-      'Suspensão sem efeito — sem próxima partida',
-    );
+    const mari = page.getByRole('row', { name: /Mari/ });
+    await expect(mari.getByRole('cell').nth(4)).toHaveText('1');
+    await expect(mari).toContainText('Sem suspensão');
   });
 
   test('as estatísticas têm as cinco seções pedidas', async ({ page }) => {
@@ -159,38 +171,39 @@ test.describe('páginas da competição', () => {
     await expect(page.locator('section.section')).toHaveCount(5);
   });
 
-  test('a fase final não tem disputa de 3º lugar e o amistoso é informativo', async ({ page }) => {
+  test('a fase final não tem amistoso nem 3º lugar e mostra o pódio completo', async ({
+    page,
+  }) => {
     await page.goto('fase-final/');
 
     await expect(page.getByRole('heading', { level: 1, name: 'Fase final' })).toBeVisible();
-    await expect(page.getByRole('heading', { level: 2, name: 'Final' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Semifinal' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Final', exact: true })).toBeVisible();
     await expect(page.getByText('4º lugar')).toHaveCount(0);
 
-    const friendly = page.locator('.friendly-card');
-    if ((await friendly.count()) > 0) {
-      await expect(friendly).toContainText('Informativo — não é partida oficial');
-      await expect(friendly.locator('.score')).toHaveCount(0);
-      await expect(friendly.locator('a')).toHaveCount(0);
-    }
+    await expect(page.locator('.friendly-card')).toHaveCount(0);
+
+    await expect(page.locator('main')).toContainText('vantagem do empate');
 
     const podium = page.locator('.podium__item');
-    const podiumCount = await podium.count();
-    if (podiumCount > 0) {
-      expect(podiumCount).toBe(3);
-      await expect(page.locator('.podium')).toContainText('Campeã');
-      await expect(page.locator('.podium')).toContainText('Vice-campeã');
-      await expect(page.locator('.podium')).toContainText('3º lugar');
-    }
+    await expect(podium).toHaveCount(3);
+    await expect(page.locator('.podium')).toContainText('Campeã');
+    await expect(page.locator('.podium')).toContainText('Vice-campeã');
+    await expect(page.locator('.podium')).toContainText('3ª colocada');
   });
 
-  test('a início mostra um dos quatro estados e não exibe o amistoso', async ({ page }) => {
+  test('a início mostra a campeã e o resultado da final', async ({ page }) => {
     await page.goto('');
 
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(page.locator('#campea')).toHaveCount(1);
+    await expect(
+      page.getByRole('heading', { level: 2, name: 'Campeã' }),
+    ).toBeVisible();
+    await expect(page.getByText('Campeã: Time C')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Resultado da final' })).toBeVisible();
     await expect(page.getByText('Informativo — não é partida oficial')).toHaveCount(0);
-    await expect(page.locator('#primeira-rodada, #proxima-rodada, #final, #campea')).toHaveCount(
-      1,
-    );
+    await expect(page.getByText('Amistoso')).toHaveCount(0);
   });
 
   test('rotas inexistentes caem no 404', async ({ page }) => {
@@ -203,7 +216,15 @@ test.describe('páginas da competição', () => {
   test('as páginas não têm overflow horizontal em 320px', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 800 });
 
-    for (const path of ['classificacao/', 'times/', 'times/ta/', 'estatisticas/', 'fase-final/']) {
+    for (const path of [
+      'classificacao/',
+      'times/',
+      'times/ta/',
+      'estatisticas/',
+      'fase-final/',
+      'jogos/semi/',
+      'jogos/final/',
+    ]) {
       await page.goto(path);
       const hasOverflow = await page.evaluate(
         () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
@@ -213,7 +234,15 @@ test.describe('páginas da competição', () => {
   });
 
   test('as páginas não têm violações sérias de acessibilidade', async ({ page }) => {
-    for (const path of ['classificacao/', 'times/', 'times/ta/', 'estatisticas/', 'fase-final/']) {
+    for (const path of [
+      'classificacao/',
+      'times/',
+      'times/ta/',
+      'estatisticas/',
+      'fase-final/',
+      'jogos/semi/',
+      'jogos/final/',
+    ]) {
       await page.goto(path);
       const results = await new AxeBuilder({ page }).analyze();
       const seriousViolations = results.violations.filter(

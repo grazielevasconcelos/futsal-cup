@@ -33,14 +33,14 @@ describe('pipeline de dados', () => {
     expect(result.errors).toEqual([]);
     expect(result.warnings).toEqual([]);
     expect(result.competition?.teams).toHaveLength(3);
-    expect(result.competition?.matches).toHaveLength(7);
+    expect(result.competition?.matches).toHaveLength(8);
   });
 
   it('aceita a fonte pública da edição 2026', () => {
     const result = loadCompetitionResult('data/2026/copa.yaml');
     expect(result.errors).toEqual([]);
     expect(result.competition?.teams).toHaveLength(3);
-    expect(result.competition?.matches).toHaveLength(7);
+    expect(result.competition?.matches).toHaveLength(8);
   });
 
   it('congela a competição validada', () => {
@@ -98,9 +98,11 @@ describe('pipeline de dados', () => {
     expect(codes(validateCompetition(noOffset))).toContain('VAL-002');
   });
 
-  it('VAL-002: rejeita a fixture de schema incompleto', () => {
+  it('VAL-002: rejeita a fixture de schema incompleto, com campos legados e proibidos', () => {
     const result = validateSource(schemaFixture, 'tests/fixtures/invalida-schema.yaml');
-    expect(codes(result)).toContain('VAL-002');
+    const errorCodes = codes(result);
+    expect(errorCodes).toContain('VAL-002');
+    expect(errorCodes).toContain('VAL-027');
   });
 
   it('VAL-026: rejeita placar materializado', () => {
@@ -119,6 +121,12 @@ describe('pipeline de dados', () => {
     expect(codes(validateCompetition(withRound))).toContain('VAL-027');
   });
 
+  it('VAL-027: rejeita awayTeamId na semifinal', () => {
+    const data = validData();
+    match(data, 'semi').awayTeamId = 'tb';
+    expect(codes(validateCompetition(data))).toContain('VAL-027');
+  });
+
   it('VAL-032: rejeita campos de privacidade', () => {
     const data = validData();
     player(data, 'p-001').fullName = 'Nome Completo';
@@ -129,18 +137,28 @@ describe('pipeline de dados', () => {
     expect(result.errors.every((item) => !item.message.includes('Nome Completo'))).toBe(true);
   });
 
-  it('VAL-033: campo de partida no amistoso falha como amistoso inválido', () => {
+  it('VAL-002: rejeita campo legado friendly com mensagem de migração', () => {
     const data = validData();
-    data.friendly.status = 'scheduled';
-    expect(codes(validateCompetition(data))).toContain('VAL-033');
+    data.friendly = null;
+
+    const result = validateCompetition(data);
+    expect(codes(result)).toContain('VAL-002');
+
+    const friendly = result.errors.find((item) => item.path === 'friendly');
+    expect(friendly?.message).toContain('removido na v2.0');
+    expect(friendly?.message).toContain('amistoso');
   });
 
-  it('VAL-033: placar no amistoso falha como amistoso inválido, não como placar materializado', () => {
+  it('VAL-002: rejeita campo legado shootout com mensagem de migração', () => {
     const data = validData();
-    data.friendly.score = { home: 1, away: 0 };
-    const errorCodes = codes(validateCompetition(data));
-    expect(errorCodes).toContain('VAL-033');
-    expect(errorCodes).not.toContain('VAL-026');
+    match(data, 'g1').shootout = { home: 1, away: 0 };
+
+    const result = validateCompetition(data);
+    expect(codes(result)).toContain('VAL-002');
+
+    const shootout = result.errors.find((item) => item.path.endsWith('.shootout'));
+    expect(shootout?.message).toContain('removido na v2.0');
+    expect(shootout?.message).toContain('shootout');
   });
 
   it('normaliza campos opcionais ausentes para null', () => {

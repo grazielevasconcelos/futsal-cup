@@ -143,7 +143,6 @@ matches:
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover: null
-    shootout: null
     events:
       - type: "yellow"
         playerId: "p-009"
@@ -167,7 +166,6 @@ matches:
       winnerTeamId: "tc"
       reason: "no_show"
       note: "TB não compareceu."
-    shootout: null
     events: []
     # W.O. 0x1 para TC na ordem mandante/visitante; sem gols ou assistências.
 
@@ -181,7 +179,6 @@ matches:
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover: null
-    shootout: null
     events:
       - type: "yellow"
         playerId: "p-005"
@@ -209,7 +206,6 @@ matches:
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover: null
-    shootout: null
     events:
       - type: "ownGoal"
         playerId: "p-005"
@@ -231,7 +227,6 @@ matches:
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover: null
-    shootout: null
     events:
       - type: "goal"
         playerId: "p-017"
@@ -265,7 +260,6 @@ matches:
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover: null
-    shootout: null
     events:
       - type: "goal"
         playerId: "p-020"
@@ -283,7 +277,37 @@ matches:
       - type: "red"
         playerId: "p-014"
         minute: 24
-        # Vermelho direto; TB não tem próxima partida.
+        # Vermelho direto; TB cumpre a suspensão na semifinal.
+
+  - id: "semi"
+    stage: "semi"
+    round: null
+    date: "2026-12-02"
+    startsAt: "2026-12-02T20:30:00-03:00"
+    venue: "Vila Mariana, São Paulo"
+    status: "finished"
+    walkover: null
+    events:
+      - type: "goal"
+        playerId: "p-012"
+        assistPlayerId: "p-013"
+        minute: 9
+        penalty: false
+      - type: "goal"
+        playerId: "p-002"
+        assistPlayerId: "p-003"
+        minute: 14
+        penalty: false
+      - type: "yellow"
+        playerId: "p-010"
+        minute: 18
+      - type: "goal"
+        playerId: "p-015"
+        assistPlayerId: "p-012"
+        minute: 22
+        penalty: false
+      # Semifinal: 2º (TA) x 3º (TB); TB venceu por 2x1 e avançou.
+      # p-014 (TB) cumpriu a suspensão do vermelho de g6 e não tem eventos.
 
   - id: "final"
     stage: "final"
@@ -293,37 +317,28 @@ matches:
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover: null
-    shootout:
-      home: 4
-      away: 3
     events:
       - type: "goal"
         playerId: "p-017"
-        assistPlayerId: "p-018"
+        assistPlayerId: null
         minute: 10
-        penalty: false
+        penalty: true
       - type: "yellow"
         playerId: "p-019"
         minute: 12
       - type: "goal"
-        playerId: "p-002"
-        assistPlayerId: null
+        playerId: "p-012"
+        assistPlayerId: "p-013"
         minute: 17
-        penalty: true
+        penalty: false
       - type: "yellow"
-        playerId: "p-006"
+        playerId: "p-010"
         minute: 21
-      # 1x1 no tempo normal; TC venceu nos pênaltis por 4x3.
+      # 1x1 no tempo normal; TC campeã pela vantagem do empate (finalists[0]).
 
-finalists:
-  final: ["tc", "ta"]
+semifinalists: ["ta", "tb"]
+finalists: ["tc", "tb"]
 
 drawOrder: null
-
-friendly:
-  date: "2026-12-03"
-  startsAt: "2026-12-03T18:30:00-03:00"
-  venue: "Vila Mariana, São Paulo"
-  note: "Amistoso do 3º colocado contra um time convidado. Não vale pontos e não altera a competição."
 
 notices: []

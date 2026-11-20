@@ -53,13 +53,28 @@ describe('validação semântica de partidas', () => {
     expect(codes(validateCompetition(data))).toContain('VAL-015');
   });
 
-  it('VAL-016: bloqueia final encerrada antes do grupo terminar', () => {
+  it('VAL-016: bloqueia semifinal encerrada antes de o grupo terminar', () => {
     const data = validData();
     const g1 = match(data, 'g1');
     g1.status = 'scheduled';
     g1.events = [];
     g1.walkover = null;
-    g1.shootout = null;
+
+    expect(codes(validateCompetition(data))).toContain('VAL-016');
+  });
+
+  it('VAL-016: bloqueia eventos de semifinal sem semifinalists', () => {
+    const data = validData();
+    data.semifinalists = null;
+    expect(codes(validateCompetition(data))).toContain('VAL-016');
+  });
+
+  it('VAL-016: bloqueia final encerrada antes da semifinal', () => {
+    const data = validData();
+    const semi = match(data, 'semi');
+    semi.status = 'scheduled';
+    semi.events = [];
+    semi.walkover = null;
 
     expect(codes(validateCompetition(data))).toContain('VAL-016');
   });
@@ -82,43 +97,39 @@ describe('validação semântica de partidas', () => {
     expect(codes(validateCompetition(data))).toContain('VAL-024');
   });
 
-  it('VAL-024 e VAL-025: bloqueiam W.O. com shootout', () => {
+  it('VAL-024: aceita W.O. válido na semifinal e na final', () => {
     const data = validData();
-    match(data, 'g2').shootout = { home: 1, away: 0 };
-    const errorCodes = codes(validateCompetition(data));
-    expect(errorCodes).toContain('VAL-024');
-    expect(errorCodes).toContain('VAL-025');
+    const semi = match(data, 'semi');
+    semi.walkover = { winnerTeamId: 'tb', reason: 'withdrawal', note: null };
+    semi.events = [];
+
+    const final = match(data, 'final');
+    final.walkover = { winnerTeamId: 'tc', reason: 'no_show', note: null };
+    final.events = [];
+
+    const result = validateCompetition(data);
+    expect(result.errors).toEqual([]);
   });
 
-  it('VAL-025: bloqueia shootout em partida de grupo', () => {
+  it('VAL-024: bloqueia W.O. na semifinal com vencedor fora dos participantes', () => {
     const data = validData();
-    match(data, 'g1').shootout = { home: 1, away: 0 };
-    expect(codes(validateCompetition(data))).toContain('VAL-025');
+    const semi = match(data, 'semi');
+    semi.walkover = { winnerTeamId: 'tc', reason: 'withdrawal', note: null };
+    semi.events = [];
+
+    expect(codes(validateCompetition(data))).toContain('VAL-024');
   });
 
-  it('VAL-025: bloqueia shootout empatado', () => {
+  it('VAL-027: bloqueia homeTeamId na semifinal', () => {
     const data = validData();
-    match(data, 'final').shootout = { home: 4, away: 4 };
-    expect(codes(validateCompetition(data))).toContain('VAL-025');
+    match(data, 'semi').homeTeamId = 'ta';
+    expect(codes(validateCompetition(data))).toContain('VAL-027');
   });
 
-  it('VAL-030: bloqueia final empatada sem shootout', () => {
+  it('VAL-027: bloqueia round na semifinal', () => {
     const data = validData();
-    match(data, 'final').shootout = null;
-    expect(codes(validateCompetition(data))).toContain('VAL-030');
-  });
-
-  it('VAL-030: bloqueia shootout com tempo normal não empatado', () => {
-    const data = validData();
-    match(data, 'final').events.push({
-      type: 'goal',
-      playerId: 'p-017',
-      assistPlayerId: null,
-      minute: 30,
-      penalty: false,
-    });
-
-    expect(codes(validateCompetition(data))).toContain('VAL-030');
+    match(data, 'semi').round = 1;
+    expect(codes(validateCompetition(data))).toContain('VAL-027');
   });
 
   it('VAL-029: bloqueia evento em W.O. por no_show', () => {

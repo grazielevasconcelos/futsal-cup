@@ -8,16 +8,20 @@ import {
   formatStatus,
   walkoverReasonLabel,
 } from '../../src/lib/format/match';
-import type { Competition, Finalists, Match } from '../../src/lib/domain/types';
+import type { Competition, Match, PlayoffSnapshots } from '../../src/lib/domain/types';
 import {
   goal,
   goalsFor,
   makeCompetition,
   makeFinal,
   makeGroupMatch,
+  makeSemi,
 } from '../factories/domain';
 
-const finalists: Finalists = { final: ['ta', 'tb'] };
+const snapshots: PlayoffSnapshots = {
+  semifinalists: ['ta', 'tb'],
+  finalists: ['tc', 'ta'],
+};
 
 function cupWith(...matches: readonly Match[]): Competition {
   return makeCompetition({ matches });
@@ -25,6 +29,13 @@ function cupWith(...matches: readonly Match[]): Competition {
 
 function playerTeams(competition: Competition) {
   return buildPlayerTeamMap(competition);
+}
+
+function snapshotsOf(competition: Competition): PlayoffSnapshots {
+  return {
+    semifinalists: competition.semifinalists,
+    finalists: competition.finalists,
+  };
 }
 
 describe('formatScore', () => {
@@ -62,12 +73,28 @@ describe('formatScore', () => {
     expect(formatScore(match, null, playerTeams(cupWith(match)))).toBe('Adiada');
   });
 
+  it('mostra "Confrontos a definir" para a semifinal sem semifinalistas', () => {
+    const match = makeSemi();
+
+    expect(
+      formatScore(
+        match,
+        { semifinalists: null, finalists: ['tc', 'ta'] },
+        playerTeams(cupWith(match)),
+      ),
+    ).toBe('Confrontos a definir');
+  });
+
   it('mostra "Confrontos a definir" para a final sem finalistas', () => {
     const match = makeFinal();
 
-    expect(formatScore(match, null, playerTeams(cupWith(match)))).toBe(
-      'Confrontos a definir',
-    );
+    expect(
+      formatScore(
+        match,
+        { semifinalists: ['ta', 'tb'], finalists: null },
+        playerTeams(cupWith(match)),
+      ),
+    ).toBe('Confrontos a definir');
   });
 
   it('TST-073: mostra W.O. na ordem mandante/visitante', () => {
@@ -94,25 +121,71 @@ describe('formatScore', () => {
     expect(formatScore(match, null, playerTeams(cupWith(match)))).toBe('1 x 0 (W.O.)');
   });
 
-  it('TST-074: mostra o placar dos pênaltis entre parênteses', () => {
+  it('mostra o W.O. da final na ordem mandante/visitante', () => {
     const match = makeFinal({
-      events: [goal('p-ta1'), goal('p-tb1')],
-      shootout: { home: 4, away: 3 },
+      walkover: { winnerTeamId: 'ta', reason: 'no_show', note: null },
+      events: [],
     });
 
-    expect(formatScore(match, finalists, playerTeams(cupWith(match)))).toBe(
-      '1 (4) x (3) 1',
-    );
+    expect(formatScore(match, snapshots, playerTeams(cupWith(match)))).toBe('0 x 1 (W.O.)');
   });
 
-  it('formata o W.O. e o shootout da fonte real', () => {
+  it('resolve a semifinal pela ordem dos semifinalistas', () => {
+    const match = makeSemi({
+      events: [...goalsFor('ta', 2), ...goalsFor('tb', 1)],
+    });
+
+    expect(
+      formatScore(
+        match,
+        { semifinalists: ['ta', 'tb'], finalists: null },
+        playerTeams(cupWith(match)),
+      ),
+    ).toBe('2 x 1');
+  });
+
+  it('resolve a final pela ordem dos finalistas', () => {
+    const match = makeFinal({
+      events: [...goalsFor('tc', 1), ...goalsFor('ta', 1)],
+    });
+
+    expect(
+      formatScore(
+        match,
+        { semifinalists: ['ta', 'tb'], finalists: ['tc', 'ta'] },
+        playerTeams(cupWith(match)),
+      ),
+    ).toBe('1 x 1');
+  });
+
+  it('usa a ordem dos finalistas para o mando da final', () => {
+    const match = makeFinal({ events: [goal('p-tc1')] });
+    const teams = playerTeams(cupWith(match));
+
+    expect(
+      formatScore(
+        match,
+        { semifinalists: ['ta', 'tb'], finalists: ['tc', 'ta'] },
+        teams,
+      ),
+    ).toBe('1 x 0');
+    expect(
+      formatScore(
+        match,
+        { semifinalists: ['ta', 'tb'], finalists: ['ta', 'tc'] },
+        teams,
+      ),
+    ).toBe('0 x 1');
+  });
+
+  it('formata o W.O. e o empate da final da fonte real', () => {
     const competition = loadCompetition('tests/fixtures/valida.yaml');
     const teams = playerTeams(competition);
     const walkover = competition.matches.find((match) => match.id === 'g2') as Match;
     const final = competition.matches.find((match) => match.id === 'final') as Match;
 
     expect(formatScore(walkover, null, teams)).toBe('0 x 1 (W.O.)');
-    expect(formatScore(final, competition.finalists, teams)).toBe('1 (4) x (3) 1');
+    expect(formatScore(final, snapshotsOf(competition), teams)).toBe('1 x 1');
   });
 });
 
@@ -144,17 +217,34 @@ describe('formatScoreAccessible', () => {
     );
   });
 
-  it('descreve o shootout com o vencedor', () => {
-    const match = makeFinal({
-      events: [goal('p-ta1'), goal('p-tb1')],
-      shootout: { home: 4, away: 3 },
+  it('descreve a semifinal resolvida pelos semifinalistas', () => {
+    const match = makeSemi({
+      events: [...goalsFor('ta', 1), ...goalsFor('tb', 2)],
     });
 
     expect(
-      formatScoreAccessible(match, finalists, 'Time TA', 'Time TB', playerTeams(cupWith(match))),
-    ).toBe(
-      'Time TA 1 a 1 Time TB no tempo normal; 4 a 3 nos pênaltis; vitória de Time TA.',
-    );
+      formatScoreAccessible(
+        match,
+        { semifinalists: ['ta', 'tb'], finalists: null },
+        'Time TA',
+        'Time TB',
+        playerTeams(cupWith(match)),
+      ),
+    ).toBe('Time TA 1 a 2 Time TB.');
+  });
+
+  it('descreve a final resolvida pelos finalistas', () => {
+    const match = makeFinal({ events: [goal('p-tc1')] });
+
+    expect(
+      formatScoreAccessible(
+        match,
+        { semifinalists: ['ta', 'tb'], finalists: ['tc', 'ta'] },
+        'Time TC',
+        'Time TA',
+        playerTeams(cupWith(match)),
+      ),
+    ).toBe('Time TC 1 a 0 Time TA.');
   });
 
   it('descreve partida agendada sem placar', () => {
@@ -184,11 +274,81 @@ describe('formatScoreAccessible', () => {
     );
   });
 
+  it('explica a semifinal sem semifinalistas', () => {
+    const match = makeSemi({ status: 'scheduled' });
+
+    expect(
+      formatScoreAccessible(
+        match,
+        { semifinalists: null, finalists: ['tc', 'ta'] },
+        'A definir',
+        'A definir',
+        playerTeams(cupWith(match)),
+      ),
+    ).toBe('Confrontos a definir; a fase final depende da etapa anterior.');
+  });
+
   it('explica a final sem finalistas', () => {
     const match = makeFinal({ status: 'scheduled' });
 
-    expect(formatScoreAccessible(match, null, 'A definir', 'A definir', playerTeams(cupWith(match)))).toBe(
-      'Confrontos a definir; a fase final depende das 6 partidas da classificatória.',
+    expect(
+      formatScoreAccessible(
+        match,
+        { semifinalists: ['ta', 'tb'], finalists: null },
+        'A definir',
+        'Vencedora da semifinal',
+        playerTeams(cupWith(match)),
+      ),
+    ).toBe('Confrontos a definir; a fase final depende da etapa anterior.');
+  });
+
+  it('explica a semifinal empatada com a vantagem do 2º colocado', () => {
+    const match = makeSemi({
+      events: [...goalsFor('ta', 1), ...goalsFor('tb', 1)],
+    });
+
+    expect(
+      formatScoreAccessible(match, snapshots, 'Time TA', 'Time TB', playerTeams(cupWith(match))),
+    ).toBe('Time TA 1 a 1 Time TB no tempo normal; Time TA avança pela vantagem do empate.');
+  });
+
+  it('explica a final empatada com a vantagem do 1º colocado', () => {
+    const match = makeFinal({
+      events: [...goalsFor('tc', 1), ...goalsFor('ta', 1)],
+    });
+
+    expect(
+      formatScoreAccessible(match, snapshots, 'Time TC', 'Time TA', playerTeams(cupWith(match))),
+    ).toBe(
+      'Time TC 1 a 1 Time TA no tempo normal; Time TC conquista o título pela vantagem do empate.',
+    );
+  });
+
+  it('descreve o W.O. da final com vencedor visitante', () => {
+    const match = makeFinal({
+      walkover: { winnerTeamId: 'ta', reason: 'no_show', note: null },
+      events: [],
+    });
+
+    expect(
+      formatScoreAccessible(match, snapshots, 'Time TC', 'Time TA', playerTeams(cupWith(match))),
+    ).toBe('Time TC 0 a 1 Time TA por W.O. — Não compareceu.');
+  });
+
+  it('descreve o empate da final da fonte real', () => {
+    const competition = loadCompetition('tests/fixtures/valida.yaml');
+    const match = competition.matches.find((item) => item.id === 'final') as Match;
+
+    expect(
+      formatScoreAccessible(
+        match,
+        snapshotsOf(competition),
+        'Time C',
+        'Time B',
+        playerTeams(competition),
+      ),
+    ).toBe(
+      'Time C 1 a 1 Time B no tempo normal; Time C conquista o título pela vantagem do empate.',
     );
   });
 });

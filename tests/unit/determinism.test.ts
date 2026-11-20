@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { loadCompetition } from '../../src/lib/data/load';
-import { buildExpectedFinalists, buildPodium } from '../../src/lib/domain/finalists';
+import {
+  buildExpectedFinalists,
+  buildExpectedSemifinalists,
+  buildPodium,
+} from '../../src/lib/domain/playoffs';
 import { getNextMatch, getLastResults } from '../../src/lib/domain/home';
 import { buildPlayerStats, buildTeamStats } from '../../src/lib/domain/stats';
 import { buildStandings } from '../../src/lib/domain/standings';
@@ -24,6 +28,7 @@ function snapshot(competition: Competition): Record<string, unknown> {
     standings: buildStandings(competition),
     players: buildPlayerStats(competition),
     teams: buildTeamStats(competition),
+    semifinalists: buildExpectedSemifinalists(competition),
     finalists: buildExpectedFinalists(competition),
     podium: buildPodium(competition),
   };

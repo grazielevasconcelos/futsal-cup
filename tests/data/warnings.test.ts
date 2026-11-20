@@ -41,19 +41,17 @@ describe('avisos não bloqueantes', () => {
     expect(warningCodes(result)).toContain('VAL-W03');
   });
 
-  it('VAL-W04: avisa partida agendada no passado sem bloquear', () => {
+  it('VAL-W04: avisa semifinal e final agendadas no passado sem bloquear', () => {
     const data = validData();
-    const g1 = match(data, 'g1');
-    g1.status = 'scheduled';
-    g1.events = [];
-    g1.walkover = null;
-    g1.shootout = null;
+    const semi = match(data, 'semi');
+    semi.status = 'scheduled';
+    semi.events = [];
+    semi.walkover = null;
 
     const final = match(data, 'final');
     final.status = 'scheduled';
     final.events = [];
     final.walkover = null;
-    final.shootout = null;
 
     data.finalists = null;
 
@@ -62,5 +60,6 @@ describe('avisos não bloqueantes', () => {
     });
     expect(result.errors).toEqual([]);
     expect(warningCodes(result)).toContain('VAL-W04');
+    expect(warningCodes(result).filter((code) => code === 'VAL-W04')).toHaveLength(2);
   });
 });

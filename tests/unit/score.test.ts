@@ -2,23 +2,27 @@ import { describe, expect, it } from 'vitest';
 
 import { buildPlayerTeamMap } from '../../src/lib/domain/players';
 import {
-  FinalistsRequiredError,
+  SnapshotsRequiredError,
   deriveScore,
   resolveMatchTeams,
   toResolvedMatch,
   winnerOf,
 } from '../../src/lib/domain/score';
-import type { Competition, Finalists, Match } from '../../src/lib/domain/types';
+import type { Competition, Match, PlayoffSnapshots } from '../../src/lib/domain/types';
 import {
   goal,
   goalsFor,
   makeCompetition,
   makeFinal,
   makeGroupMatch,
+  makeSemi,
   ownGoal,
 } from '../factories/domain';
 
-const finalists: Finalists = { final: ['ta', 'tb'] };
+const snapshots: PlayoffSnapshots = {
+  semifinalists: ['ta', 'tb'],
+  finalists: ['tc', 'ta'],
+};
 
 function cupWith(...matches: readonly Match[]): Competition {
   return makeCompetition({ matches });
@@ -38,25 +42,41 @@ describe('resolveMatchTeams', () => {
     });
   });
 
-  it('usa a ordem dos finalistas na final', () => {
-    expect(resolveMatchTeams(makeFinal(), finalists)).toEqual({
+  it('usa a ordem dos semifinalistas na semifinal', () => {
+    expect(resolveMatchTeams(makeSemi(), snapshots)).toEqual({
       homeTeamId: 'ta',
       awayTeamId: 'tb',
     });
   });
 
+  it('usa a ordem dos finalistas na final', () => {
+    expect(resolveMatchTeams(makeFinal(), snapshots)).toEqual({
+      homeTeamId: 'tc',
+      awayTeamId: 'ta',
+    });
+  });
+
+  it('falha ao resolver a semifinal sem semifinalistas', () => {
+    expect(() =>
+      resolveMatchTeams(makeSemi(), { semifinalists: null, finalists: ['tc', 'ta'] }),
+    ).toThrow(SnapshotsRequiredError);
+  });
+
   it('falha ao resolver a final sem finalistas', () => {
-    expect(() => resolveMatchTeams(makeFinal(), null)).toThrow(FinalistsRequiredError);
+    expect(() =>
+      resolveMatchTeams(makeFinal(), { semifinalists: ['ta', 'tb'], finalists: null }),
+    ).toThrow(SnapshotsRequiredError);
   });
 
   it('resolve a partida mantendo os demais campos', () => {
-    const match = makeFinal({ shootout: { home: 4, away: 3 } });
+    const match = makeFinal({ events: goalsFor('tc', 1) });
 
-    expect(toResolvedMatch(match, finalists)).toMatchObject({
+    expect(toResolvedMatch(match, snapshots)).toMatchObject({
       id: 'final',
-      homeTeamId: 'ta',
-      awayTeamId: 'tb',
-      shootout: { home: 4, away: 3 },
+      homeTeamId: 'tc',
+      awayTeamId: 'ta',
+      status: 'finished',
+      date: '2026-12-03',
     });
   });
 });
@@ -148,17 +168,36 @@ describe('deriveScore', () => {
     });
   });
 
-  it('TST-033: o shootout não altera o placar do tempo normal', () => {
-    const match = makeFinal({
-      events: [goal('p-ta1'), goal('p-tb1')],
-      shootout: { home: 4, away: 3 },
+  it('deriva o placar da semifinal a partir dos semifinalistas', () => {
+    const match = makeSemi({
+      events: [...goalsFor('ta', 1), ...goalsFor('tb', 2)],
     });
 
-    expect(deriveScore(match, finalists, playerTeams(cupWith(match)))).toEqual({
+    expect(deriveScore(match, snapshots, playerTeams(cupWith(match)))).toEqual({
+      home: 1,
+      away: 2,
+      kind: 'normal',
+    });
+  });
+
+  it('mantém o empate no placar da final, sem converter a vantagem em gol', () => {
+    const match = makeFinal({
+      events: [...goalsFor('tc', 1), ...goalsFor('ta', 1)],
+    });
+
+    expect(deriveScore(match, snapshots, playerTeams(cupWith(match)))).toEqual({
       home: 1,
       away: 1,
       kind: 'normal',
     });
+  });
+
+  it('falha ao derivar placar de mata-mata sem o snapshot necessário', () => {
+    const match = makeSemi({ events: goalsFor('ta', 1) });
+
+    expect(() => deriveScore(match, null, playerTeams(cupWith(match)))).toThrow(
+      SnapshotsRequiredError,
+    );
   });
 
   it('retorna null para partida não finalizada', () => {
@@ -194,7 +233,7 @@ describe('winnerOf', () => {
     expect(winnerOf(match, null, playerTeams(cupWith(match)))).toBe('tb');
   });
 
-  it('retorna null em empate sem shootout', () => {
+  it('retorna null em empate de partida de grupo', () => {
     const match = makeGroupMatch({
       id: 'g1',
       home: 'ta',
@@ -217,13 +256,34 @@ describe('winnerOf', () => {
     expect(winnerOf(match, null, playerTeams(cupWith(match)))).toBe('tc');
   });
 
-  it('decide a final pelo shootout', () => {
-    const match = makeFinal({
+  it('classifica o 2º quando a semifinal termina empatada', () => {
+    const match = makeSemi({
       events: [goal('p-ta1'), goal('p-tb1')],
-      shootout: { home: 3, away: 4 },
     });
 
-    expect(winnerOf(match, finalists, playerTeams(cupWith(match)))).toBe('tb');
+    expect(winnerOf(match, snapshots, playerTeams(cupWith(match)))).toBe('ta');
+  });
+
+  it('dá o título ao 1º quando a final termina empatada', () => {
+    const match = makeFinal({
+      events: [goal('p-tc1'), goal('p-ta1')],
+    });
+
+    expect(winnerOf(match, snapshots, playerTeams(cupWith(match)))).toBe('tc');
+  });
+
+  it('define o vencedor da semifinal pelo placar normal, inclusive visitante', () => {
+    const match = makeSemi({ events: goalsFor('tb', 1) });
+
+    expect(winnerOf(match, snapshots, playerTeams(cupWith(match)))).toBe('tb');
+  });
+
+  it('define o campeão pelo W.O. da final, inclusive visitante', () => {
+    const match = makeFinal({
+      walkover: { winnerTeamId: 'ta', reason: 'no_show', note: null },
+    });
+
+    expect(winnerOf(match, snapshots, playerTeams(cupWith(match)))).toBe('ta');
   });
 
   it('retorna null para partida não finalizada', () => {

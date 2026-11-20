@@ -1,7 +1,23 @@
+# Fixture propositalmente inválida: erros grosseiros de schema, campos legados
+# removidos na v2.0 (friendly, shootout) e campos proibidos no mata-mata
+# (homeTeamId, awayTeamId e round na semifinal).
 edition: 2026
 timezone: "America/Sao_Paulo"
 teams: []
-matches: []
+matches:
+  - id: "semi"
+    stage: "semi"
+    round: 1
+    homeTeamId: "ta"
+    awayTeamId: "tb"
+    date: "2026-12-02"
+    startsAt: "2026-12-02T20:30:00-03:00"
+    venue: "Vila Mariana, São Paulo"
+    status: "scheduled"
+    walkover: null
+    events: []
+    shootout: null
+semifinalists: null
 finalists: null
 drawOrder: null
 friendly: null

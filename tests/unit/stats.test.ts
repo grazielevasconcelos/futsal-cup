@@ -11,7 +11,7 @@ import {
   rankTeamCards,
   rankTopScorers,
 } from '../../src/lib/domain/stats';
-import type { Competition, PlayerStats, Team, TeamId, TeamStats } from '../../src/lib/domain/types';
+import type { PlayerStats, Team, TeamId, TeamStats } from '../../src/lib/domain/types';
 import {
   goal,
   makeCompetition,
@@ -42,9 +42,9 @@ describe('estatísticas individuais', () => {
   });
 
   it('TST-029: conta pênalti do tempo normal na artilharia', () => {
-    const bia = stat(playerStats, 'p-002');
-    expect(bia.goals).toBe(2);
-    expect(bia.assists).toBe(2);
+    const paula = stat(playerStats, 'p-017');
+    expect(paula.goals).toBe(2);
+    expect(paula.assists).toBe(1);
   });
 
   it('TST-030: registra gol contra sem somar gol para a jogadora', () => {
@@ -55,38 +55,41 @@ describe('estatísticas individuais', () => {
 
   it('TST-031: conta assistência válida para a companheira de time', () => {
     expect(stat(playerStats, 'p-007').assists).toBe(1);
-    expect(stat(playerStats, 'p-018').assists).toBe(2);
+    expect(stat(playerStats, 'p-018').assists).toBe(1);
   });
 
-  it('TST-033: não converte a disputa de pênaltis em gols ou assistências', () => {
+  it('TST-033: não cria gols de shootout e conta o pênalti da final uma única vez', () => {
     expect(stat(playerStats, 'p-017').goals).toBe(2);
     expect(stat(playerStats, 'p-017').assists).toBe(1);
     expect(stat(playerStats, 'p-018').goals).toBe(1);
-    expect(stat(playerStats, 'p-018').assists).toBe(2);
+    expect(stat(playerStats, 'p-018').assists).toBe(1);
   });
 
   it('TST-034: ordena a artilharia por gols, assistências e nomes', () => {
     expect(rankTopScorers(playerStats, teams).map((item) => item.playerId)).toEqual([
+      'p-012',
       'p-002',
       'p-017',
       'p-004',
+      'p-003',
       'p-018',
       'p-020',
-      'p-003',
-      'p-012',
+      'p-015',
       'p-019',
     ]);
   });
 
   it('TST-035: ordena as assistências por assistências, gols e nomes', () => {
     expect(rankAssists(playerStats, teams).map((item) => item.playerId)).toEqual([
+      'p-013',
       'p-002',
-      'p-018',
+      'p-012',
       'p-017',
+      'p-003',
+      'p-018',
       'p-020',
       'p-006',
       'p-007',
-      'p-013',
       'p-021',
     ]);
   });
@@ -95,8 +98,8 @@ describe('estatísticas individuais', () => {
     expect(rankPlayerCards(playerStats, teams).map((item) => item.playerId)).toEqual([
       'p-016',
       'p-014',
+      'p-010',
       'p-005',
-      'p-006',
       'p-009',
       'p-019',
       'p-021',
@@ -136,50 +139,49 @@ describe('estatísticas individuais', () => {
 });
 
 describe('estatísticas coletivas', () => {
-  it('TST-115: agrega grupo e final e separa a campanha nos pênaltis', () => {
+  it('TST-115: agrega grupo, semifinal e final e conta empate no mata-mata como empate', () => {
     expect(teamStat(teamStats, 'ta')).toMatchObject({
       played: 5,
       wins: 2,
-      draws: 2,
-      losses: 1,
-      shootoutWins: 0,
-      shootoutLosses: 1,
+      draws: 1,
+      losses: 2,
       goalsFor: 5,
-      goalsAgainst: 5,
-      goalDifference: 0,
+      goalsAgainst: 6,
+      goalDifference: -1,
     });
     expect(teamStat(teamStats, 'tc')).toMatchObject({
       played: 5,
       wins: 2,
       draws: 2,
       losses: 1,
-      shootoutWins: 1,
-      shootoutLosses: 0,
       goalsFor: 6,
       goalsAgainst: 4,
       goalDifference: 2,
     });
     expect(teamStat(teamStats, 'tb')).toMatchObject({
-      played: 4,
-      wins: 0,
-      draws: 2,
+      played: 6,
+      wins: 1,
+      draws: 3,
       losses: 2,
-      shootoutWins: 0,
-      shootoutLosses: 0,
-      goalsFor: 2,
-      goalsAgainst: 4,
-      goalDifference: -2,
+      goalsFor: 5,
+      goalsAgainst: 6,
+      goalDifference: -1,
     });
   });
 
-  it('TST-026: conta cartões da final nas estatísticas sem alterar a classificação', () => {
+  it('TST-026: conta cartões da semifinal e da final nas estatísticas sem alterar a classificação', () => {
     expect(teamStat(teamStats, 'ta')).toMatchObject({
-      yellow: 2,
+      yellow: 1,
       red: 0,
-      disciplinaryPoints: 2,
+      disciplinaryPoints: 1,
     });
     expect(teamStat(teamStats, 'tc')).toMatchObject({
       yellow: 4,
+      red: 1,
+      disciplinaryPoints: 5,
+    });
+    expect(teamStat(teamStats, 'tb')).toMatchObject({
+      yellow: 3,
       red: 1,
       disciplinaryPoints: 5,
     });
@@ -193,28 +195,14 @@ describe('estatísticas coletivas', () => {
     ]);
   });
 
-  it('não inclui o amistoso nas estatísticas', () => {
-    const withFriendly: Competition = {
-      ...competition,
-      friendly: {
-        date: '2026-12-03',
-        startsAt: '2026-12-03T18:30:00-03:00',
-        venue: 'Vila Mariana, São Paulo',
-        note: 'Amistoso do 3º colocado.',
-      },
-    };
-
-    expect(buildTeamStats(withFriendly)).toEqual(teamStats);
-    expect(buildPlayerStats(withFriendly)).toEqual(playerStats);
-  });
-
   it('não conta a final antes de ela terminar', () => {
     const scheduledFinal = makeCompetition({
       teams: competition.teams,
+      semifinalists: competition.semifinalists,
       finalists: competition.finalists,
       matches: competition.matches.map((match) =>
         match.id === 'final'
-          ? { ...match, status: 'scheduled', events: [], shootout: null }
+          ? { ...match, status: 'scheduled', events: [] }
           : match,
       ),
     });

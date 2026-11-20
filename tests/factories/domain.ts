@@ -7,7 +7,7 @@ import type {
   MatchStatus,
   Player,
   PlayerId,
-  Shootout,
+  SemiFinalMatch,
   Team,
   TeamId,
   Walkover,
@@ -100,7 +100,6 @@ export interface GroupMatchInput {
   readonly date?: string;
   readonly startsAt?: string | null;
   readonly walkover?: Walkover | null;
-  readonly shootout?: Shootout | null;
 }
 
 export function makeGroupMatch(input: GroupMatchInput): GroupMatch {
@@ -116,21 +115,34 @@ export function makeGroupMatch(input: GroupMatchInput): GroupMatch {
     venue: null,
     status: input.status ?? 'finished',
     walkover: input.walkover ?? null,
-    shootout: input.shootout ?? null,
     events: input.events ?? [],
   };
 }
 
-export interface FinalMatchInput {
+export interface KnockoutMatchInput {
   readonly events?: readonly Event[];
   readonly status?: MatchStatus;
   readonly date?: string;
   readonly startsAt?: string | null;
   readonly walkover?: Walkover | null;
-  readonly shootout?: Shootout | null;
 }
 
-export function makeFinal(input: FinalMatchInput = {}): FinalStageMatch {
+export function makeSemi(input: KnockoutMatchInput = {}): SemiFinalMatch {
+  return {
+    id: 'semi',
+    stage: 'semi',
+    round: null,
+    date: input.date ?? '2026-12-02',
+    startsAt:
+      input.startsAt === undefined ? '2026-12-02T20:30:00-03:00' : input.startsAt,
+    venue: null,
+    status: input.status ?? 'finished',
+    walkover: input.walkover ?? null,
+    events: input.events ?? [],
+  };
+}
+
+export function makeFinal(input: KnockoutMatchInput = {}): FinalStageMatch {
   return {
     id: 'final',
     stage: 'final',
@@ -141,7 +153,6 @@ export function makeFinal(input: FinalMatchInput = {}): FinalStageMatch {
     venue: null,
     status: input.status ?? 'finished',
     walkover: input.walkover ?? null,
-    shootout: input.shootout ?? null,
     events: input.events ?? [],
   };
 }
@@ -152,9 +163,9 @@ export function makeCompetition(overrides: Partial<Competition> = {}): Competiti
     timezone: 'America/Sao_Paulo',
     teams: domainTeams(),
     matches: [],
+    semifinalists: null,
     finalists: null,
     drawOrder: null,
-    friendly: null,
     notices: [],
     ...overrides,
   };

@@ -76,3 +76,36 @@ describe('validação semântica de eventos', () => {
     expect(codes(validateCompetition(data))).toContain('VAL-028');
   });
 });
+
+describe('eventos na fase final', () => {
+  it('VAL-019: bloqueia jogadora de fora do confronto da semifinal', () => {
+    const data = validData();
+    match(data, 'semi').events.push({ type: 'yellow', playerId: 'p-017', minute: 30 });
+    expect(codes(validateCompetition(data))).toContain('VAL-019');
+  });
+
+  it('VAL-019: bloqueia jogadora de fora do confronto da final', () => {
+    const data = validData();
+    match(data, 'final').events.push({ type: 'yellow', playerId: 'p-002', minute: 30 });
+    expect(codes(validateCompetition(data))).toContain('VAL-019');
+  });
+
+  it('VAL-020: bloqueia jogadora inelegível na semifinal', () => {
+    const data = validData();
+    match(data, 'semi').events.push({ type: 'yellow', playerId: 'p-007', minute: 30 });
+    expect(codes(validateCompetition(data))).toContain('VAL-020');
+  });
+
+  it('VAL-023: bloqueia evento de jogadora suspensa na semifinal', () => {
+    const data = validData();
+    match(data, 'semi').events.push({ type: 'yellow', playerId: 'p-014', minute: 30 });
+    expect(codes(validateCompetition(data))).toContain('VAL-023');
+  });
+
+  it('VAL-023: bloqueia evento de jogadora suspensa na final', () => {
+    const data = validData();
+    match(data, 'semi').events.push({ type: 'red', playerId: 'p-010', minute: 30 });
+    match(data, 'final').events.push({ type: 'yellow', playerId: 'p-010', minute: 30 });
+    expect(codes(validateCompetition(data))).toContain('VAL-023');
+  });
+});

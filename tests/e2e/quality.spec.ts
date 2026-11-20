@@ -10,6 +10,7 @@ const routes = [
   'jogos/g4/',
   'jogos/g5/',
   'jogos/g6/',
+  'jogos/semi/',
   'jogos/final/',
   'classificacao/',
   'times/',
