@@ -290,7 +290,7 @@ describe('classificação e desempate', () => {
     expect(rankTeams(competition).provisional).toBe(true);
   });
 
-  it('TST-015: converte W.O. em 1x0 na classificação', () => {
+  it('TST-015: converte W.O. em 3x0 na classificação', () => {
     const competition = makeCompetition({
       matches: [
         makeGroupMatch({
@@ -306,16 +306,16 @@ describe('classificação e desempate', () => {
     expect(row(rows, 'tc')).toMatchObject({
       points: 3,
       wins: 1,
-      goalsFor: 1,
+      goalsFor: 3,
       goalsAgainst: 0,
-      goalDifference: 1,
+      goalDifference: 3,
     });
     expect(row(rows, 'tb')).toMatchObject({
       points: 0,
       losses: 1,
       goalsFor: 0,
-      goalsAgainst: 1,
-      goalDifference: -1,
+      goalsAgainst: 3,
+      goalDifference: -3,
     });
   });
 
@@ -352,7 +352,7 @@ describe('classificação e desempate', () => {
     expect(ranking.rows.every((item) => !item.decidedByDraw)).toBe(true);
   });
 
-  it('TST-110: soma W.O. como 1x0 no saldo agregado do confronto direto', () => {
+  it('TST-110: soma W.O. como 3x0 no saldo agregado do confronto direto', () => {
     const competition = makeCompetition({
       matches: [
         makeGroupMatch({
@@ -381,6 +381,6 @@ describe('classificação e desempate', () => {
     expect(row(rows, 'ta').points).toBe(4);
     expect(row(rows, 'tb').points).toBe(4);
     expect(row(rows, 'ta').goalDifference).toBeGreaterThan(row(rows, 'tb').goalDifference);
-    expect(rows.map((item) => item.teamId)).toEqual(['tc', 'tb', 'ta']);
+    expect(rows.map((item) => item.teamId)).toEqual(['tc', 'ta', 'tb']);
   });
 });

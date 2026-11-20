@@ -39,7 +39,7 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 
 - [x] Implementar `deriveScore` e `resolveMatchTeams`.
 - [x] Implementar `buildStandings` e `rankTeams` com grupos de desempate.
-- [x] Implementar confronto direto de dois jogos: pontos agregados, saldo agregado, ambos `finished` e W.O. 1x0.
+- [x] Implementar confronto direto de dois jogos: pontos agregados, saldo agregado, ambos `finished` e W.O. 3x0.
 - [x] Implementar pontos disciplinares e segundo amarelo (3 pontos).
 - [x] Implementar `buildSuspensions` e bloqueio de eventos de suspensa.
 - [x] Implementar `buildPlayerStats` (gols, assistências, gols contra, cartões).

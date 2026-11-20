@@ -76,7 +76,7 @@ test.describe('páginas da competição', () => {
   }) => {
     await page.goto('jogos/g3/');
 
-    await expect(page.locator('.score span[aria-hidden="true"]')).toHaveText('0 x 1 (W.O.)');
+    await expect(page.locator('.score span[aria-hidden="true"]')).toHaveText('0 x 3 (W.O.)');
     await expect(
       page.getByRole('heading', { level: 2, name: 'Vitória por W.O. — Não compareceu' }),
     ).toBeVisible();

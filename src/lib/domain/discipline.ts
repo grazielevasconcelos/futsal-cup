@@ -34,7 +34,7 @@ export function cardSummary(events: readonly Event[], playerId: PlayerId): CardS
   if (yellow >= 2) {
     points = 3;
   } else if (directRed >= 1) {
-    points = 2 + yellow;
+    points = 3 + yellow;
   } else {
     points = yellow;
   }

@@ -141,7 +141,7 @@ describe('deriveScore', () => {
     });
   });
 
-  it('aplica W.O. 1x0 na ordem mandante/visitante e ignora gols', () => {
+  it('aplica W.O. 3x0 na ordem mandante/visitante e ignora gols', () => {
     const homeWinner = makeGroupMatch({
       id: 'g1',
       home: 'ta',
@@ -157,13 +157,13 @@ describe('deriveScore', () => {
     });
 
     expect(deriveScore(homeWinner, null, playerTeams(cupWith(homeWinner)))).toEqual({
-      home: 1,
+      home: 3,
       away: 0,
       kind: 'walkover',
     });
     expect(deriveScore(awayWinner, null, playerTeams(cupWith(awayWinner)))).toEqual({
       home: 0,
-      away: 1,
+      away: 3,
       kind: 'walkover',
     });
   });

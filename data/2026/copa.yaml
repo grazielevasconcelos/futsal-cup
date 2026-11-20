@@ -104,6 +104,11 @@ teams:
         position: "linha"
         joinedAt: "2026-11-17T00:00:00-03:00"
         leftAt: null
+      - id: "p-025"
+        nickname: "Elisa"
+        position: "linha"
+        joinedAt: "2026-11-20T00:00:00-03:00"
+        leftAt: null
 
   - id: "tc"
     name: "Time C" # provisório até a organização confirmar o nome público

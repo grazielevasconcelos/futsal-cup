@@ -67,7 +67,7 @@ function bracketMatches(input: BracketInput = {}): readonly Match[] {
 }
 
 describe('cartões e pontos disciplinares', () => {
-  it('TST-017: um amarelo vale 1 ponto e um vermelho direto vale 2', () => {
+  it('TST-017: um amarelo vale 1 ponto e um vermelho direto vale 3', () => {
     expect(cardSummary([yellow('p-ta1')], 'p-ta1')).toEqual({
       yellow: 1,
       red: 0,
@@ -78,16 +78,16 @@ describe('cartões e pontos disciplinares', () => {
       yellow: 0,
       red: 1,
       redDerived: 0,
-      points: 2,
+      points: 3,
     });
   });
 
-  it('TST-018: amarelo e vermelho direto no mesmo jogo valem 3 pontos', () => {
+  it('TST-018: amarelo e vermelho direto no mesmo jogo valem 4 pontos', () => {
     expect(cardSummary([yellow('p-ta1'), red('p-ta1')], 'p-ta1')).toEqual({
       yellow: 1,
       red: 1,
       redDerived: 0,
-      points: 3,
+      points: 4,
     });
   });
 

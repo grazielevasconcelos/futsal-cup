@@ -154,9 +154,9 @@ describe('estatísticas coletivas', () => {
       wins: 2,
       draws: 2,
       losses: 1,
-      goalsFor: 6,
+      goalsFor: 8,
       goalsAgainst: 4,
-      goalDifference: 2,
+      goalDifference: 4,
     });
     expect(teamStat(teamStats, 'tb')).toMatchObject({
       played: 6,
@@ -164,8 +164,8 @@ describe('estatísticas coletivas', () => {
       draws: 3,
       losses: 2,
       goalsFor: 5,
-      goalsAgainst: 6,
-      goalDifference: -1,
+      goalsAgainst: 8,
+      goalDifference: -3,
     });
   });
 
@@ -183,14 +183,14 @@ describe('estatísticas coletivas', () => {
     expect(teamStat(teamStats, 'tb')).toMatchObject({
       yellow: 3,
       red: 1,
-      disciplinaryPoints: 5,
+      disciplinaryPoints: 6,
     });
   });
 
   it('ordena os cartões por time', () => {
     expect(rankTeamCards(teamStats, teams).map((item) => item.teamId)).toEqual([
-      'tc',
       'tb',
+      'tc',
       'ta',
     ]);
   });

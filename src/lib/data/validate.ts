@@ -239,7 +239,7 @@ export function validateSemantics(
     });
   }
 
-  /* VAL-009 — máximo de 8 ativas simultaneamente */
+  /* VAL-009 — máximo de 9 ativas simultaneamente */
   const instantFormatter = (value: string): string => value;
   for (const [teamIndex, team] of competition.teams.entries()) {
     const events = team.players.flatMap((player) => {
@@ -254,14 +254,14 @@ export function validateSemantics(
     let active = 0;
     for (const event of events) {
       active += event.delta;
-      if (active > 8) {
+      if (active > 9) {
         errors.push(
           issue(
             'VAL-009',
             ['teams', teamIndex],
-            'No máximo 8 jogadoras ativas simultaneamente.',
+            'No máximo 9 jogadoras ativas simultaneamente.',
             `${active} ativas em ${instantFormatter(event.label)}`,
-            `O elenco de ${team.id} tem ${active} jogadoras ativas em ${instantFormatter(event.label)}; o máximo é 8. Registre a saída de uma jogadora com \`leftAt\`.`,
+            `O elenco de ${team.id} tem ${active} jogadoras ativas em ${instantFormatter(event.label)}; o máximo é 9. Registre a saída de uma jogadora com \`leftAt\`.`,
           ),
         );
         break;
@@ -1065,9 +1065,9 @@ export function validateSemantics(
       warning(
         'VAL-W01',
         ['teams', competition.teams.findIndex((item) => item.id === team.id)],
-        '7 ou 8 jogadoras ativas.',
+        '7 a 9 jogadoras ativas.',
         `${active} ativas`,
-        `Time ${team.name} tem ${active} jogadoras ativas; o alvo é 7 ou 8. A publicação não é bloqueada.`,
+        `Time ${team.name} tem ${active} jogadoras ativas; o mínimo é 7. A publicação não é bloqueada.`,
       ),
     );
   }

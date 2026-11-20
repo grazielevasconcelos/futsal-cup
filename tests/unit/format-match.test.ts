@@ -106,10 +106,10 @@ describe('formatScore', () => {
       events: [],
     });
 
-    expect(formatScore(match, null, playerTeams(cupWith(match)))).toBe('0 x 1 (W.O.)');
+    expect(formatScore(match, null, playerTeams(cupWith(match)))).toBe('0 x 3 (W.O.)');
   });
 
-  it('mostra o W.O. com o vencedor mandante em 1 x 0', () => {
+  it('mostra o W.O. com o vencedor mandante em 3 x 0', () => {
     const match = makeGroupMatch({
       id: 'g1',
       home: 'ta',
@@ -118,7 +118,7 @@ describe('formatScore', () => {
       events: [],
     });
 
-    expect(formatScore(match, null, playerTeams(cupWith(match)))).toBe('1 x 0 (W.O.)');
+    expect(formatScore(match, null, playerTeams(cupWith(match)))).toBe('3 x 0 (W.O.)');
   });
 
   it('mostra o W.O. da final na ordem mandante/visitante', () => {
@@ -127,7 +127,7 @@ describe('formatScore', () => {
       events: [],
     });
 
-    expect(formatScore(match, snapshots, playerTeams(cupWith(match)))).toBe('0 x 1 (W.O.)');
+    expect(formatScore(match, snapshots, playerTeams(cupWith(match)))).toBe('0 x 3 (W.O.)');
   });
 
   it('resolve a semifinal pela ordem dos semifinalistas', () => {
@@ -184,7 +184,7 @@ describe('formatScore', () => {
     const walkover = competition.matches.find((match) => match.id === 'g3') as Match;
     const final = competition.matches.find((match) => match.id === 'final') as Match;
 
-    expect(formatScore(walkover, null, teams)).toBe('0 x 1 (W.O.)');
+    expect(formatScore(walkover, null, teams)).toBe('0 x 3 (W.O.)');
     expect(formatScore(final, snapshotsOf(competition), teams)).toBe('1 x 1');
   });
 });
@@ -213,7 +213,7 @@ describe('formatScoreAccessible', () => {
     });
 
     expect(formatScoreAccessible(match, null, 'Time TB', 'Time TC', playerTeams(cupWith(match)))).toBe(
-      'Time TB 0 a 1 Time TC por W.O. — Menos de 3 jogadoras em quadra.',
+      'Time TB 0 a 3 Time TC por W.O. — Menos de 3 jogadoras em quadra.',
     );
   });
 
@@ -332,7 +332,7 @@ describe('formatScoreAccessible', () => {
 
     expect(
       formatScoreAccessible(match, snapshots, 'Time TC', 'Time TA', playerTeams(cupWith(match))),
-    ).toBe('Time TC 0 a 1 Time TA por W.O. — Não compareceu.');
+    ).toBe('Time TC 0 a 3 Time TA por W.O. — Não compareceu.');
   });
 
   it('descreve o empate da final da fonte real', () => {

@@ -132,7 +132,7 @@ Quando a partida não acontece e é decidida administrativamente:
 ```
 
 - Motivos válidos: `no_show`, `insufficient_players`, `withdrawal`.
-- Placar fixo 1x0 para a vencedora; **não** lance gols nem assistências.
+- Placar fixo 3x0 para a vencedora; **não** lance gols nem assistências.
 - `no_show` não tem nenhum evento. Em `insufficient_players` e `withdrawal`,
   cartões são permitidos.
 

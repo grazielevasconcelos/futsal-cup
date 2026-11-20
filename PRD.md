@@ -104,7 +104,7 @@ No MVP não existem contas, login, níveis de permissão ou área administrativa
 ### 6.1 No escopo
 
 - **3 times:** TA, TB e TC, com nomes editáveis.
-- Elencos de 7 ou 8 jogadoras ativas.
+- Elencos de 7 a 9 jogadoras ativas.
 - Cadastro de jogadoras com apelido obrigatório, posição opcional e time.
 - Calendário com **6 jogos classificatórios em turno e returno + 1 semifinal + 1 final**.
 - Registro de resultados, gols, assistências e cartões.
@@ -164,19 +164,19 @@ No MVP não existem contas, login, níveis de permissão ou área administrativa
 
 ### 7.2 Elenco
 
-- Cada time tem **7 ou 8 jogadoras ativas**, sem contar comissão técnica.
+- Cada time tem **7 a 9 jogadoras ativas**, sem contar comissão técnica.
 - Campos da jogadora: **apelido** (obrigatório), **posição** (opcional: goleira ou linha) e **time** (obrigatório).
 - O apelido é a identidade pública da jogadora. Deve ser **único dentro do time** e pode se repetir entre times diferentes.
 - A mesma jogadora não pode estar em dois times.
 - O elenco é **flexível**: novas alunas podem ser incluídas a qualquer momento, inclusive após o início da copa, desde que:
-  - o time tenha vaga (no máximo **8 jogadoras ativas simultaneamente**);
+  - o time tenha vaga (no máximo **9 jogadoras ativas simultaneamente**);
   - a jogadora não esteja em outro time;
   - a inclusão seja feita antes da partida em que ela vai atuar.
 - A nova jogadora fica elegível a partir da próxima partida do time. Não há registro retroativo de eventos.
-- A saída do elenco ativo é registrada com `leftAt`; ela **preserva o histórico** de gols, assistências e cartões e **libera a vaga** para outra jogadora. O limite de 8 é de jogadoras ativas simultâneas, não de IDs já cadastrados.
-- Se o time já estiver com 8 jogadoras ativas, a organização decide como acomodar a nova aluna; o site bloqueia a 9ª ativa.
+- A saída do elenco ativo é registrada com `leftAt`; ela **preserva o histórico** de gols, assistências e cartões e **libera a vaga** para outra jogadora. O limite de 9 é de jogadoras ativas simultâneas, não de IDs já cadastrados.
+- Se o time já estiver com 9 jogadoras ativas, a organização decide como acomodar uma nova aluna; o site bloqueia a 10ª ativa.
 - Uma jogadora que já participou de uma partida **não pode trocar de time** nesta edição.
-- O sistema bloqueia a 9ª jogadora ativa e sinaliza elenco incompleto quando houver menos de 7. Times incompletos não impedem a publicação do site, mas ficam visivelmente sinalizados para a organização.
+- O sistema bloqueia a 10ª jogadora ativa e sinaliza elenco incompleto quando houver menos de 7. Times incompletos não impedem a publicação do site, mas ficam visivelmente sinalizados para a organização.
 - O badge público **“Elenco em formação”** aparece somente quando o time tem **menos de 5 atletas ativas**. Entre 5 e 6, a pendência fica apenas no aviso de build; não há badge público.
 - O mínimo de **3 jogadoras em quadra** é regra de jogo, não regra de elenco. O site não detecta quantas jogadoras estão em quadra; o W.O. é registrado manualmente.
 
@@ -204,7 +204,7 @@ A classificação da fase classificatória segue a ordem abaixo:
    - Se a soma de pontos for igual, considera o **saldo de gols agregado** dos dois jogos.
    - Se o saldo agregado também for igual, segue para o próximo critério.
    - O confronto direto só é aplicado se **os dois jogos estiverem `finished`**. Se um deles não estiver encerrado, o critério é ignorado e seguem os próximos.
-   - W.O. conta como **1x0** para o vencedor no confronto direto.
+   - W.O. conta como **3x0** para o vencedor no confronto direto.
    - Quando um grupo de 3 ou mais times empatados é reduzido a exatamente dois por um critério anterior, o confronto direto volta a ser aplicado a esses dois.
 2. **Número de vitórias.**
 3. **Saldo de gols** (gols pró menos gols contra).
@@ -212,8 +212,8 @@ A classificação da fase classificatória segue a ordem abaixo:
 5. **Menos gols contra.**
 6. **Pontos disciplinares**, com menor pontuação tendo vantagem:
    - cartão amarelo = 1 ponto;
-   - cartão vermelho = 2 pontos;
-   - **segundo amarelo no mesmo jogo** é convertido em vermelho: o time soma 1 ponto pelo primeiro amarelo + 2 pontos pelo vermelho = **3 pontos**. O segundo amarelo não soma outro ponto de amarelo. O registro da jogadora mostra “2º amarelo → vermelho”.
+   - cartão vermelho = 3 pontos;
+   - **segundo amarelo no mesmo jogo** é convertido em vermelho e vale **3 pontos disciplinares no total**. O segundo amarelo não soma outro ponto de amarelo. O registro da jogadora mostra “2º amarelo → vermelho”.
 7. **Sorteio**, realizado pela organização, com a ordem final registrada manualmente na fonte de dados em `drawOrder`.
 
 Observações:
@@ -283,7 +283,7 @@ Observações:
 - Horários exatos: **a definir**.
 - Local: Vila Mariana, São Paulo. O nome da instituição não deve aparecer na interface pública.
 - Se uma partida for adiada, a organização atualiza `status` para `postponed`, ajusta `date`/`startsAt` e, quando remarcar, volta para `scheduled`.
-- **W.O.:** é registrado manualmente, com placar fixo **1x0** para o vencedor. Motivos: `no_show`, `insufficient_players` ou `withdrawal`. Não há gols ou assistências fictícios. Cartões são permitidos em `insufficient_players`/`withdrawal`; `no_show` não tem eventos. O site não detecta ausência nem automatiza retirada de time; a organização registra um W.O. por partida restante. W.O. é permitido na semifinal e na final.
+- **W.O.:** é registrado manualmente, com placar fixo **3x0** para o vencedor. Motivos: `no_show`, `insufficient_players` ou `withdrawal`. Não há gols ou assistências fictícios. Cartões são permitidos em `insufficient_players`/`withdrawal`; `no_show` não tem eventos. O site não detecta ausência nem automatiza retirada de time; a organização registra um W.O. por partida restante. W.O. é permitido na semifinal e na final.
 - Não há partida de 3º lugar nem amistoso.
 
 ### 7.9 Correções, sorteio e avisos
@@ -315,7 +315,7 @@ Observações:
 | FR-12 | Publicação no GitHub Pages | Obrigatório | Site público, sem login, atualizado após a publicação da fonte de dados |
 | FR-13 | Suspensões | Obrigatório | Exibir jogadoras suspensas e a partida que perdem; bloquear eventos indevidos; considerar o caminho do time no chaveamento |
 | FR-14 | Correções e avisos | Obrigatório | Correções recalculam classificação, estatísticas e chaveamento; alertar se semifinalistas ou finalistas mudarem após a respectiva partida; `notices` gera banner |
-| FR-15 | Flexibilidade de elenco | Obrigatório | Permitir inclusão de novas alunas dentro do limite de 8 ativas, com elegibilidade a partir da próxima partida |
+| FR-15 | Flexibilidade de elenco | Obrigatório | Permitir inclusão de novas alunas dentro do limite de 9 ativas, com elegibilidade a partir da próxima partida |
 | FR-16 | Edição 2026 | Obrigatório | Exibir apenas 2026, com estrutura preparada para edições futuras |
 | FR-17 | Privacidade | Obrigatório | Exibir apenas apelido, posição, time e estatísticas; sem nome completo, foto, contato, camisa ou data de nascimento |
 | FR-18 | Nome de exibição | Obrigatório | Usar “Copa de Futsal Feminino Vila Mariana 2026”; não exibir o nome da instituição na interface |
@@ -326,7 +326,7 @@ Observações:
 
 - Exatamente **3 times** na edição 2026, com IDs `ta`, `tb` e `tc`.
 - Exatamente **8 partidas oficiais**: `g1`…`g6`, `semi` e `final`.
-- Cada time com no máximo **8 jogadoras ativas simultaneamente**; menos de 7 gera aviso.
+- Cada time com no máximo **9 jogadoras ativas simultaneamente**; menos de 7 gera aviso.
 - Apelido único dentro do time após normalização.
 - Jogadora não pode estar em dois times.
 - Evento de gol, assistência ou cartão deve referenciar jogadora do elenco do time na partida e elegível no início dela.
@@ -502,7 +502,7 @@ Observações:
    - Se a soma de pontos for igual, o saldo agregado dos dois jogos decide.
    - Se o saldo agregado for igual, aplica-se o próximo critério.
    - Se um dos dois jogos não estiver `finished`, o confronto direto é ignorado.
-   - W.O. conta como 1x0 no confronto direto.
+   - W.O. conta como 3x0 no confronto direto.
 
 4. **Desempate entre três ou mais times**
    - O confronto direto não é aplicado.
@@ -510,8 +510,8 @@ Observações:
    - Se um critério reduzir o grupo a dois times, o confronto direto volta a valer para esses dois, considerando os dois jogos.
 
 5. **Cartões**
-   - Amarelo = 1 ponto; vermelho = 2 pontos.
-   - Segundo amarelo no mesmo jogo = 1 amarelo + 1 vermelho = 3 pontos para o time.
+   - Amarelo = 1 ponto; vermelho = 3 pontos.
+    - Segundo amarelo no mesmo jogo = 3 pontos disciplinares no total para o time.
    - Vermelho suspende a jogadora da próxima partida real do time, considerando o chaveamento e a ausência de semifinal para o 1º colocado.
    - Um vermelho na semifinal suspende a final apenas se o time se classificar; um vermelho na final não tem efeito.
    - Não há suspensão por acúmulo de amarelos.
@@ -553,7 +553,7 @@ Observações:
     - `notices` gera banner global.
 
 11. **Elenco flexível**
-    - Nova jogadora pode ser incluída se o time tiver menos de 8 ativas.
+    - Nova jogadora pode ser incluída se o time tiver menos de 9 ativas.
     - Ela fica elegível a partir da próxima partida.
     - Não há eventos retroativos.
     - Jogadora que já atuou não pode trocar de time.
@@ -609,7 +609,7 @@ Observações:
 | Semifinalistas ou finalistas errados | Alto | Snapshots `semifinalists`/`finalists` validados; build falha com antigos/novos; `notices` para o público |
 | Correção após a semifinal ou a final | Alto | Bloqueio do build com antigos/novos; reconciliação explícita e `notice` |
 | W.O. mal registrado | Médio | Schema de `walkover`; validação de motivo/eventos; UI explícita; W.O. prevalece sobre a vantagem |
-| Elenco flexível gerar inconsistência | Médio | `joinedAt`/`leftAt`, limite de 8 ativas, apelido único, vínculo imutável |
+| Elenco flexível gerar inconsistência | Médio | `joinedAt`/`leftAt`, limite de 9 ativas, apelido único, vínculo imutável |
 | Suspensão aplicada à partida errada | Médio | Ordem canônica, caminho do time no chaveamento, validação de cronologia e testes |
 | Sorteio refeito sem atualizar `drawOrder` | Médio | `drawOrder` é registro vigente; validação e `notice` |
 | Cache do GitHub Pages | Baixo | Verificar após o deploy e orientar recarregar a página |
@@ -643,12 +643,12 @@ Observações:
 - W.O. é permitido na semifinal e na final e prevalece sobre a vantagem do empate.
 - `semifinalists` e `finalists` são snapshots validados; a ordem define mando e vantagem.
 - Correção após a semifinal que mude semifinalistas bloqueia o build; correção após a final que mude finalistas bloqueia até atualização do snapshot.
-- Confronto direto apenas para dois times, considerando os dois jogos; se os pontos empatarem, o saldo agregado decide; só vale com os dois jogos `finished`; W.O. conta 1x0.
+- Confronto direto apenas para dois times, considerando os dois jogos; se os pontos empatarem, o saldo agregado decide; só vale com os dois jogos `finished`; W.O. conta 3x0.
 - `drawOrder` é obrigatório apenas quando o sorteio é necessário e pode ser atualizado se o sorteio for refeito.
 - Placar derivado dos gols.
 - Segundo amarelo = 3 pontos para o time (1 amarelo + 1 vermelho).
 - Suspensão é cumprida na próxima partida real do time, considerando o chaveamento.
-- Elenco flexível, com limite de 8 ativas simultâneas e mínimo de 7 sinalizado; badge público com menos de 5.
+- Elenco flexível, com limite de 9 ativas simultâneas e mínimo de 7 sinalizado; badge público com menos de 5.
 - Jogadora que já atuou não troca de time nesta edição.
 - Estatísticas do time somam grupo + semifinal + final; V/E/D pelo tempo normal; empate na semifinal ou final conta como empate.
 - Sem nome completo, número de camisa, foto, contato ou data de nascimento.
@@ -665,7 +665,7 @@ Estas questões não bloqueiam o MVP e podem ser resolvidas pela organização d
 - Horários exatos das partidas, incluindo os dois jogos do mesmo time em 24/11, 26/11 e 01/12 e os horários da semifinal e da final.
 - Nomes definitivos dos times.
 - Local/quadra exata a exibir publicamente.
-- Como acomodar novas alunas se todos os times estiverem com 8 ativas.
+- Como acomodar novas alunas se todos os times estiverem com 9 ativas.
 - Critério de assistência em casos duvidosos.
 - Data de habilitação do GitHub Pages.
 - Necessidade de modo escuro, impressão/PDF ou analytics no futuro.
@@ -685,9 +685,9 @@ Estas questões não bloqueiam o MVP e podem ser resolvidas pela organização d
 - **Gols pró:** gols marcados.
 - **Gols contra:** gols marcados contra o próprio time; contam para o adversário e não entram na artilharia da marcadora.
 - **Gols sofridos:** gols marcados pelo adversário no gol do time.
-- **Pontos disciplinares:** amarelo = 1; vermelho = 2; segundo amarelo = 3 para o time.
+- **Pontos disciplinares:** amarelo = 1; vermelho = 3; segundo amarelo = 3 para o time.
 - **Tempo técnico:** pausa de 1 minuto por time por tempo.
-- **W.O.:** vitória administrativa por 1x0; registrada manualmente, sem gols ou assistências fictícios.
+- **W.O.:** vitória administrativa por 3x0; registrada manualmente, sem gols ou assistências fictícios.
 - **Fonte de dados:** arquivo versionado que contém todas as informações da copa.
 - **`semifinalists`:** snapshot dos dois semifinalistas, no formato `[2º, 3º]`, validado contra a classificação.
 - **`finalists`:** snapshot dos dois finalistas, no formato `[1º, vencedora da semifinal]`, validado contra a classificação e o resultado da semifinal.

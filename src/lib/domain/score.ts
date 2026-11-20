@@ -60,8 +60,8 @@ export function deriveScore(
 
   if (match.walkover !== null) {
     return match.walkover.winnerTeamId === homeTeamId
-      ? { home: 1, away: 0, kind: 'walkover' }
-      : { home: 0, away: 1, kind: 'walkover' };
+      ? { home: 3, away: 0, kind: 'walkover' }
+      : { home: 0, away: 3, kind: 'walkover' };
   }
 
   let home = 0;

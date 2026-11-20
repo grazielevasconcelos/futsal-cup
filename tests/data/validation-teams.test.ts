@@ -49,12 +49,19 @@ describe('validação semântica de times e elencos', () => {
     expect(codes(validateCompetition(data))).toContain('VAL-008');
   });
 
-  it('VAL-009: bloqueia a 9ª jogadora ativa simultânea', () => {
+  it('VAL-009: bloqueia a 10ª jogadora ativa simultânea', () => {
     const data = validData();
     const ta = team(data, 'ta');
     ta.players.push({
       id: 'p-099',
       nickname: 'Extra',
+      position: 'linha',
+      joinedAt: '2026-11-10T00:00:00-03:00',
+      leftAt: null,
+    });
+    ta.players.push({
+      id: 'p-100',
+      nickname: 'Extra 2',
       position: 'linha',
       joinedAt: '2026-11-10T00:00:00-03:00',
       leftAt: null,
@@ -76,7 +83,7 @@ describe('validação semântica de times e elencos', () => {
     expect(errorCodes).toContain('VAL-019');
   });
 
-  it('TST-039: aceita elenco com 7 e com 8 jogadoras ativas', () => {
+  it('TST-039: aceita elenco com 7, 8 e 9 jogadoras ativas', () => {
     const seven = validData();
     const sevenResult = validateCompetition(seven);
     expect(sevenResult.errors).toEqual([]);
@@ -87,6 +94,18 @@ describe('validação semântica de times e elencos', () => {
     const eightResult = validateCompetition(eight);
     expect(eightResult.errors).toEqual([]);
     expect(activePlayers(team(eight, 'ta') as any)).toHaveLength(8);
+
+    const nine = validData();
+    player(nine, 'p-007').leftAt = null;
+    addPlayer(nine, 'ta', {
+      id: 'p-099',
+      nickname: 'Nove',
+      position: 'linha',
+      joinedAt: '2026-11-10T00:00:00-03:00',
+      leftAt: null,
+    });
+    expect(validateCompetition(nine).errors).toEqual([]);
+    expect(activePlayers(team(nine, 'ta') as any)).toHaveLength(9);
   });
 
   it('TST-043: aceita apelidos diferentes que só variam pelo acento', () => {
@@ -123,11 +142,18 @@ describe('validação semântica de times e elencos', () => {
     expect(codes(validateCompetition(data))).toContain('VAL-020');
   });
 
-  it('TST-048: bloqueia sobreposição de 9 ativas antes da saída', () => {
+  it('TST-048: bloqueia sobreposição de 10 ativas antes da saída', () => {
     const data = validData();
     addPlayer(data, 'ta', {
       id: 'p-023',
       nickname: 'Zoe',
+      position: 'linha',
+      joinedAt: '2026-11-20T00:00:00-03:00',
+      leftAt: null,
+    });
+    addPlayer(data, 'ta', {
+      id: 'p-024',
+      nickname: 'Zara',
       position: 'linha',
       joinedAt: '2026-11-20T00:00:00-03:00',
       leftAt: null,

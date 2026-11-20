@@ -126,25 +126,25 @@ Os arquivos `airbnb-design-design.md` e `airbnb-design-tokens.css` são uma refe
    - Se a soma empatar, **saldo agregado** dos dois jogos.
    - Se o saldo agregado empatar, passa ao próximo critério.
    - Só vale se os **dois jogos** estiverem `finished`; se um não estiver, o confronto direto é ignorado.
-   - W.O. conta como 1x0.
+   - W.O. conta como 3x0.
 2. Número de vitórias.
 3. Saldo de gols (gols pró − gols contra).
 4. Gols pró.
 5. Menos gols contra.
-6. Pontos disciplinares (menor é melhor): amarelo = 1; vermelho = 2; **segundo amarelo no mesmo jogo = 1 + 2 = 3 pontos**, sem somar outro amarelo.
+6. Pontos disciplinares (menor é melhor): amarelo = 1; vermelho = 3; **segundo amarelo no mesmo jogo = 3 pontos no total**, sem somar outro amarelo.
 7. Sorteio, com a ordem final registrada manualmente na fonte de dados em `drawOrder`.
 
 Com 3 ou mais times empatados, o confronto direto **não** é aplicado até que o grupo se reduza a dois. A classificação considera apenas as 6 partidas de grupo; a semifinal e a final não alteram posições.
 
 ### Elenco
 
-- Cada time tem 7 ou 8 jogadoras **ativas**; a 9ª ativa é bloqueada e menos de 7 gera aviso visível (sem impedir a publicação).
-- `leftAt` remove a jogadora do elenco ativo, preserva o histórico e libera a vaga; o limite é de 8 ativas simultâneas.
+- Cada time tem 7 a 9 jogadoras **ativas**; a 10ª ativa é bloqueada e menos de 7 gera aviso visível (sem impedir a publicação).
+- `leftAt` remove a jogadora do elenco ativo, preserva o histórico e libera a vaga; o limite é de 9 ativas simultâneas.
 - Badge público “Elenco em formação” somente com menos de 5 ativas; entre 5 e 6, apenas aviso de build.
 - Apelido obrigatório e único dentro do time; pode repetir entre times.
 - Posição opcional (goleira ou linha); time obrigatório.
 - A mesma jogadora não pode estar em dois times.
-- Inclusão de novas jogadoras é permitida até 8 ativas, antes da partida em que ela atuará; elegibilidade a partir da próxima partida, sem eventos retroativos.
+- Inclusão de novas jogadoras é permitida até 9 ativas, antes da partida em que ela atuará; elegibilidade a partir da próxima partida, sem eventos retroativos.
 - Jogadora que já atuou não pode trocar de time nesta edição.
 - Remover jogadora do elenco ativo não apaga seu histórico.
 - O mínimo de 3 em quadra é regra de jogo, não de elenco; o site não detecta jogadoras em quadra.
@@ -202,7 +202,7 @@ Com 3 ou mais times empatados, o confronto direto **não** é aplicado até que 
 
 ### W.O. e retirada de time
 
-- W.O. é manual, com placar fixo **1x0** para o vencedor.
+- W.O. é manual, com placar fixo **3x0** para o vencedor.
 - Motivos: `no_show`, `insufficient_players` ou `withdrawal`.
 - Sem gols ou assistências fictícios.
 - Cartões são permitidos em `insufficient_players`/`withdrawal`; `no_show` não tem eventos.
@@ -217,7 +217,7 @@ A publicação deve ser bloqueada com mensagem clara quando houver:
 - quantidade de times diferente de 3 na edição 2026;
 - conjunto de partidas diferente de `g1`…`g6` + `semi` + `final`;
 - confrontos de grupo diferentes dos seis do turno e returno, time repetido, time contra si mesmo ou par sem os dois jogos;
-- time com mais de 8 jogadoras ativas simultaneamente ou apelido repetido dentro do time;
+- time com mais de 9 jogadoras ativas simultaneamente ou apelido repetido dentro do time;
 - jogadora em dois times;
 - evento referenciando jogadora fora do elenco do time na partida ou inelegível;
 - assistência de jogadora de outro time, igual à marcadora, em pênalti ou em gol contra;

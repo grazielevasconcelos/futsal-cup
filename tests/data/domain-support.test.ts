@@ -23,7 +23,7 @@ describe('apoio de domínio usado pela validação', () => {
 
     expect(deriveScore(g3, null, buildPlayerTeamMap(competition))).toEqual({
       home: 0,
-      away: 1,
+      away: 3,
       kind: 'walkover',
     });
   });
