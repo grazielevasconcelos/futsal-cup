@@ -25,14 +25,16 @@ for (const match of matches) {
 
 <BaseLayout
   title="Jogos"
-  description="Calendário completo das sete partidas oficiais da Copa de Futsal Feminino Vila Mariana 2026, com datas, horários e resultados."
+  description="Calendário completo das oito partidas oficiais da Copa de Futsal Feminino Vila Mariana 2026, com datas, horários e resultados."
   activeNav="jogos"
   notices={competition.notices}
 >
   <div class="page">
     <div class="page-header">
       <h1>Jogos</h1>
-      <p class="lead">As sete partidas oficiais: seis da fase classificatória e a final.</p>
+      <p class="lead">
+        As oito partidas oficiais: seis da fase classificatória, a semifinal e a final.
+      </p>
     </div>
 
     {
@@ -51,8 +53,8 @@ for (const match of matches) {
     }
 
     <p class="meta">
-      O amistoso do 3º colocado é informativo e aparece apenas na página da
-      <a href={withBase('/fase-final/')}>Fase final</a>.
+      A semifinal e a final aparecem com os participantes definidos pela classificação.
+      <a href={withBase('/fase-final/')}> Ver a fase final</a>.
     </p>
   </div>
 </BaseLayout>

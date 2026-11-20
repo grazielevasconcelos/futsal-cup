@@ -6,7 +6,7 @@ import MatchCard from '../components/MatchCard.astro';
 import PodiumList from '../components/PodiumList.astro';
 import StandingsTable from '../components/StandingsTable.astro';
 import { loadCompetition } from '../lib/data/load';
-import { buildPodium } from '../lib/domain/finalists';
+import { buildPodium } from '../lib/domain/playoffs';
 import {
   getHomeState,
   getLastResults,
@@ -49,14 +49,22 @@ const nextRound = state === 'duringGroup' ? getNextRoundMatches(competition, now
 const pending = state === 'duringGroup' ? getPendingMatches(competition, now) : [];
 const postponed = competition.matches.filter((match) => match.status === 'postponed');
 const lastResults =
-  state === 'duringGroup' || state === 'groupComplete' ? getLastResults(competition) : [];
+  state === 'duringGroup' || state === 'groupComplete' || state === 'semiComplete'
+    ? getLastResults(competition)
+    : [];
 
 const finalMatch = competition.matches.find((match) => match.id === 'final');
-const podium = state === 'afterFinal' ? buildPodium(competition) : null;
+const semiMatch = competition.matches.find((match) => match.id === 'semi');
+const podium =
+  state === 'afterFinal' || state === 'semiComplete' ? buildPodium(competition) : null;
 const championName =
   podium === null || podium.champion === null
     ? null
     : teams.get(podium.champion)?.name ?? null;
+const thirdName =
+  podium === null || podium.third === null
+    ? null
+    : teams.get(podium.third)?.name ?? null;
 
 const scorers = rankTopScorers(playerStats, teams);
 const assists = rankAssists(playerStats, teams);
@@ -276,6 +284,24 @@ const standingsCaption =
     {
       state === 'groupComplete' && (
         <>
+          <section class="section" aria-labelledby="semifinal">
+            <h2 id="semifinal">Semifinal</h2>
+            {semiMatch === undefined ? (
+              <p class="empty-state">A semifinal ainda não está cadastrada na fonte oficial.</p>
+            ) : (
+              <MatchCard
+                match={semiMatch}
+                competition={competition}
+                now={now}
+                showStage={false}
+              />
+            )}
+            <p class="meta">
+              O 2º colocado tem mando de campo e vantagem do empate: se a semifinal terminar
+              empatada no tempo normal, o 2º avança.
+            </p>
+          </section>
+
           <section class="section" aria-labelledby="final">
             <h2 id="final">Final</h2>
             {finalMatch === undefined ? (
@@ -288,6 +314,10 @@ const standingsCaption =
                 showStage={false}
               />
             )}
+            <p class="meta">
+              O 1º colocado tem mando de campo e vantagem do empate: se a final terminar empatada
+              no tempo normal, o título é do 1º.
+            </p>
             <p class="meta">
               <a href={withBase('/fase-final/')}>Ver a fase final</a>
             </p>
@@ -316,9 +346,58 @@ const standingsCaption =
               labelledBy="classificacao-final"
             />
             <p class="meta">
-              A 3ª colocada da classificação está definida. A final não altera esta tabela.
+              A classificação define os semifinalistas; a semifinal e a final não alteram esta
+              tabela.
             </p>
           </section>
+        </>
+      )
+    }
+
+    {
+      state === 'semiComplete' && (
+        <>
+          {thirdName !== null && (
+            <section class="section" aria-labelledby="terceira-colocada">
+              <h2 id="terceira-colocada">3ª colocada</h2>
+              <p class="home-champion">3ª colocada: {thirdName}</p>
+              <p class="meta">A 3ª colocada é a perdedora da semifinal.</p>
+            </section>
+          )}
+
+          <section class="section" aria-labelledby="final">
+            <h2 id="final">Final</h2>
+            {finalMatch === undefined ? (
+              <p class="empty-state">A final ainda não está cadastrada na fonte oficial.</p>
+            ) : (
+              <MatchCard
+                match={finalMatch}
+                competition={competition}
+                now={now}
+                showStage={false}
+              />
+            )}
+            <p class="meta">
+              O 1º colocado tem mando de campo e vantagem do empate: se a final terminar empatada
+              no tempo normal, o título é do 1º.
+            </p>
+            <p class="meta">
+              <a href={withBase('/fase-final/')}>Ver a fase final</a>
+            </p>
+          </section>
+
+          {lastResults.length > 0 && (
+            <section class="section" aria-labelledby="ultimos-resultados">
+              <h2 id="ultimos-resultados">Últimos resultados</h2>
+              <ul class="card-grid">
+                {lastResults.map((match) => (
+                  <li>
+                    <MatchCard match={match} competition={competition} now={now} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
         </>
       )
     }

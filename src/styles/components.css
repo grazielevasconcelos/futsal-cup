@@ -254,17 +254,6 @@ th .badge {
   font-weight: var(--font-weight-regular);
 }
 
-.friendly-card {
-  border-left: var(--space-1) solid var(--color-accent);
-}
-
-.friendly-card__title {
-  margin: 0 0 var(--space-1);
-  font-size: var(--text-heading-2-size);
-  line-height: var(--text-heading-2-line);
-  font-weight: var(--font-weight-bold);
-}
-
 .stat-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

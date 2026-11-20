@@ -11,7 +11,7 @@ const { podium, teams } = Astro.props;
 const places = [
   { label: 'Campeã', teamId: podium.champion },
   { label: 'Vice-campeã', teamId: podium.runnerUp },
-  { label: '3º lugar', teamId: podium.third },
+  { label: '3ª colocada', teamId: podium.third },
 ].filter((place): place is { label: string; teamId: TeamId } => place.teamId !== null);
 ---
 

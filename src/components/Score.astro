@@ -1,21 +1,21 @@
 ---
-import type { Finalists, Match, PlayerTeamMap } from '../lib/domain/types';
+import type { Match, PlayoffSnapshots, PlayerTeamMap } from '../lib/domain/types';
 import { formatScore, formatScoreAccessible } from '../lib/format/match';
 
 interface Props {
   match: Match;
-  finalists: Finalists | null;
+  snapshots: PlayoffSnapshots | null;
   homeName: string;
   awayName: string;
   playerTeams: PlayerTeamMap;
   size?: 'default' | 'large';
 }
 
-const { match, finalists, homeName, awayName, playerTeams, size = 'default' } = Astro.props;
-const visual = formatScore(match, finalists, playerTeams);
+const { match, snapshots, homeName, awayName, playerTeams, size = 'default' } = Astro.props;
+const visual = formatScore(match, snapshots, playerTeams);
 const accessible = formatScoreAccessible(
   match,
-  finalists,
+  snapshots,
   homeName,
   awayName,
   playerTeams,

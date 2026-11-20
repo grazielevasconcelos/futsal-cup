@@ -1,19 +1,16 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import FinalPhase from '../../components/FinalPhase.astro';
-import FriendlyCard from '../../components/FriendlyCard.astro';
 import { loadCompetition } from '../../lib/data/load';
-import { buildFriendlyCard } from '../../lib/domain/friendly';
 import { getBuildDate } from '../../lib/site';
 
 const competition = loadCompetition();
 const now = getBuildDate();
-const friendly = buildFriendlyCard(competition);
 ---
 
 <BaseLayout
   title="Fase final"
-  description="Final única entre o 1º e o 2º colocados, card informativo do amistoso e pódio de três posições da Copa de Futsal Feminino Vila Mariana 2026."
+  description="Semifinal entre o 2º e o 3º, final entre o 1º e a vencedora da semifinal e pódio de três posições da Copa de Futsal Feminino Vila Mariana 2026."
   activeNav="fase-final"
   notices={competition.notices}
 >
@@ -21,36 +18,34 @@ const friendly = buildFriendlyCard(competition);
     <div class="page-header">
       <h1>Fase final</h1>
       <p class="lead">
-        Final única entre o 1º e o 2º colocados e pódio de três posições.
+        Semifinal, final e pódio de três posições: campeã, vice-campeã e 3ª colocada.
       </p>
     </div>
-
-    {
-      friendly !== null && (
-        <section class="section" aria-labelledby="amistoso">
-          <h2 id="amistoso">Amistoso do 3º colocado</h2>
-          <FriendlyCard friendly={friendly} />
-        </section>
-      )
-    }
 
     <FinalPhase competition={competition} now={now} />
 
     <section class="section" aria-labelledby="como-funciona">
       <h2 id="como-funciona">Como funciona</h2>
       <ul>
-        <li>Apenas o 1º e o 2º colocados da fase classificatória disputam a final, em partida única.</li>
-        <li>Não há semifinais.</li>
         <li>
-          Empate no tempo normal vai direto para os pênaltis: cinco cobranças alternadas e morte
-          súbita, se necessário.
+          A semifinal é disputada entre o 2º e o 3º colocados da fase classificatória, em
+          partida única. O 2º tem mando de campo e vantagem do empate.
         </li>
         <li>
-          A 3ª colocada é a 3ª da classificação da fase classificatória, sem partida extra.
+          A final é disputada entre o 1º colocado e a vencedora da semifinal, em partida única.
+          O 1º tem mando de campo e vantagem do empate.
         </li>
         <li>
-          O amistoso do 3º colocado é informativo e não altera classificação, estatísticas,
-          suspensões ou pódio.
+          Empates encerram a partida no tempo normal. Na semifinal, o empate classifica o 2º; na
+          final, o empate dá o título ao 1º.
+        </li>
+        <li>
+          A 3ª colocada é a perdedora da semifinal. Não há partida extra para definir a terceira
+          posição.
+        </li>
+        <li>
+          Em caso de W.O., o vencedor administrativo avança ou conquista o título, e o W.O.
+          prevalece sobre a vantagem do empate.
         </li>
       </ul>
     </section>

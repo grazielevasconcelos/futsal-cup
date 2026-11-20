@@ -1,6 +1,6 @@
 ---
 import type { Competition } from '../lib/domain/types';
-import { buildPodium, isGroupComplete } from '../lib/domain/finalists';
+import { buildPodium, isGroupComplete, isSemiComplete } from '../lib/domain/playoffs';
 import { buildTeamMap } from '../lib/domain/players';
 import { withBase } from '../lib/site';
 import EmptyState from './EmptyState.astro';
@@ -15,13 +15,73 @@ interface Props {
 const { competition, now } = Astro.props;
 
 const groupComplete = isGroupComplete(competition);
+const semiComplete = isSemiComplete(competition);
+const semiMatch = competition.matches.find((match) => match.id === 'semi');
 const finalMatch = competition.matches.find((match) => match.id === 'final');
-const podium = finalMatch?.status === 'finished' ? buildPodium(competition) : null;
+const finalFinished = finalMatch?.status === 'finished';
+const podium = semiComplete ? buildPodium(competition) : null;
 const teams = buildTeamMap(competition);
+const thirdName =
+  podium?.third === null || podium?.third === undefined
+    ? null
+    : teams.get(podium.third)?.name ?? podium.third;
 ---
 
 {
-  podium !== null && (
+  !groupComplete && (
+    <section class="section" aria-labelledby="fase-final">
+      <h2 id="fase-final">Confrontos a definir</h2>
+      <EmptyState
+        title="Confrontos a definir"
+        description="A semifinal e a final dependem do término das 6 partidas da fase classificatória."
+      />
+      <p class="meta">
+        <a href={withBase('/classificacao/')}>Ver classificação</a>
+      </p>
+    </section>
+  )
+}
+
+{
+  groupComplete && (
+    <section class="section" aria-labelledby="semifinal">
+      <h2 id="semifinal">Semifinal</h2>
+
+      {semiMatch === undefined ? (
+        <p class="empty-state">A semifinal ainda não está cadastrada na fonte oficial.</p>
+      ) : (
+        <MatchCard match={semiMatch} competition={competition} now={now} showStage={false} />
+      )}
+
+      <p class="meta">
+        O 2º colocado tem mando de campo e vantagem do empate: se a partida terminar empatada no
+        tempo normal, o 2º avança. O W.O. prevalece sobre a vantagem.
+      </p>
+    </section>
+  )
+}
+
+{
+  groupComplete && (
+    <section class="section" aria-labelledby="final">
+      <h2 id="final">Final</h2>
+
+      {finalMatch === undefined ? (
+        <p class="empty-state">A final ainda não está cadastrada na fonte oficial.</p>
+      ) : (
+        <MatchCard match={finalMatch} competition={competition} now={now} showStage={false} />
+      )}
+
+      <p class="meta">
+        O 1º colocado tem mando de campo e vantagem do empate: se a final terminar empatada no
+        tempo normal, o título é do 1º. O W.O. prevalece sobre a vantagem.
+      </p>
+    </section>
+  )
+}
+
+{
+  finalFinished && podium !== null && (
     <section class="section" aria-labelledby="podio">
       <h2 id="podio">Pódio</h2>
       <PodiumList podium={podium} teams={teams} />
@@ -29,24 +89,12 @@ const teams = buildTeamMap(competition);
   )
 }
 
-<section class="section" aria-labelledby="final">
-  <h2 id="final">Final</h2>
-
-  {
-    !groupComplete ? (
-      <>
-        <EmptyState
-          title="Confrontos a definir"
-          description="A final depende das seis partidas da fase classificatória. As finalistas serão o 1º e o 2º colocados."
-        />
-        <p>
-          <a href={withBase('/classificacao/')}>Acompanhar a classificação</a>
-        </p>
-      </>
-    ) : finalMatch === undefined ? (
-      <p class="empty-state">A final ainda não está cadastrada na fonte oficial.</p>
-    ) : (
-      <MatchCard match={finalMatch} competition={competition} now={now} showStage={false} />
-    )
-  }
-</section>
+{
+  semiComplete && !finalFinished && thirdName !== null && (
+    <section class="section" aria-labelledby="terceira-colocada">
+      <h2 id="terceira-colocada">3ª colocada</h2>
+      <p class="home-champion">3ª colocada: {thirdName}</p>
+      <p class="meta">A 3ª colocada é a perdedora da semifinal.</p>
+    </section>
+  )
+}

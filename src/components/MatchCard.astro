@@ -1,7 +1,9 @@
 ---
-import type { Competition, Match } from '../lib/domain/types';
+import type { Competition, Match, PlayoffSnapshots, TeamId } from '../lib/domain/types';
 import { buildPlayerTeamMap, buildTeamMap } from '../lib/domain/players';
+import { buildExpectedSemifinalists } from '../lib/domain/playoffs';
 import { resolveMatchTeams } from '../lib/domain/score';
+import { rankTeams } from '../lib/domain/standings';
 import { formatDate, formatTime } from '../lib/format/date';
 import {
   formatStage,
@@ -22,17 +24,42 @@ const { match, competition, now, showStage = true } = Astro.props;
 
 const teams = buildTeamMap(competition);
 const playerTeams = buildPlayerTeamMap(competition);
+const snapshots: PlayoffSnapshots = {
+  semifinalists: competition.semifinalists,
+  finalists: competition.finalists,
+};
 
-const resolved =
-  match.stage === 'group'
-    ? { homeTeamId: match.homeTeamId, awayTeamId: match.awayTeamId }
-    : competition.finalists === null
-      ? null
-      : resolveMatchTeams(match, competition.finalists);
+let resolved: { homeTeamId: TeamId; awayTeamId: TeamId } | null = null;
+try {
+  resolved = resolveMatchTeams(match, snapshots);
+} catch {
+  resolved = null;
+}
 
-const homeName = resolved === null ? 'A definir' : teams.get(resolved.homeTeamId)?.name ?? 'A definir';
-const awayName = resolved === null ? 'A definir' : teams.get(resolved.awayTeamId)?.name ?? 'A definir';
-const title = resolved === null ? 'Confrontos a definir' : `${homeName} x ${awayName}`;
+let homeName =
+  resolved === null ? 'A definir' : teams.get(resolved.homeTeamId)?.name ?? 'A definir';
+let awayName =
+  resolved === null ? 'A definir' : teams.get(resolved.awayTeamId)?.name ?? 'A definir';
+
+if (resolved === null && match.stage === 'final') {
+  const ranking = rankTeams(competition);
+  const leader = ranking.rows[0];
+  homeName = leader === undefined ? '1º colocado' : teams.get(leader.teamId)?.name ?? '1º colocado';
+  awayName = 'Vencedora da semifinal';
+}
+
+if (resolved === null && match.stage === 'semi') {
+  const expected = buildExpectedSemifinalists(competition);
+  if (expected !== null) {
+    homeName = teams.get(expected[0])?.name ?? '2º colocado';
+    awayName = teams.get(expected[1])?.name ?? '3º colocado';
+  } else {
+    homeName = '2º colocado';
+    awayName = '3º colocado';
+  }
+}
+
+const title = `${homeName} x ${awayName}`;
 const href = withBase(`/jogos/${match.id}/`);
 const time = match.startsAt === null ? 'Horário a definir' : formatTime(match.startsAt);
 const venue = match.venue ?? 'Local a definir';
@@ -54,7 +81,7 @@ const venue = match.venue ?? 'Local a definir';
     match.status === 'finished' && (
       <Score
         match={match}
-        finalists={competition.finalists}
+        snapshots={snapshots}
         homeName={homeName}
         awayName={awayName}
         playerTeams={playerTeams}

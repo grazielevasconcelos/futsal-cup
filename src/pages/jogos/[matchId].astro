@@ -6,10 +6,13 @@ import { loadCompetition } from '../../lib/data/load';
 import { suspendedFor } from '../../lib/domain/discipline';
 import { isMatchPast } from '../../lib/domain/home';
 import { buildPlayerTeamMap, buildTeamMap } from '../../lib/domain/players';
+import { buildExpectedSemifinalists } from '../../lib/domain/playoffs';
 import { resolveMatchTeams } from '../../lib/domain/score';
+import { rankTeams } from '../../lib/domain/standings';
 import { formatDate, formatDateHeading, formatTime } from '../../lib/format/date';
 import { buildEventViews } from '../../lib/format/events';
 import { formatStage, walkoverReasonLabel } from '../../lib/format/match';
+import type { PlayoffSnapshots, TeamId } from '../../lib/domain/types';
 import { getBuildDate, withBase } from '../../lib/site';
 
 export function getStaticPaths() {
@@ -27,29 +30,51 @@ if (match === undefined) {
 
 const teams = buildTeamMap(competition);
 const playerTeams = buildPlayerTeamMap(competition);
+const snapshots: PlayoffSnapshots = {
+  semifinalists: competition.semifinalists,
+  finalists: competition.finalists,
+};
 
-const resolved =
-  match.stage === 'group'
-    ? { homeTeamId: match.homeTeamId, awayTeamId: match.awayTeamId }
-    : competition.finalists === null
-      ? null
-      : resolveMatchTeams(match, competition.finalists);
+let resolved: { homeTeamId: TeamId; awayTeamId: TeamId } | null = null;
+try {
+  resolved = resolveMatchTeams(match, snapshots);
+} catch {
+  resolved = null;
+}
 
 const homeTeam = resolved === null ? undefined : teams.get(resolved.homeTeamId);
 const awayTeam = resolved === null ? undefined : teams.get(resolved.awayTeamId);
-const homeName = homeTeam?.name ?? 'A definir';
-const awayName = awayTeam?.name ?? 'A definir';
+let homeName = homeTeam?.name ?? 'A definir';
+let awayName = awayTeam?.name ?? 'A definir';
+
+if (resolved === null && match.stage === 'final') {
+  const ranking = rankTeams(competition);
+  const leader = ranking.rows[0];
+  homeName = leader === undefined ? '1º colocado' : teams.get(leader.teamId)?.name ?? '1º colocado';
+  awayName = 'Vencedora da semifinal';
+}
+
+if (resolved === null && match.stage === 'semi') {
+  const expected = buildExpectedSemifinalists(competition);
+  if (expected !== null) {
+    homeName = teams.get(expected[0])?.name ?? '2º colocado';
+    awayName = teams.get(expected[1])?.name ?? '3º colocado';
+  } else {
+    homeName = '2º colocado';
+    awayName = '3º colocado';
+  }
+}
 
 const title =
-  match.stage === 'final'
-    ? `Final — ${formatDate(match.date)}`
-    : `${homeName} x ${awayName} — ${formatDate(match.date)}`;
+  match.stage === 'group'
+    ? `${homeName} x ${awayName} — ${formatDate(match.date)}`
+    : `${formatStage(match)} — ${formatDate(match.date)}`;
 
 const status = match.status;
 const pendingResult = status === 'scheduled' && isMatchPast(match, now);
 const eventViews =
   status === 'finished' && resolved !== null
-    ? buildEventViews(match, competition.finalists, playerTeams, teams)
+    ? buildEventViews(match, snapshots, playerTeams, teams)
     : [];
 
 const suspensionIds = suspendedFor(match, competition);
@@ -70,9 +95,18 @@ const time = match.startsAt === null ? 'Horário a definir' : formatTime(match.s
 const venue = match.venue ?? 'Local a definir';
 
 const description =
-  resolved === null
-    ? `Final da Copa de Futsal Feminino Vila Mariana 2026 em ${formatDate(match.date)}: confrontos a definir, placar e eventos.`
-    : `${homeName} x ${awayName} em ${formatDate(match.date)}: placar, eventos e desfalques da Copa de Futsal Feminino Vila Mariana 2026.`;
+  match.stage === 'final'
+    ? `Final da Copa de Futsal Feminino Vila Mariana 2026 em ${formatDate(match.date)}: ${homeName} x ${awayName}, placar, eventos e desfalques.`
+    : match.stage === 'semi'
+      ? `Semifinal da Copa de Futsal Feminino Vila Mariana 2026 em ${formatDate(match.date)}: ${homeName} x ${awayName}, placar, eventos e desfalques.`
+      : `${homeName} x ${awayName} em ${formatDate(match.date)}: placar, eventos e desfalques da Copa de Futsal Feminino Vila Mariana 2026.`;
+
+const missingSnapshotTitle =
+  match.stage === 'semi' ? 'Semifinal a definir' : 'Final a definir';
+const missingSnapshotText =
+  match.stage === 'semi'
+    ? 'A semifinal será disputada entre o 2º e o 3º colocados da fase classificatória, depois das seis partidas de grupo.'
+    : 'A final será disputada entre o 1º colocado e a vencedora da semifinal, depois da semifinal.';
 ---
 
 <BaseLayout
@@ -89,7 +123,7 @@ const description =
         <span class="badge">{formatStage(match)}</span>
         <StatusBadge match={match} now={now} />
       </p>
-      <h1>{resolved === null ? 'Confrontos a definir' : `${homeName} x ${awayName}`}</h1>
+      <h1>{resolved === null ? `${homeName} x ${awayName}` : `${homeName} x ${awayName}`}</h1>
       <p class="meta">
         {formatDateHeading(match.date)} · {time} · {venue}
       </p>
@@ -98,7 +132,7 @@ const description =
         status === 'finished' && (
           <Score
             match={match}
-            finalists={competition.finalists}
+            snapshots={snapshots}
             homeName={homeName}
             awayName={awayName}
             playerTeams={playerTeams}
@@ -110,14 +144,29 @@ const description =
 
     {
       resolved === null && (
-        <section class="section" aria-labelledby="final-a-definir">
-          <h2 id="final-a-definir">Final a definir</h2>
-          <p>
-            A final será disputada entre o 1º e o 2º colocados da fase classificatória,
-            depois das seis partidas de grupo.
-          </p>
+        <section class="section" aria-labelledby="mata-mata-a-definir">
+          <h2 id="mata-mata-a-definir">{missingSnapshotTitle}</h2>
+          <p>{missingSnapshotText}</p>
           <p><a href={withBase('/classificacao/')}>Acompanhar a classificação</a></p>
         </section>
+      )
+    }
+
+    {
+      match.stage === 'semi' && (
+        <p class="meta">
+          O 2º colocado tem mando de campo e vantagem do empate: se a partida terminar empatada
+          no tempo normal, o 2º avança. O W.O. prevalece sobre a vantagem.
+        </p>
+      )
+    }
+
+    {
+      match.stage === 'final' && (
+        <p class="meta">
+          O 1º colocado tem mando de campo e vantagem do empate: se a final terminar empatada no
+          tempo normal, o título é do 1º. O W.O. prevalece sobre a vantagem.
+        </p>
       )
     }
 
