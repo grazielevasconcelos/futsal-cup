@@ -8,20 +8,21 @@ import type {
   TeamId,
 } from '../domain/types';
 import { buildTeamMap } from '../domain/players';
+import { resolveMatchTeams } from '../domain/score';
 import { formatDate } from './date';
 
 function opponentOf(match: Match, teamId: TeamId, competition: Competition): TeamId | null {
-  if (match.stage === 'group') {
-    if (match.homeTeamId === teamId) return match.awayTeamId;
-    if (match.awayTeamId === teamId) return match.homeTeamId;
+  try {
+    const { homeTeamId, awayTeamId } = resolveMatchTeams(match, {
+      semifinalists: competition.semifinalists,
+      finalists: competition.finalists,
+    });
+    if (homeTeamId === teamId) return awayTeamId;
+    if (awayTeamId === teamId) return homeTeamId;
+    return null;
+  } catch {
     return null;
   }
-
-  if (competition.finalists === null) return null;
-  const [home, away] = competition.finalists.final;
-  if (home === teamId) return away;
-  if (away === teamId) return home;
-  return null;
 }
 
 /**
@@ -75,7 +76,7 @@ export function buildSuspensionLabels(
       }
 
       if (suspensions.some((suspension) => suspension.pendingFinalists)) {
-        labels.set(player.id, 'Suspensão pendente — final a definir');
+        labels.set(player.id, 'Suspensão pendente — fase final a definir');
         continue;
       }
 

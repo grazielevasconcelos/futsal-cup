@@ -5,6 +5,7 @@ import { deriveScore, resolveMatchTeams } from './score';
 import type {
   Competition,
   Match,
+  PlayoffSnapshots,
   PlayerId,
   PlayerStats,
   Team,
@@ -33,14 +34,19 @@ interface MutableTeamStats {
   wins: number;
   draws: number;
   losses: number;
-  shootoutWins: number;
-  shootoutLosses: number;
   goalsFor: number;
   goalsAgainst: number;
   goalDifference: number;
   yellow: number;
   red: number;
   disciplinaryPoints: number;
+}
+
+function snapshotsOf(competition: Competition): PlayoffSnapshots {
+  return {
+    semifinalists: competition.semifinalists,
+    finalists: competition.finalists,
+  };
 }
 
 function finishedMatches(competition: Competition): readonly Match[] {
@@ -52,7 +58,7 @@ function participants(
   competition: Competition,
   teams: ReadonlyMap<TeamId, Team>,
 ): readonly Team[] {
-  const { homeTeamId, awayTeamId } = resolveMatchTeams(match, competition.finalists);
+  const { homeTeamId, awayTeamId } = resolveMatchTeams(match, snapshotsOf(competition));
   return [teams.get(homeTeamId), teams.get(awayTeamId)].filter(
     (team): team is Team => team !== undefined,
   );
@@ -60,8 +66,7 @@ function participants(
 
 /**
  * Soma gols, assistências, gols contra e cartões de todas as partidas
- * oficiais encerradas (grupo + final). O amistoso não é uma partida e não
- * aparece em `competition.matches`.
+ * oficiais encerradas (grupo + semifinal + final).
  */
 export function buildPlayerStats(competition: Competition): readonly PlayerStats[] {
   const stats = new Map<PlayerId, MutablePlayerStats>();
@@ -120,9 +125,9 @@ export function buildPlayerStats(competition: Competition): readonly PlayerStats
 }
 
 /**
- * Agrega as partidas oficiais do time (grupo + final). Uma final decidida
- * nos pênaltis conta como empate no tempo normal; a campanha nos pênaltis é
- * registrada separadamente e não altera GP/GC/SG.
+ * Agrega as 8 partidas oficiais do time (grupo + semifinal + final). Empates
+ * no mata-mata contam como empate em V/E/D; GP/GC/SG consideram o tempo
+ * normal e não existe campanha de pênaltis.
  */
 export function buildTeamStats(competition: Competition): readonly TeamStats[] {
   const stats = new Map<TeamId, MutableTeamStats>();
@@ -134,8 +139,6 @@ export function buildTeamStats(competition: Competition): readonly TeamStats[] {
       wins: 0,
       draws: 0,
       losses: 0,
-      shootoutWins: 0,
-      shootoutLosses: 0,
       goalsFor: 0,
       goalsAgainst: 0,
       goalDifference: 0,
@@ -147,10 +150,11 @@ export function buildTeamStats(competition: Competition): readonly TeamStats[] {
 
   const teams = buildTeamMap(competition);
   const playerTeams = buildPlayerTeamMap(competition);
+  const snapshots = snapshotsOf(competition);
 
   for (const match of finishedMatches(competition)) {
-    const { homeTeamId, awayTeamId } = resolveMatchTeams(match, competition.finalists);
-    const score = deriveScore(match, competition.finalists, playerTeams);
+    const { homeTeamId, awayTeamId } = resolveMatchTeams(match, snapshots);
+    const score = deriveScore(match, snapshots, playerTeams);
     if (score === null) continue;
 
     const results = [
@@ -172,12 +176,6 @@ export function buildTeamStats(competition: Competition): readonly TeamStats[] {
         entry.losses += 1;
       } else {
         entry.draws += 1;
-        if (match.shootout !== null) {
-          const shootoutWinner =
-            match.shootout.home > match.shootout.away ? homeTeamId : awayTeamId;
-          if (shootoutWinner === result.teamId) entry.shootoutWins += 1;
-          else entry.shootoutLosses += 1;
-        }
       }
     }
 

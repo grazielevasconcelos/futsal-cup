@@ -1,6 +1,6 @@
 import { isMatchPast } from '../domain/home';
 import { deriveScore, resolveMatchTeams, winnerOf } from '../domain/score';
-import type { Finalists, Match, PlayerTeamMap, WalkoverReason } from '../domain/types';
+import type { Match, PlayoffSnapshots, PlayerTeamMap, WalkoverReason } from '../domain/types';
 
 export function walkoverReasonLabel(reason: WalkoverReason): string {
   if (reason === 'no_show') return 'Não compareceu';
@@ -8,48 +8,57 @@ export function walkoverReasonLabel(reason: WalkoverReason): string {
   return 'Desistência';
 }
 
+function snapshotFor(
+  match: Match,
+  snapshots: PlayoffSnapshots | null,
+): readonly [string, string] | null {
+  if (match.stage === 'group') return null;
+  const pair =
+    match.stage === 'semi' ? snapshots?.semifinalists : snapshots?.finalists;
+  return pair ?? null;
+}
+
 /**
  * O mapa de jogadoras é necessário para derivar o placar a partir dos gols.
- * A assinatura da SPEC §9.1 não o inclui porque recebe a partida isolada;
+ * A assinatura da SPEC §7.11 não o inclui porque recebe a partida isolada;
  * assim como em `deriveScore`, ele é passado explicitamente.
  */
 export function formatScore(
   match: Match,
-  finalists: Finalists | null,
+  snapshots: PlayoffSnapshots | null,
   playerTeams: PlayerTeamMap,
 ): string {
-  if (match.stage !== 'group' && finalists === null) return 'Confrontos a definir';
+  if (match.stage !== 'group' && snapshotFor(match, snapshots) === null) {
+    return 'Confrontos a definir';
+  }
   if (match.status === 'postponed') return 'Adiada';
   if (match.status === 'scheduled') return 'A definir';
 
-  const score = deriveScore(match, finalists, playerTeams);
+  const score = deriveScore(match, snapshots, playerTeams);
   if (score === null) return 'A definir';
 
   if (match.walkover !== null) return `${score.home} x ${score.away} (W.O.)`;
-  if (match.shootout !== null) {
-    return `${score.home} (${match.shootout.home}) x (${match.shootout.away}) ${score.away}`;
-  }
   return `${score.home} x ${score.away}`;
 }
 
 export function formatScoreAccessible(
   match: Match,
-  finalists: Finalists | null,
+  snapshots: PlayoffSnapshots | null,
   homeName: string,
   awayName: string,
   playerTeams: PlayerTeamMap,
 ): string {
-  if (match.stage !== 'group' && finalists === null) {
-    return 'Confrontos a definir; a fase final depende das 6 partidas da classificatória.';
+  if (match.stage !== 'group' && snapshotFor(match, snapshots) === null) {
+    return 'Confrontos a definir; a fase final depende da etapa anterior.';
   }
   if (match.status === 'postponed') return 'Partida adiada.';
   if (match.status === 'scheduled') return 'Partida agendada; placar a definir.';
 
-  const score = deriveScore(match, finalists, playerTeams);
+  const score = deriveScore(match, snapshots, playerTeams);
   if (score === null) return 'Partida agendada; placar a definir.';
 
-  const teams = resolveMatchTeams(match, finalists);
-  const winner = winnerOf(match, finalists, playerTeams);
+  const teams = resolveMatchTeams(match, snapshots);
+  const winner = winnerOf(match, snapshots, playerTeams);
   const winnerName =
     winner === null ? '' : winner === teams.homeTeamId ? homeName : awayName;
 
@@ -57,8 +66,11 @@ export function formatScoreAccessible(
     return `${homeName} ${score.home} a ${score.away} ${awayName} por W.O. — ${walkoverReasonLabel(match.walkover.reason)}.`;
   }
 
-  if (match.shootout !== null) {
-    return `${homeName} ${score.home} a ${score.away} ${awayName} no tempo normal; ${match.shootout.home} a ${match.shootout.away} nos pênaltis; vitória de ${winnerName}.`;
+  if (match.stage !== 'group' && score.home === score.away) {
+    if (match.stage === 'semi') {
+      return `${homeName} ${score.home} a ${score.away} ${awayName} no tempo normal; ${winnerName} avança pela vantagem do empate.`;
+    }
+    return `${homeName} ${score.home} a ${score.away} ${awayName} no tempo normal; ${winnerName} conquista o título pela vantagem do empate.`;
   }
 
   return `${homeName} ${score.home} a ${score.away} ${awayName}.`;
@@ -72,6 +84,7 @@ export function formatStatus(match: Match, now: Date): string {
 }
 
 export function formatStage(match: Match): string {
+  if (match.stage === 'semi') return 'Semifinal';
   if (match.stage === 'final') return 'Final';
   return `Rodada ${match.round}`;
 }

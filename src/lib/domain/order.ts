@@ -7,6 +7,7 @@ export const CANONICAL_MATCH_ORDER: readonly MatchId[] = [
   'g4',
   'g5',
   'g6',
+  'semi',
   'final',
 ];
 
@@ -19,6 +20,7 @@ export const ORIGINAL_MATCH_DATES: Readonly<Record<MatchId, string>> = {
   g4: '2026-11-26',
   g5: '2026-12-01',
   g6: '2026-12-01',
+  semi: '2026-12-02',
   final: '2026-12-03',
 };
 

@@ -1,8 +1,8 @@
 export type TeamId = 'ta' | 'tb' | 'tc';
 export type PlayerId = `p-${string}`;
-export type MatchId = 'g1' | 'g2' | 'g3' | 'g4' | 'g5' | 'g6' | 'final';
-export type GroupMatchId = Exclude<MatchId, 'final'>;
-export type Stage = 'group' | 'final';
+export type MatchId = 'g1' | 'g2' | 'g3' | 'g4' | 'g5' | 'g6' | 'semi' | 'final';
+export type GroupMatchId = 'g1' | 'g2' | 'g3' | 'g4' | 'g5' | 'g6';
+export type Stage = 'group' | 'semi' | 'final';
 export type MatchStatus = 'scheduled' | 'finished' | 'postponed';
 export type Position = 'goleira' | 'linha' | null;
 export type WalkoverReason = 'no_show' | 'insufficient_players' | 'withdrawal';
@@ -28,11 +28,6 @@ export interface Walkover {
   readonly note: string | null;
 }
 
-export interface Shootout {
-  readonly home: number;
-  readonly away: number;
-}
-
 export type Event =
   | {
       readonly type: 'goal';
@@ -53,7 +48,6 @@ interface MatchBase {
   readonly venue: string | null;
   readonly status: MatchStatus;
   readonly walkover: Walkover | null;
-  readonly shootout: Shootout | null;
   readonly events: readonly Event[];
 }
 
@@ -64,27 +58,29 @@ export interface GroupMatch extends MatchBase {
   readonly awayTeamId: TeamId;
 }
 
+export interface SemiFinalMatch extends MatchBase {
+  readonly id: 'semi';
+  readonly stage: 'semi';
+  readonly round: null;
+}
+
 export interface FinalStageMatch extends MatchBase {
+  readonly id: 'final';
   readonly stage: 'final';
   readonly round: null;
 }
 
-export type Match = GroupMatch | FinalStageMatch;
+export type KnockoutMatch = SemiFinalMatch | FinalStageMatch;
+export type Match = GroupMatch | KnockoutMatch;
 
 export type ResolvedMatch = Match & {
   readonly homeTeamId: TeamId;
   readonly awayTeamId: TeamId;
 };
 
-export interface Finalists {
-  readonly final: readonly [TeamId, TeamId];
-}
-
-export interface Friendly {
-  readonly date: string;
-  readonly startsAt: string;
-  readonly venue: string;
-  readonly note: string;
+export interface PlayoffSnapshots {
+  readonly semifinalists: readonly [TeamId, TeamId] | null;
+  readonly finalists: readonly [TeamId, TeamId] | null;
 }
 
 export interface Notice {
@@ -97,9 +93,9 @@ export interface Competition {
   readonly timezone: 'America/Sao_Paulo';
   readonly teams: readonly Team[];
   readonly matches: readonly Match[];
-  readonly finalists: Finalists | null;
+  readonly semifinalists: readonly [TeamId, TeamId] | null;
+  readonly finalists: readonly [TeamId, TeamId] | null;
   readonly drawOrder: readonly TeamId[] | null;
-  readonly friendly: Friendly | null;
   readonly notices: readonly Notice[];
 }
 
@@ -153,8 +149,6 @@ export interface TeamStats {
   readonly wins: number;
   readonly draws: number;
   readonly losses: number;
-  readonly shootoutWins: number;
-  readonly shootoutLosses: number;
   readonly goalsFor: number;
   readonly goalsAgainst: number;
   readonly goalDifference: number;
@@ -176,15 +170,6 @@ export interface Podium {
   readonly champion: TeamId | null;
   readonly runnerUp: TeamId | null;
   readonly third: TeamId | null;
-}
-
-export interface FriendlyCard {
-  readonly title: string;
-  readonly date: string;
-  readonly startsAt: string;
-  readonly venue: string;
-  readonly note: string;
-  readonly informational: true;
 }
 
 /* ---------- contexto de elenco ---------- */

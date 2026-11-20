@@ -1,8 +1,14 @@
 import { canonicalOrder } from './order';
+import { isGroupComplete, isSemiComplete } from './playoffs';
 import { localDateInSaoPaulo } from './time';
 import type { Competition, Match } from './types';
 
-export type HomeState = 'beforeCup' | 'duringGroup' | 'groupComplete' | 'afterFinal';
+export type HomeState =
+  | 'beforeCup'
+  | 'duringGroup'
+  | 'groupComplete'
+  | 'semiComplete'
+  | 'afterFinal';
 
 function isPast(match: Match, now: Date, today: string): boolean {
   if (match.status !== 'scheduled') return false;
@@ -21,11 +27,10 @@ function groupMatches(competition: Competition): readonly Match[] {
 export function getHomeState(competition: Competition, now: Date): HomeState {
   const final = competition.matches.find((match) => match.id === 'final');
   if (final?.status === 'finished') return 'afterFinal';
+  if (isSemiComplete(competition)) return 'semiComplete';
+  if (isGroupComplete(competition)) return 'groupComplete';
 
   const group = groupMatches(competition);
-  if (group.length === 6 && group.every((match) => match.status === 'finished')) {
-    return 'groupComplete';
-  }
 
   const firstDay = group.reduce<string | null>(
     (earliest, match) =>

@@ -1,4 +1,6 @@
+import { buildPlayerTeamMap } from './players';
 import { byCanonicalOrder } from './order';
+import { winnerOf } from './score';
 import type {
   Competition,
   Event,
@@ -65,6 +67,11 @@ export function redCardsForTeamInMatch(team: Team, match: Match): readonly RedCa
   return reds;
 }
 
+/**
+ * Partidas reais do time no chaveamento. Inclui a semifinal apenas quando o
+ * time é semifinalista e a final apenas quando é finalista. Assim, o 1º
+ * colocado não tem semifinal e sua próxima partida após o grupo é a final.
+ */
 export function matchesForTeam(competition: Competition, teamId: TeamId): readonly Match[] {
   const matches: Match[] = competition.matches.filter(
     (match) =>
@@ -72,14 +79,51 @@ export function matchesForTeam(competition: Competition, teamId: TeamId): readon
       (match.homeTeamId === teamId || match.awayTeamId === teamId),
   );
 
-  if (competition.finalists !== null) {
-    const final = competition.matches.find((match) => match.stage === 'final');
-    if (final !== undefined && competition.finalists.final.includes(teamId)) {
-      matches.push(final);
-    }
+  const semi = competition.matches.find((match) => match.stage === 'semi');
+  if (
+    semi !== undefined &&
+    competition.semifinalists !== null &&
+    competition.semifinalists.includes(teamId)
+  ) {
+    matches.push(semi);
+  }
+
+  const final = competition.matches.find((match) => match.stage === 'final');
+  if (
+    final !== undefined &&
+    competition.finalists !== null &&
+    competition.finalists.includes(teamId)
+  ) {
+    matches.push(final);
   }
 
   return matches.sort(byCanonicalOrder);
+}
+
+function isPendingFinalists(
+  competition: Competition,
+  teamId: TeamId,
+  sentOffIn: Match,
+): boolean {
+  if (competition.finalists !== null) return false;
+
+  if (sentOffIn.stage === 'group') {
+    // O 1º colocado não disputa a semifinal; sem finalists, a final é a
+    // próxima partida possível. O 2º/3º já têm a semifinal como próxima.
+    return !competition.semifinalists?.includes(teamId);
+  }
+
+  if (sentOffIn.stage === 'semi') {
+    const semi = sentOffIn;
+    const winner = winnerOf(
+      semi,
+      { semifinalists: competition.semifinalists, finalists: competition.finalists },
+      buildPlayerTeamMap(competition),
+    );
+    return winner === teamId;
+  }
+
+  return false;
 }
 
 export function buildSuspensions(competition: Competition): readonly Suspension[] {
@@ -93,16 +137,14 @@ export function buildSuspensions(competition: Competition): readonly Suspension[
 
       for (const red of reds) {
         const next = matches[index + 1];
-        const pendingFinalists =
-          next === undefined && competition.finalists === null && match.stage === 'group';
-
         suspensions.push({
           playerId: red.playerId,
           teamId: team.id,
           reason: red.reason,
           sentOffIn: match.id as MatchId,
           suspendedFor: next?.id ?? null,
-          pendingFinalists,
+          pendingFinalists:
+            next === undefined && isPendingFinalists(competition, team.id, match),
         });
       }
     });

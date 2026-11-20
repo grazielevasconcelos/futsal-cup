@@ -1,44 +1,62 @@
-import type { Finalists, Match, PlayerTeamMap, ResolvedMatch, Score, TeamId } from './types';
+import type {
+  KnockoutMatch,
+  Match,
+  PlayoffSnapshots,
+  PlayerTeamMap,
+  ResolvedMatch,
+  Score,
+  TeamId,
+} from './types';
 
-export class FinalistsRequiredError extends Error {
+export class SnapshotsRequiredError extends Error {
   constructor(matchId: Match['id']) {
-    super(`A partida ${matchId} precisa de finalists para resolver os participantes.`);
-    this.name = 'FinalistsRequiredError';
+    super(`A partida ${matchId} precisa dos snapshots do mata-mata para resolver os participantes.`);
+    this.name = 'SnapshotsRequiredError';
   }
+}
+
+function knockoutTeams(
+  match: KnockoutMatch,
+  snapshots: PlayoffSnapshots | null,
+): readonly [TeamId, TeamId] {
+  const pair =
+    match.stage === 'semi' ? snapshots?.semifinalists : snapshots?.finalists;
+  if (pair === undefined || pair === null) throw new SnapshotsRequiredError(match.id);
+  return pair;
 }
 
 export function resolveMatchTeams(
   match: Match,
-  finalists: Finalists | null,
+  snapshots: PlayoffSnapshots | null,
 ): { readonly homeTeamId: TeamId; readonly awayTeamId: TeamId } {
   if (match.stage === 'group') {
     return { homeTeamId: match.homeTeamId, awayTeamId: match.awayTeamId };
   }
 
-  if (finalists === null) {
-    throw new FinalistsRequiredError(match.id);
-  }
-
-  return { homeTeamId: finalists.final[0], awayTeamId: finalists.final[1] };
+  const [homeTeamId, awayTeamId] = knockoutTeams(match, snapshots);
+  return { homeTeamId, awayTeamId };
 }
 
-export function toResolvedMatch(match: Match, finalists: Finalists | null): ResolvedMatch {
-  return { ...match, ...resolveMatchTeams(match, finalists) };
+export function toResolvedMatch(
+  match: Match,
+  snapshots: PlayoffSnapshots | null,
+): ResolvedMatch {
+  return { ...match, ...resolveMatchTeams(match, snapshots) };
 }
 
 /**
- * O mapa `playerTeams` não aparece na assinatura da SPEC §9.1, mas é
- * necessário para saber a que time pertence cada evento. Ele é derivado uma
- * única vez por competição com `buildPlayerTeamMap`.
+ * O mapa `playerTeams` é necessário para saber a que time pertence cada
+ * evento. Ele é derivado uma única vez por competição com
+ * `buildPlayerTeamMap`.
  */
 export function deriveScore(
   match: Match,
-  finalists: Finalists | null,
+  snapshots: PlayoffSnapshots | null,
   playerTeams: PlayerTeamMap,
 ): Score | null {
   if (match.status !== 'finished') return null;
 
-  const { homeTeamId, awayTeamId } = resolveMatchTeams(match, finalists);
+  const { homeTeamId, awayTeamId } = resolveMatchTeams(match, snapshots);
 
   if (match.walkover !== null) {
     return match.walkover.winnerTeamId === homeTeamId
@@ -68,24 +86,26 @@ export function deriveScore(
   return { home, away, kind: 'normal' };
 }
 
+/**
+ * Vencedor administrativo/esportivo. Em empate no tempo normal de uma
+ * partida de mata-mata, vence o mandante do snapshot por vantagem do empate.
+ * Em partida de grupo empatada, retorna `null`.
+ */
 export function winnerOf(
   match: Match,
-  finalists: Finalists | null,
+  snapshots: PlayoffSnapshots | null,
   playerTeams: PlayerTeamMap,
 ): TeamId | null {
   if (match.status !== 'finished') return null;
 
-  const { homeTeamId, awayTeamId } = resolveMatchTeams(match, finalists);
+  const { homeTeamId, awayTeamId } = resolveMatchTeams(match, snapshots);
 
   if (match.walkover !== null) return match.walkover.winnerTeamId;
 
-  if (match.shootout !== null) {
-    if (match.shootout.home > match.shootout.away) return homeTeamId;
-    if (match.shootout.away > match.shootout.home) return awayTeamId;
-    return null;
+  const score = deriveScore(match, snapshots, playerTeams);
+  if (score === null) return null;
+  if (score.home === score.away) {
+    return match.stage === 'group' ? null : homeTeamId;
   }
-
-  const score = deriveScore(match, finalists, playerTeams);
-  if (score === null || score.home === score.away) return null;
   return score.home > score.away ? homeTeamId : awayTeamId;
 }

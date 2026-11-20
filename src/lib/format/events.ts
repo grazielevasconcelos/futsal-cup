@@ -1,8 +1,8 @@
 import { sortEvents } from '../domain/events';
 import { resolveMatchTeams } from '../domain/score';
 import type {
-  Finalists,
   Match,
+  PlayoffSnapshots,
   PlayerId,
   PlayerTeamMap,
   Team,
@@ -18,6 +18,13 @@ export interface MatchEventView {
   readonly tags: readonly string[];
 }
 
+function hasSnapshot(match: Match, snapshots: PlayoffSnapshots | null): boolean {
+  if (match.stage === 'group') return true;
+  return match.stage === 'semi'
+    ? snapshots?.semifinalists !== null && snapshots?.semifinalists !== undefined
+    : snapshots?.finalists !== null && snapshots?.finalists !== undefined;
+}
+
 /**
  * ALG-009 aplicado à apresentação: eventos ordenados por minuto e descritos
  * em pt-BR. O segundo amarelo aparece no próprio evento, não como um
@@ -25,13 +32,13 @@ export interface MatchEventView {
  */
 export function buildEventViews(
   match: Match,
-  finalists: Finalists | null,
+  snapshots: PlayoffSnapshots | null,
   playerTeams: PlayerTeamMap,
   teams: ReadonlyMap<TeamId, Team>,
 ): readonly MatchEventView[] {
-  if (match.stage === 'final' && finalists === null) return [];
+  if (!hasSnapshot(match, snapshots)) return [];
 
-  const { homeTeamId, awayTeamId } = resolveMatchTeams(match, finalists);
+  const { homeTeamId, awayTeamId } = resolveMatchTeams(match, snapshots);
   const yellowCounts = new Map<PlayerId, number>();
 
   return sortEvents(match.events).map((event) => {
