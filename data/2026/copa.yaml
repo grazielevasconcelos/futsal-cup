@@ -4,8 +4,8 @@
 # Não inclua nome completo, foto, contato, camisa ou data de nascimento.
 #
 # Estado atual: pré-competição. Elencos definidos em 17/11/2026 com nomes de
-# times provisórios (Time A/B/C); horários e local ainda serão confirmados pela
-# organização. Vi é a única goleira; as demais jogadoras atuam na linha.
+# times provisórios (Time A/B/C). Horários confirmados pela organização:
+# primeiro jogo do dia às 18h45 e segundo às 19h20, no 7º andar. Vi é a única goleira; as demais jogadoras atuam na linha.
 # Não registre resultados fictícios.
 
 edition: 2026
@@ -154,8 +154,8 @@ matches:
     homeTeamId: "ta"
     awayTeamId: "tb"
     date: "2026-11-24"
-    startsAt: null # horário a definir
-    venue: null # local a definir
+    startsAt: "2026-11-24T18:45:00-03:00"
+    venue: "7º andar"
     status: "scheduled"
     walkover: null
     events: []
@@ -166,8 +166,8 @@ matches:
     homeTeamId: "tc"
     awayTeamId: "ta"
     date: "2026-11-24"
-    startsAt: null # horário a definir
-    venue: null # local a definir
+    startsAt: "2026-11-24T19:20:00-03:00"
+    venue: "7º andar"
     status: "scheduled"
     walkover: null
     events: []
@@ -178,8 +178,8 @@ matches:
     homeTeamId: "tb"
     awayTeamId: "tc"
     date: "2026-11-26"
-    startsAt: null # horário a definir
-    venue: null # local a definir
+    startsAt: "2026-11-26T18:45:00-03:00"
+    venue: "7º andar"
     status: "scheduled"
     walkover: null
     events: []
@@ -190,8 +190,8 @@ matches:
     homeTeamId: "tb"
     awayTeamId: "ta"
     date: "2026-11-26"
-    startsAt: null # horário a definir
-    venue: null # local a definir
+    startsAt: "2026-11-26T19:20:00-03:00"
+    venue: "7º andar"
     status: "scheduled"
     walkover: null
     events: []
@@ -202,8 +202,8 @@ matches:
     homeTeamId: "ta"
     awayTeamId: "tc"
     date: "2026-12-01"
-    startsAt: null # horário a definir
-    venue: null # local a definir
+    startsAt: "2026-12-01T18:45:00-03:00"
+    venue: "7º andar"
     status: "scheduled"
     walkover: null
     events: []
@@ -214,8 +214,8 @@ matches:
     homeTeamId: "tc"
     awayTeamId: "tb"
     date: "2026-12-01"
-    startsAt: null # horário a definir
-    venue: null # local a definir
+    startsAt: "2026-12-01T19:20:00-03:00"
+    venue: "7º andar"
     status: "scheduled"
     walkover: null
     events: []
@@ -224,8 +224,8 @@ matches:
     stage: "semi"
     round: null
     date: "2026-12-03"
-    startsAt: null # horário a definir
-    venue: null # local a definir
+    startsAt: "2026-12-03T18:45:00-03:00"
+    venue: "7º andar"
     status: "scheduled"
     walkover: null
     events: []
@@ -234,8 +234,8 @@ matches:
     stage: "final"
     round: null
     date: "2026-12-03"
-    startsAt: null # horário a definir
-    venue: null # local a definir
+    startsAt: "2026-12-03T19:20:00-03:00"
+    venue: "7º andar"
     status: "scheduled"
     walkover: null
     events: []
