@@ -24,10 +24,10 @@ import {
 
 const GROUP_MATCHUPS = [
   ['g1', 'ta', 'tb'],
-  ['g2', 'tb', 'tc'],
-  ['g3', 'ta', 'tc'],
+  ['g2', 'tc', 'ta'],
+  ['g3', 'tb', 'tc'],
   ['g4', 'tb', 'ta'],
-  ['g5', 'tc', 'ta'],
+  ['g5', 'ta', 'tc'],
   ['g6', 'tc', 'tb'],
 ] as const;
 
@@ -112,7 +112,7 @@ describe('suspensões', () => {
       teamId: 'ta',
       reason: 'direct',
       sentOffIn: 'g1',
-      suspendedFor: 'g3',
+      suspendedFor: 'g2',
       pendingFinalists: false,
     });
   });
@@ -127,7 +127,7 @@ describe('suspensões', () => {
       teamId: 'ta',
       reason: 'secondYellow',
       sentOffIn: 'g1',
-      suspendedFor: 'g3',
+      suspendedFor: 'g2',
       pendingFinalists: false,
     });
   });
@@ -156,7 +156,7 @@ describe('suspensões', () => {
     const competition = makeCompetition({
       matches: groupMatches({
         g1: [yellow('p-ta1')],
-        g3: [yellow('p-ta1')],
+        g2: [yellow('p-ta1')],
       }),
     });
 
@@ -167,7 +167,7 @@ describe('suspensões', () => {
     const competition = makeCompetition({
       matches: [
         makeGroupMatch({
-          id: 'g2',
+          id: 'g3',
           home: 'tb',
           away: 'tc',
           walkover: { winnerTeamId: 'tc', reason: 'insufficient_players', note: null },
@@ -181,7 +181,7 @@ describe('suspensões', () => {
       playerId: 'p-tb1',
       teamId: 'tb',
       reason: 'direct',
-      sentOffIn: 'g2',
+      sentOffIn: 'g3',
       suspendedFor: 'g4',
       pendingFinalists: false,
     });
@@ -193,7 +193,7 @@ describe('suspensões', () => {
     const changed = makeCompetition({
       teams: competition.teams,
       matches: competition.matches.map((match) =>
-        match.id === 'g3'
+        match.id === 'g1'
           ? { ...match, events: [...match.events, red('p-001')] }
           : match,
       ),
@@ -202,7 +202,7 @@ describe('suspensões', () => {
     });
 
     const suspension = buildSuspensions(changed).find((item) => item.playerId === 'p-001');
-    expect(suspension).toMatchObject({ sentOffIn: 'g3', suspendedFor: 'g4' });
+    expect(suspension).toMatchObject({ sentOffIn: 'g1', suspendedFor: 'g2' });
   });
 
   it('TST-121: 1º colocado cumpre na final o vermelho do último jogo de grupo', () => {
@@ -295,9 +295,9 @@ describe('suspensões', () => {
     const competition = makeCompetition({
       matches: groupMatches({ g1: [red('p-ta1')] }),
     });
-    const g3 = competition.matches.find((match) => match.id === 'g3');
-    if (g3 === undefined) throw new Error('g3 ausente.');
+    const g2 = competition.matches.find((match) => match.id === 'g2');
+    if (g2 === undefined) throw new Error('g2 ausente.');
 
-    expect([...suspendedFor(g3, competition)]).toEqual(['p-ta1']);
+    expect([...suspendedFor(g2, competition)]).toEqual(['p-ta1']);
   });
 });

@@ -42,12 +42,11 @@ test.describe('páginas da competição', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Jogos' })).toBeVisible();
 
     const days = page.locator('section.section');
-    await expect(days).toHaveCount(5);
+    await expect(days).toHaveCount(4);
     await expect(days.nth(0)).toContainText('24/11/2026');
     await expect(days.nth(1)).toContainText('26/11/2026');
     await expect(days.nth(2)).toContainText('01/12/2026');
-    await expect(days.nth(3)).toContainText('02/12/2026');
-    await expect(days.nth(4)).toContainText('03/12/2026');
+    await expect(days.nth(3)).toContainText('03/12/2026');
 
     const cards = page.locator('.match-card');
     await expect(cards).toHaveCount(8);
@@ -61,7 +60,7 @@ test.describe('páginas da competição', () => {
   });
 
   test('TST-072: o detalhe mantém a ordem dos eventos por minuto', async ({ page }) => {
-    await page.goto('jogos/g3/');
+    await page.goto('jogos/g5/');
 
     await expect(page.getByRole('heading', { level: 2, name: 'Eventos' })).toBeVisible();
     await expect(page.locator('.event__minute')).toHaveText([
@@ -75,7 +74,7 @@ test.describe('páginas da competição', () => {
   test('TST-073: o detalhe do W.O. mostra o placar na ordem mandante/visitante', async ({
     page,
   }) => {
-    await page.goto('jogos/g2/');
+    await page.goto('jogos/g3/');
 
     await expect(page.locator('.score span[aria-hidden="true"]')).toHaveText('0 x 1 (W.O.)');
     await expect(
@@ -104,7 +103,7 @@ test.describe('páginas da competição', () => {
   });
 
   test('o detalhe da partida lista as desfalques por suspensão', async ({ page }) => {
-    await page.goto('jogos/g5/');
+    await page.goto('jogos/g6/');
 
     const absences = page.locator('section[aria-labelledby="desfalques"]');
     await expect(absences.getByRole('heading', { level: 2 })).toHaveText(

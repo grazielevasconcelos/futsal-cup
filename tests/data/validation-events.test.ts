@@ -6,7 +6,7 @@ import { codes, match, player, validData } from '../factories/competition';
 describe('validação semântica de eventos', () => {
   it('VAL-019: bloqueia jogadora fora do elenco dos times da partida', () => {
     const data = validData();
-    match(data, 'g3').events.push({ type: 'yellow', playerId: 'p-009', minute: 15 });
+    match(data, 'g5').events.push({ type: 'yellow', playerId: 'p-009', minute: 15 });
     expect(codes(validateCompetition(data))).toContain('VAL-019');
   });
 
@@ -39,9 +39,9 @@ describe('validação semântica de eventos', () => {
 
   it('VAL-022: bloqueia terceiro amarelo no mesmo jogo', () => {
     const data = validData();
-    const g3 = match(data, 'g3');
-    g3.events.push({ type: 'yellow', playerId: 'p-005', minute: 16 });
-    g3.events.push({ type: 'yellow', playerId: 'p-005', minute: 24 });
+    const g5 = match(data, 'g5');
+    g5.events.push({ type: 'yellow', playerId: 'p-005', minute: 16 });
+    g5.events.push({ type: 'yellow', playerId: 'p-005', minute: 24 });
     expect(codes(validateCompetition(data))).toContain('VAL-022');
   });
 
@@ -53,13 +53,13 @@ describe('validação semântica de eventos', () => {
 
   it('VAL-022: bloqueia vermelho explícito junto de dois amarelos', () => {
     const data = validData();
-    match(data, 'g3').events.push({ type: 'red', playerId: 'p-016', minute: 25 });
+    match(data, 'g5').events.push({ type: 'red', playerId: 'p-016', minute: 25 });
     expect(codes(validateCompetition(data))).toContain('VAL-022');
   });
 
   it('VAL-023: bloqueia evento de jogadora suspensa na partida da suspensão', () => {
     const data = validData();
-    match(data, 'g5').events.push({ type: 'yellow', playerId: 'p-016', minute: 10 });
+    match(data, 'g6').events.push({ type: 'yellow', playerId: 'p-016', minute: 10 });
     expect(codes(validateCompetition(data))).toContain('VAL-023');
   });
 

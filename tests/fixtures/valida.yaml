@@ -156,10 +156,42 @@ matches:
   - id: "g2"
     stage: "group"
     round: 1
-    homeTeamId: "tb"
-    awayTeamId: "tc"
+    homeTeamId: "tc"
+    awayTeamId: "ta"
     date: "2026-11-24"
     startsAt: "2026-11-24T20:30:00-03:00"
+    venue: "Vila Mariana, São Paulo"
+    status: "finished"
+    walkover: null
+    events:
+      - type: "goal"
+        playerId: "p-017"
+        assistPlayerId: "p-018"
+        minute: 7
+        penalty: false
+      - type: "goal"
+        playerId: "p-004"
+        assistPlayerId: "p-002"
+        minute: 13
+        penalty: false
+      - type: "goal"
+        playerId: "p-018"
+        assistPlayerId: "p-017"
+        minute: 20
+        penalty: false
+      - type: "goal"
+        playerId: "p-019"
+        assistPlayerId: "p-020"
+        minute: 27
+        penalty: false
+
+  - id: "g3"
+    stage: "group"
+    round: 2
+    homeTeamId: "tb"
+    awayTeamId: "tc"
+    date: "2026-11-26"
+    startsAt: "2026-11-26T19:00:00-03:00"
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover:
@@ -168,33 +200,6 @@ matches:
       note: "TB não compareceu."
     events: []
     # W.O. 0x1 para TC na ordem mandante/visitante; sem gols ou assistências.
-
-  - id: "g3"
-    stage: "group"
-    round: 2
-    homeTeamId: "ta"
-    awayTeamId: "tc"
-    date: "2026-11-26"
-    startsAt: "2026-11-26T19:00:00-03:00"
-    venue: "Vila Mariana, São Paulo"
-    status: "finished"
-    walkover: null
-    events:
-      - type: "yellow"
-        playerId: "p-005"
-        minute: 9
-      - type: "yellow"
-        playerId: "p-016"
-        minute: 14
-      - type: "goal"
-        playerId: "p-003"
-        assistPlayerId: "p-002"
-        minute: 18
-        penalty: false
-      - type: "yellow"
-        playerId: "p-016"
-        minute: 22
-        # 2º amarelo -> vermelho derivado; p-016 suspensa em g5.
 
   - id: "g4"
     stage: "group"
@@ -220,35 +225,29 @@ matches:
   - id: "g5"
     stage: "group"
     round: 3
-    homeTeamId: "tc"
-    awayTeamId: "ta"
+    homeTeamId: "ta"
+    awayTeamId: "tc"
     date: "2026-12-01"
     startsAt: "2026-12-01T19:00:00-03:00"
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover: null
     events:
+      - type: "yellow"
+        playerId: "p-005"
+        minute: 9
+      - type: "yellow"
+        playerId: "p-016"
+        minute: 14
       - type: "goal"
-        playerId: "p-017"
-        assistPlayerId: "p-018"
-        minute: 7
-        penalty: false
-      - type: "goal"
-        playerId: "p-004"
+        playerId: "p-003"
         assistPlayerId: "p-002"
-        minute: 13
+        minute: 18
         penalty: false
-      - type: "goal"
-        playerId: "p-018"
-        assistPlayerId: "p-017"
-        minute: 20
-        penalty: false
-      - type: "goal"
-        playerId: "p-019"
-        assistPlayerId: "p-020"
-        minute: 27
-        penalty: false
-    # p-016 (TC) está suspensa por 2º amarelo em g3 e não tem eventos aqui.
+      - type: "yellow"
+        playerId: "p-016"
+        minute: 22
+        # 2º amarelo -> vermelho derivado; p-016 suspensa em g6.
 
   - id: "g6"
     stage: "group"
@@ -278,12 +277,13 @@ matches:
         playerId: "p-014"
         minute: 24
         # Vermelho direto; TB cumpre a suspensão na semifinal.
+    # p-016 (TC) está suspensa por 2º amarelo em g5 e não tem eventos aqui.
 
   - id: "semi"
     stage: "semi"
     round: null
-    date: "2026-12-02"
-    startsAt: "2026-12-02T20:30:00-03:00"
+    date: "2026-12-03"
+    startsAt: "2026-12-03T19:00:00-03:00"
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover: null

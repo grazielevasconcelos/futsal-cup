@@ -191,13 +191,12 @@ Com 3 ou mais times empatados, o confronto direto **não** é aplicado até que 
 
 | Data | Partidas |
 |---|---|
-| 24/11/2026 | TA x TB (g1) e TB x TC (g2) |
-| 26/11/2026 | TA x TC (g3) e TB x TA (g4) |
-| 01/12/2026 | TC x TA (g5) e TC x TB (g6) |
-| 02/12/2026 | Semifinal: 2º x 3º |
-| 03/12/2026 | Final: 1º x vencedora da semifinal |
+| 24/11/2026 | TA x TB (g1) e TC x TA (g2) |
+| 26/11/2026 | TB x TC (g3) e TB x TA (g4) |
+| 01/12/2026 | TA x TC (g5) e TC x TB (g6) |
+| 03/12/2026 | Semifinal: 2º x 3º e Final: 1º x vencedora da semifinal |
 
-- Cada time joga duas vezes em 24/11, 26/11 e 01/12; os horários devem ser distintos e respeitar a ordem canônica g1 → g2 → g3 → g4 → g5 → g6 → semifinal → final.
+- Cada time joga duas vezes em 24/11, 26/11 e 01/12; os horários devem ser distintos e respeitar a ordem canônica g1 → g2 → g3 → g4 → g5 → g6 → semifinal → final. A semifinal e a final acontecem no mesmo dia (03/12), com horários distintos, a semifinal primeiro.
 - Horários e nomes definitivos dos times ainda não foram definidos; devem vir da fonte de dados, não fixos no código.
 - Se uma partida for adiada, a organização atualiza `status` para `postponed`, ajusta `date`/`startsAt` e, quando remarcar, volta para `scheduled`.
 

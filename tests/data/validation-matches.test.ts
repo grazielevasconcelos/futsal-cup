@@ -87,13 +87,13 @@ describe('validação semântica de partidas', () => {
 
   it('VAL-024: bloqueia W.O. com vencedor fora da partida', () => {
     const data = validData();
-    match(data, 'g2').walkover.winnerTeamId = 'ta';
+    match(data, 'g3').walkover.winnerTeamId = 'ta';
     expect(codes(validateCompetition(data))).toContain('VAL-024');
   });
 
   it('VAL-024: bloqueia W.O. em partida não encerrada', () => {
     const data = validData();
-    match(data, 'g2').status = 'scheduled';
+    match(data, 'g3').status = 'scheduled';
     expect(codes(validateCompetition(data))).toContain('VAL-024');
   });
 
@@ -134,15 +134,15 @@ describe('validação semântica de partidas', () => {
 
   it('VAL-029: bloqueia evento em W.O. por no_show', () => {
     const data = validData();
-    match(data, 'g2').events.push({ type: 'yellow', playerId: 'p-009', minute: 5 });
+    match(data, 'g3').events.push({ type: 'yellow', playerId: 'p-009', minute: 5 });
     expect(codes(validateCompetition(data))).toContain('VAL-029');
   });
 
   it('VAL-029: bloqueia gol em W.O. por elenco insuficiente', () => {
     const data = validData();
-    const g2 = match(data, 'g2');
-    g2.walkover.reason = 'insufficient_players';
-    g2.events.push({
+    const g3 = match(data, 'g3');
+    g3.walkover.reason = 'insufficient_players';
+    g3.events.push({
       type: 'goal',
       playerId: 'p-012',
       assistPlayerId: null,

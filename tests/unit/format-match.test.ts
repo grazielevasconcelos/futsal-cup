@@ -181,7 +181,7 @@ describe('formatScore', () => {
   it('formata o W.O. e o empate da final da fonte real', () => {
     const competition = loadCompetition('tests/fixtures/valida.yaml');
     const teams = playerTeams(competition);
-    const walkover = competition.matches.find((match) => match.id === 'g2') as Match;
+    const walkover = competition.matches.find((match) => match.id === 'g3') as Match;
     const final = competition.matches.find((match) => match.id === 'final') as Match;
 
     expect(formatScore(walkover, null, teams)).toBe('0 x 1 (W.O.)');

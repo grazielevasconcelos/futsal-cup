@@ -274,13 +274,12 @@ Observações:
 
 | Data | Partidas |
 |---|---|
-| **24/11/2026** | TA x TB (g1) e TB x TC (g2) |
-| **26/11/2026** | TA x TC (g3) e TB x TA (g4) |
-| **01/12/2026** | TC x TA (g5) e TC x TB (g6) |
-| **02/12/2026** | Semifinal: 2º x 3º |
-| **03/12/2026** | Final: 1º x vencedora da semifinal |
+| **24/11/2026** | TA x TB (g1) e TC x TA (g2) |
+| **26/11/2026** | TB x TC (g3) e TB x TA (g4) |
+| **01/12/2026** | TA x TC (g5) e TC x TB (g6) |
+| **03/12/2026** | Semifinal: 2º x 3º e Final: 1º x vencedora da semifinal |
 
-- Cada time joga **duas vezes** em 24/11, 26/11 e 01/12; os horários devem ser distintos e respeitar a ordem canônica g1 → g2 → g3 → g4 → g5 → g6 → semifinal → final.
+- Cada time joga **duas vezes** em 24/11, 26/11 e 01/12; os horários devem ser distintos e respeitar a ordem canônica g1 → g2 → g3 → g4 → g5 → g6 → semifinal → final. A semifinal e a final acontecem no mesmo dia (03/12), com horários distintos, a semifinal primeiro.
 - Horários exatos: **a definir**.
 - Local: Vila Mariana, São Paulo. O nome da instituição não deve aparecer na interface pública.
 - Se uma partida for adiada, a organização atualiza `status` para `postponed`, ajusta `date`/`startsAt` e, quando remarcar, volta para `scheduled`.
@@ -591,8 +590,7 @@ Observações:
 | **24/11/2026** | Primeira rodada (g1/g2) |
 | **26/11/2026** | Segunda rodada (g3/g4) |
 | **01/12/2026** | Terceira rodada (g5/g6) |
-| **02/12/2026** | Semifinal (2º x 3º) |
-| **03/12/2026** | Final (1º x vencedora da semifinal) |
+| **03/12/2026** | Semifinal (2º x 3º) e final (1º x vencedora da semifinal) |
 | **04/12/2026** | Retrospectiva e registro de melhorias |
 
 **Contingência:** se o site não estiver pronto até 24/11, a organização pode registrar os dados na fonte versionada e publicar o site assim que possível, sem alterar a condução da copa.
@@ -635,7 +633,7 @@ Observações:
 - Fonte de dados versionada e validada; site somente leitura.
 - Apenas a edição 2026, com estrutura preparada para edições futuras.
 - **3 times** (`ta`, `tb`, `tc`), **6 partidas de grupo em turno e returno**, **1 semifinal** e **1 final**, totalizando **8 partidas oficiais**.
-- Calendário: 24/11, 26/11, 01/12, 02/12 e 03/12/2026; horários a definir.
+- Calendário: 24/11, 26/11, 01/12 e 03/12/2026; horários a definir.
 - Cada par de times tem um jogo em casa para cada lado; `g4` é `tb x ta`.
 - A semifinal é **2º x 3º**, com vantagem do empate para o 2º colocado.
 - A final é **1º x vencedora da semifinal**, com vantagem do empate para o 1º colocado.

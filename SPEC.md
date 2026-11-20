@@ -660,16 +660,16 @@ Além do schema, a validação semântica **DEVE** garantir:
 - Exatamente **3 times** com IDs `ta`, `tb`, `tc`.
 - Exatamente **8 partidas** com IDs `g1`…`g6`, `semi`, `final`.
 - `g1`…`g6` formam exatamente os seis confrontos do **turno e returno**:
-  - `g1`: ta x tb; `g2`: tb x tc (rodada 1, 24/11/2026);
-  - `g3`: ta x tc; `g4`: tb x ta (rodada 2, 26/11/2026);
-  - `g5`: tc x ta; `g6`: tc x tb (rodada 3, 01/12/2026).
+  - `g1`: ta x tb; `g2`: tc x ta (rodada 1, 24/11/2026);
+  - `g3`: tb x tc; `g4`: tb x ta (rodada 2, 26/11/2026);
+  - `g5`: ta x tc; `g6`: tc x tb (rodada 3, 01/12/2026).
 - Cada time joga exatamente **4 partidas de grupo**; não há time contra si mesmo nem par de times sem os dois jogos.
 - `round` de `g1`/`g2` = 1; `g3`/`g4` = 2; `g5`/`g6` = 3. `semi` e `final` têm `round: null`.
 - `semi` e `final` não têm `homeTeamId`/`awayTeamId`; usam `semifinalists` e `finalists`.
 - `date` é uma data de calendário válida; se `startsAt` existe, sua data local em `America/Sao_Paulo` é igual a `date`.
 - `finished` exige `startsAt`; `scheduled`/`postponed` não têm eventos nem W.O.
 - A ordem cronológica de cada time respeita a ordem canônica (`g1` → `g2` → `g3` → `g4` → `g5` → `g6` → `semi` → `final`): a semifinal ocorre depois das 6 partidas de grupo e a final depois da semifinal. Um time pode ter duas partidas na mesma data, desde que os horários sejam distintos e respeitem essa ordem.
-- O calendário oficial é: grupo em 24/11, 26/11 e 01/12; `semi` em 02/12; `final` em 03/12 (`VAL-W02` avisa sobre desvio).
+- O calendário oficial é: grupo em 24/11, 26/11 e 01/12; `semi` e `final` em 03/12, com horários distintos, a semifinal primeiro (`VAL-W02` avisa sobre desvio).
 - `semifinalists` é `null` enquanto o grupo não termina; quando as 6 partidas terminam, é obrigatório e deve ser `[2º, 3º]` da classificação.
 - `finalists` é `null` enquanto a semifinal não termina; quando a semifinal termina, é obrigatório e deve ser `[1º, vencedora da semifinal]`. A vencedora considera W.O. e, em empate no tempo normal, a vantagem do empate do 2º colocado (mandante da semifinal).
 - A ordem de `semifinalists` e `finalists` define mando e vantagem; não há campo separado de vantagem.
@@ -1599,7 +1599,7 @@ O algoritmo do cartão informativo do amistoso foi removido na v2.0. O ID fica r
 | VAL-009 | Mais de 8 jogadoras ativas simultaneamente em qualquer instante (inclui a 9ª ativa). | Máximo 8. | Instante e contagem. | DM-012 |
 | VAL-010 | Jogadora com evento em partida de time diferente do time atual (transferência após atuar). | Vínculo imutável após o primeiro evento. | Jogadora, time atual, partida. | DM-012 |
 | VAL-011 | Conjunto de partidas ≠ 8 IDs exatos; ID duplicado; `stage`/`round` incompatível com o ID; `semi` ou `final` ausente/duplicada. | `g1`…`g6`, `semi`, `final`. | Lista encontrada. | DM-004 |
-| VAL-012 | Confrontos de grupo diferentes dos seis do turno e returno; time repetido; time contra si mesmo; par sem os dois jogos. | `g1` ta×tb, `g2` tb×tc, `g3` ta×tc, `g4` tb×ta, `g5` tc×ta, `g6` tc×tb. | Confronto encontrado. | DM-004 |
+| VAL-012 | Confrontos de grupo diferentes dos seis do turno e returno; time repetido; time contra si mesmo; par sem os dois jogos. | `g1` ta×tb, `g2` tc×ta, `g3` tb×tc, `g4` tb×ta, `g5` ta×tc, `g6` tc×tb. | Confronto encontrado. | DM-004 |
 | VAL-013 | Data de calendário inválida; `startsAt` inválido; data local de `startsAt` em `America/Sao_Paulo` diferente de `date`; `notice.date` inválida. | Data real e coerente com o fuso. | Valores encontrados. | DM-004/011 |
 | VAL-014 | `finished` sem `startsAt`; `scheduled`/`postponed` com eventos ou `walkover`. | `finished` com `startsAt`; demais sem eventos/W.O. | Status e campos. | DM-004 |
 | VAL-015 | Time com duas partidas no mesmo `startsAt`; ordem canônica incompatível com `startsAt`, inclusive `g6` → `semi` → `final`. | Ordem canônica e cronologia coerentes, inclusive nas datas com dois jogos do mesmo time. | Partidas e horários. | DM-004 |
@@ -1626,7 +1626,7 @@ O algoritmo do cartão informativo do amistoso foi removido na v2.0. O ID fica r
 | ID | Condição | Mensagem | Efeito |
 |---|---|---|---|
 | VAL-W01 | Time com menos de 7 jogadoras ativas. | “Time {nome} tem {n} jogadoras ativas; o alvo é 7 ou 8. A publicação não é bloqueada.” | Job summary; badge público só se `<5` (regra de UI, não de validação). |
-| VAL-W02 | Partida `scheduled`/`finished` fora da data original do calendário (24/11, 26/11, 01/12, 02/12, 03/12). | “Partida {id} está em {data}, fora do calendário original. Confirme o adiamento.” | Job summary. `postponed` é isenta. |
+| VAL-W02 | Partida `scheduled`/`finished` fora da data original do calendário (24/11, 26/11, 01/12, 03/12). | “Partida {id} está em {data}, fora do calendário original. Confirme o adiamento.” | Job summary. `postponed` é isenta. |
 | VAL-W03 | Nome de time duplicado após normalização. | “Os times {a} e {b} têm o mesmo nome; a abreviação distingue, mas confirme o nome público.” | Job summary. |
 | VAL-W04 | Partida `scheduled` com data/horário já passados no build. | “Partida {id} está agendada, mas a data passou. A UI mostrará ‘Resultado pendente’.” | Job summary; não bloqueia. |
 
@@ -1687,7 +1687,7 @@ A assistência deve ser do mesmo time da marcadora e não pode ser a própria ma
 - `VAL-009`: “Elenco com 9 jogadoras ativas em 2026-11-24T19:00:00-03:00; máximo permitido: 8. A 9ª jogadora deve sair com `leftAt` ou ser registrada em outro time.”
 - `VAL-017`: “Semifinalistas divergentes da classificação. Antigos: [ta, tb]. Novos: [ta, tc]. Atualize `semifinalists` para confirmar a correção.”
 - `VAL-017`: “Finalistas divergentes do esperado. Antigos: [tc, ta]. Novos: [tc, tb]. Atualize `finalists` para confirmar a correção.”
-- `VAL-023`: “p-016 (tc) está suspensa por 2º amarelo em g3 e não pode ter eventos em g5.”
+- `VAL-023`: “p-016 (tc) está suspensa por 2º amarelo em g5 e não pode ter eventos em g6.”
 - `VAL-024`: “W.O. inválido em g2: `no_show` não pode ter eventos; encontrados 2 cartões.”
 - `VAL-032`: “Campo desconhecido em teams[0].players[0]: `fullName`. Remova o campo; a privacidade permite apenas id, nickname, position, joinedAt e leftAt.”
 
@@ -2800,7 +2800,7 @@ O alinhamento abaixo foi aplicado nesta entrega. A aprovação formal do PRD (§
 - [x] §7.1/§7.7: vantagem do empate para o 2º na semifinal e para o 1º na final; sem prorrogação, pênaltis ou shootout; 3ª colocada é a perdedora da semifinal.
 - [x] §7.5: suspensão considera o caminho do time no chaveamento, incluindo o 1º colocado sem semifinal.
 - [x] §7.7/§8.1: `semifinalists` e `finalists` como snapshots validados; correções após semifinal/final bloqueiam com antigos/novos.
-- [x] §7.8: calendário com semifinal em 02/12 e final em 03/12.
+- [x] §7.8: calendário com semifinal e final em 03/12.
 - [x] §7.9/§10.6: remover o amistoso e o card informativo; exibir semifinal/final com vantagem textual e 3ª colocada.
 - [x] §10.4/§10.5: estatísticas coletivas das 8 partidas, empate no mata-mata como empate, sem colunas de pênaltis.
 - [x] §8/§12: validação e critérios de aceite para snapshots, vantagem, W.O. no mata-mata, remoção de amistoso/shootout e pódio de 3.
@@ -2877,7 +2877,7 @@ O alinhamento abaixo foi aplicado nesta entrega. A aprovação formal do PRD (§
 
 ### 16.2 Premissas
 
-- 3 times, 8 partidas oficiais (6 de grupo + semifinal + final) e o calendário de 24/11, 26/11, 01/12, 02/12 e 03/12.
+- 3 times, 8 partidas oficiais (6 de grupo + semifinal + final) e o calendário de 24/11, 26/11, 01/12 e 03/12.
 - A semifinal é 2º x 3º e a final é 1º x vencedora da semifinal; ambos os mandantes têm vantagem do empate.
 - Nomes, horários e local exato são dados operacionais; a UI tem fallback.
 - O site é somente leitura; a edição é via Git.
@@ -3154,10 +3154,42 @@ matches:
   - id: "g2"
     stage: "group"
     round: 1
-    homeTeamId: "tb"
-    awayTeamId: "tc"
+    homeTeamId: "tc"
+    awayTeamId: "ta"
     date: "2026-11-24"
     startsAt: "2026-11-24T20:30:00-03:00"
+    venue: "Vila Mariana, São Paulo"
+    status: "finished"
+    walkover: null
+    events:
+      - type: "goal"
+        playerId: "p-017"
+        assistPlayerId: "p-018"
+        minute: 7
+        penalty: false
+      - type: "goal"
+        playerId: "p-004"
+        assistPlayerId: "p-002"
+        minute: 13
+        penalty: false
+      - type: "goal"
+        playerId: "p-018"
+        assistPlayerId: "p-017"
+        minute: 20
+        penalty: false
+      - type: "goal"
+        playerId: "p-019"
+        assistPlayerId: "p-020"
+        minute: 27
+        penalty: false
+
+  - id: "g3"
+    stage: "group"
+    round: 2
+    homeTeamId: "tb"
+    awayTeamId: "tc"
+    date: "2026-11-26"
+    startsAt: "2026-11-26T19:00:00-03:00"
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover:
@@ -3166,33 +3198,6 @@ matches:
       note: "TB não compareceu."
     events: []
     # W.O. 0x1 para TC na ordem mandante/visitante; sem gols ou assistências.
-
-  - id: "g3"
-    stage: "group"
-    round: 2
-    homeTeamId: "ta"
-    awayTeamId: "tc"
-    date: "2026-11-26"
-    startsAt: "2026-11-26T19:00:00-03:00"
-    venue: "Vila Mariana, São Paulo"
-    status: "finished"
-    walkover: null
-    events:
-      - type: "yellow"
-        playerId: "p-005"
-        minute: 9
-      - type: "yellow"
-        playerId: "p-016"
-        minute: 14
-      - type: "goal"
-        playerId: "p-003"
-        assistPlayerId: "p-002"
-        minute: 18
-        penalty: false
-      - type: "yellow"
-        playerId: "p-016"
-        minute: 22
-        # 2º amarelo -> vermelho derivado; p-016 suspensa em g5.
 
   - id: "g4"
     stage: "group"
@@ -3218,35 +3223,29 @@ matches:
   - id: "g5"
     stage: "group"
     round: 3
-    homeTeamId: "tc"
-    awayTeamId: "ta"
+    homeTeamId: "ta"
+    awayTeamId: "tc"
     date: "2026-12-01"
     startsAt: "2026-12-01T19:00:00-03:00"
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover: null
     events:
+      - type: "yellow"
+        playerId: "p-005"
+        minute: 9
+      - type: "yellow"
+        playerId: "p-016"
+        minute: 14
       - type: "goal"
-        playerId: "p-017"
-        assistPlayerId: "p-018"
-        minute: 7
-        penalty: false
-      - type: "goal"
-        playerId: "p-004"
+        playerId: "p-003"
         assistPlayerId: "p-002"
-        minute: 13
+        minute: 18
         penalty: false
-      - type: "goal"
-        playerId: "p-018"
-        assistPlayerId: "p-017"
-        minute: 20
-        penalty: false
-      - type: "goal"
-        playerId: "p-019"
-        assistPlayerId: "p-020"
-        minute: 27
-        penalty: false
-    # p-016 (TC) está suspensa por 2º amarelo em g3 e não tem eventos aqui.
+      - type: "yellow"
+        playerId: "p-016"
+        minute: 22
+        # 2º amarelo -> vermelho derivado; p-016 suspensa em g6.
 
   - id: "g6"
     stage: "group"
@@ -3280,8 +3279,8 @@ matches:
   - id: "semi"
     stage: "semi"
     round: null
-    date: "2026-12-02"
-    startsAt: "2026-12-02T20:00:00-03:00"
+    date: "2026-12-03"
+    startsAt: "2026-12-03T19:00:00-03:00"
     venue: "Vila Mariana, São Paulo"
     status: "finished"
     walkover: null
@@ -3341,11 +3340,11 @@ notices: []
 **Conferência do exemplo:**
 
 - Grupo: TC 7 pts, 5 gols pró, 3 contra, saldo +2; TA 7 pts, 4 pró, 4 contra, saldo 0; TB 2 pts, 2 pró, 4 contra, saldo −2.
-- TC e TA empatam em pontos. O confronto direto soma os dois jogos: g3 TA 1x0 TC e g5 TC 3x1 TA. Pontos 3–3; saldo agregado TC 3x2, então TC é 1ª e TA é 2ª. TB é 3ª.
+- TC e TA empatam em pontos. O confronto direto soma os dois jogos: g2 TC 3x1 TA e g5 TA 1x0 TC. Pontos 3–3; saldo agregado TC 3x2, então TC é 1ª e TA é 2ª. TB é 3ª.
 - `semifinalists: ["ta", "tb"]`: semifinal TA x TB, com TA como mandante e vantagem do empate. TA terminou em 2º e TB em 3º.
 - A semifinal terminou 1x2 para TB. `finalists: ["tc", "tb"]`: final TC x TB, com TC como mandante e vantagem do empate. A 3ª colocada é TA, perdedora da semifinal; **não há 4º lugar**.
-- g2 é W.O. 0x1 para TC na ordem mandante/visitante, sem gols/assistências; conta pontos, vitória, gols pró/contra e saldo.
-- p-016 (TC) recebe o 2º amarelo em g3 e cumpre suspensão em g5; não tem eventos em g5.
+- g3 é W.O. 0x1 para TC na ordem mandante/visitante, sem gols/assistências; conta pontos, vitória, gols pró/contra e saldo.
+- p-016 (TC) recebe o 2º amarelo em g5 e cumpre suspensão em g6; não tem eventos em g6.
 - p-014 (TB) recebe vermelho direto em g6; como TB é 3ª e disputa a semifinal, a suspensão é cumprida na `semi`, onde p-014 não tem eventos.
 - A final terminou 1x1 no tempo normal. TC é campeã pela vantagem do empate; TB é vice-campeã e TA é 3ª colocada. Não há shootout, prorrogação ou pênaltis.
 - Gols, assistências e cartões da semifinal e da final entram nas estatísticas individuais e coletivas; a classificação considera apenas as 6 partidas de grupo.
@@ -3665,9 +3664,9 @@ Os IDs `TST-*` são estáveis. Casos removidos na v1.1 (por exemplo, disputa de 
 | TST-019 | FR-13 | Dois amarelos | 2 yellow, sem red | 3 pontos; red derivado=1 | U |
 | TST-020 | VAL-022 | Terceiro amarelo no mesmo jogo | 3 yellow na mesma partida | Erro bloqueante | D |
 | TST-021 | VAL-022 | Red explícito com 2 amarelos | 2 yellow + red | Erro bloqueante | D |
-| TST-022 | FR-13 | Suspensão próxima partida | Red em g1; g3 do time | Suspensa em g3 | U |
+| TST-022 | FR-13 | Suspensão próxima partida | Red em g1; g2 do time | Suspensa em g2 | U |
 | TST-023 | FR-13 | Sem próxima partida | Red na final | `suspendedFor=null`; sem efeito | U |
-| TST-024 | VAL-023 | Evento de suspensa | Red em g1; evento em g3 | Erro bloqueante | D/U |
+| TST-024 | VAL-023 | Evento de suspensa | Red em g1; evento em g2 | Erro bloqueante | D/U |
 | TST-025 | FR-13 | Sem acúmulo de amarelos | 1 yellow em jogos diferentes | Sem suspensão | U |
 | TST-026 | FR-13 | Cartões na final | Yellow/red na final | Contam stats; não classificação | U |
 | TST-027 | FR-13 | Cartões em W.O. | Cards em W.O. | Contam stats; `no_show` não tem | U/D |
@@ -3747,7 +3746,7 @@ Os IDs `TST-*` são estáveis. Casos removidos na v1.1 (por exemplo, disputa de 
 | TST-068 | FR-09 | Início grupo completo | 6 finished | Card da semifinal 2º x 3º e card da final com 1º + “Vencedora da semifinal” | E |
 | TST-069 | FR-09 | Início após final | 8 finished | Campeã + pódio de 3 | E |
 | TST-070 | FR-04 | Próximo jogo/pendente | Scheduled vencida | “Resultado pendente”; não é próximo | U/E |
-| TST-071 | FR-04 | Lista por data | 8 partidas oficiais | Grupos por data (5 datas); sem 3º lugar; sem amistoso | E |
+| TST-071 | FR-04 | Lista por data | 8 partidas oficiais | Grupos por data (4 datas); sem 3º lugar; sem amistoso | E |
 | TST-072 | FR-05 | Ordem de eventos | Minutos 10, null, 10 | 10,10,null; empate por arquivo | U/E |
 | TST-073 | FR-05 | W.O. na UI | g2 | “0 x 1 (W.O.)” na ordem mandante/visitante + motivo; sem gol | E |
 | TST-074 | FR-05 | Empate no mata-mata na UI | Final/semi 1x1 | Placar “1 x 1” + texto de vantagem do empate; sem shootout | E |
@@ -4074,7 +4073,7 @@ ADRs registram decisões de arquitetura e o porquê. O status de cada uma é **A
 
 - **Contexto:** a decisão de produto de 18/11/2026 substituiu o formato de 7 partidas por 8 partidas oficiais, com semifinal e final, mantendo 3 times e turno e returno no grupo.
 - **Decisão:** fixar `ta`, `tb`, `tc`; 6 partidas `g1`…`g6`; semifinal `2º x 3º` com vantagem do empate para o 2º; final `1º x vencedora da semifinal` com vantagem do empate para o 1º; 3ª colocada é a perdedora da semifinal; sem 3º x 4º e sem 4º lugar.
-- **Consequências:** schema com 3 times e 8 partidas; 8 rotas de jogo e 3 de time; pódio de 3; calendário com grupo em 24/11, 26/11 e 01/12, semifinal em 02/12 e final em 03/12; PRD/AGENTS atualizados na v2.0.
+- **Consequências:** schema com 3 times e 8 partidas; 8 rotas de jogo e 3 de time; pódio de 3; calendário com grupo em 24/11, 26/11 e 01/12, semifinal e final em 03/12; PRD/AGENTS atualizados na v2.0.
 - **Alternativas rejeitadas:** manter final direta 1º x 2º (formato v1.1), turno único (menos jogos), partida de 3º lugar (contraria a decisão), prorrogação/pênaltis (contraria a regra de empate).
 - **Rastreabilidade:** §2, §5.4, §6.3, §7.7, §10; SPEC-017, DM-001, DM-017.
 

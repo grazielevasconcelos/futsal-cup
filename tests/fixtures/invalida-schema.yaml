@@ -10,8 +10,8 @@ matches:
     round: 1
     homeTeamId: "ta"
     awayTeamId: "tb"
-    date: "2026-12-02"
-    startsAt: "2026-12-02T20:30:00-03:00"
+    date: "2026-12-03"
+    startsAt: "2026-12-03T20:30:00-03:00"
     venue: "Vila Mariana, São Paulo"
     status: "scheduled"
     walkover: null

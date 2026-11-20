@@ -20,7 +20,7 @@ export const ORIGINAL_MATCH_DATES: Readonly<Record<MatchId, string>> = {
   g4: '2026-11-26',
   g5: '2026-12-01',
   g6: '2026-12-01',
-  semi: '2026-12-02',
+  semi: '2026-12-03',
   final: '2026-12-03',
 };
 
@@ -28,10 +28,10 @@ export const EXPECTED_GROUP_MATCHUPS: Readonly<
   Record<GroupMatchId, { homeTeamId: TeamId; awayTeamId: TeamId; round: 1 | 2 | 3 }>
 > = {
   g1: { homeTeamId: 'ta', awayTeamId: 'tb', round: 1 },
-  g2: { homeTeamId: 'tb', awayTeamId: 'tc', round: 1 },
-  g3: { homeTeamId: 'ta', awayTeamId: 'tc', round: 2 },
+  g2: { homeTeamId: 'tc', awayTeamId: 'ta', round: 1 },
+  g3: { homeTeamId: 'tb', awayTeamId: 'tc', round: 2 },
   g4: { homeTeamId: 'tb', awayTeamId: 'ta', round: 2 },
-  g5: { homeTeamId: 'tc', awayTeamId: 'ta', round: 3 },
+  g5: { homeTeamId: 'ta', awayTeamId: 'tc', round: 3 },
   g6: { homeTeamId: 'tc', awayTeamId: 'tb', round: 3 },
 };
 

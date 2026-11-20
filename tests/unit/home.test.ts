@@ -326,10 +326,10 @@ describe('próximo jogo e resultados', () => {
     expect(getLastResults(scheduledCup())).toEqual([]);
   });
 
-  it('usa a final como último resultado quando ela termina', () => {
+  it('usa a semifinal e a final como últimos resultados quando terminam no mesmo dia', () => {
     expect(
       getLastResults(loadCompetition('tests/fixtures/valida.yaml')).map((match) => match.id),
-    ).toEqual(['final']);
+    ).toEqual(['semi', 'final']);
   });
 });
 

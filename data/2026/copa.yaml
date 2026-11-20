@@ -163,8 +163,8 @@ matches:
   - id: "g2"
     stage: "group"
     round: 1
-    homeTeamId: "tb"
-    awayTeamId: "tc"
+    homeTeamId: "tc"
+    awayTeamId: "ta"
     date: "2026-11-24"
     startsAt: null # horário a definir
     venue: null # local a definir
@@ -175,7 +175,7 @@ matches:
   - id: "g3"
     stage: "group"
     round: 2
-    homeTeamId: "ta"
+    homeTeamId: "tb"
     awayTeamId: "tc"
     date: "2026-11-26"
     startsAt: null # horário a definir
@@ -199,8 +199,8 @@ matches:
   - id: "g5"
     stage: "group"
     round: 3
-    homeTeamId: "tc"
-    awayTeamId: "ta"
+    homeTeamId: "ta"
+    awayTeamId: "tc"
     date: "2026-12-01"
     startsAt: null # horário a definir
     venue: null # local a definir
@@ -223,7 +223,7 @@ matches:
   - id: "semi"
     stage: "semi"
     round: null
-    date: "2026-12-02"
+    date: "2026-12-03"
     startsAt: null # horário a definir
     venue: null # local a definir
     status: "scheduled"

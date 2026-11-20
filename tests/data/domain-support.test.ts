@@ -18,10 +18,10 @@ describe('apoio de domínio usado pela validação', () => {
   });
 
   it('deriva o W.O. na ordem mandante/visitante', () => {
-    const g2 = competition.matches.find((match) => match.id === 'g2');
-    if (g2 === undefined) throw new Error('g2 ausente na fixture.');
+    const g3 = competition.matches.find((match) => match.id === 'g3');
+    if (g3 === undefined) throw new Error('g3 ausente na fixture.');
 
-    expect(deriveScore(g2, null, buildPlayerTeamMap(competition))).toEqual({
+    expect(deriveScore(g3, null, buildPlayerTeamMap(competition))).toEqual({
       home: 0,
       away: 1,
       kind: 'walkover',
@@ -37,8 +37,8 @@ describe('apoio de domínio usado pela validação', () => {
       playerId: 'p-016',
       teamId: 'tc',
       reason: 'secondYellow',
-      sentOffIn: 'g3',
-      suspendedFor: 'g5',
+      sentOffIn: 'g5',
+      suspendedFor: 'g6',
       pendingFinalists: false,
     });
   });

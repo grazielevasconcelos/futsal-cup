@@ -123,12 +123,12 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 
 ### 9.2 Dados e validação
 
-- [x] Adicionar `semi` (02/12/2026) e remover `shootout`/`friendly` de `data/2026/copa.yaml`.
+- [x] Adicionar `semi` (03/12/2026) e remover `shootout`/`friendly` de `data/2026/copa.yaml`.
 - [x] Adicionar `semifinalists` e `finalists` ao envelope; ambos `null` antes da competição.
 - [x] Atualizar `schema.ts` para 8 IDs, `stage: semi`, snapshots e proibição de campos antigos.
 - [x] Atualizar `validate.ts`: conjunto de partidas, progressão, snapshots, W.O. no mata-mata, suspensões e migração.
 - [x] Atualizar fixture `tests/fixtures/valida.yaml`: TC 1ª, TA 2ª, TB 3ª; semi TA 1x2 TB; final TC 1x1 TB; TC campeã por vantagem.
-- [x] Garantir suspensões da fixture: TB `p-014` vermelho em g6 cumpre na semi; TC `p-016` 2º amarelo em g3 cumpre em g5.
+- [x] Garantir suspensões da fixture: TB `p-014` vermelho em g6 cumpre na semi; TC `p-016` 2º amarelo em g5 cumpre em g6.
 
 ### 9.3 Domínio
 
@@ -151,7 +151,7 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 ### 9.5 Testes e build
 
 - [x] Atualizar factories e testes unitários/de dados para snapshots, vantagem do empate, W.O. no mata-mata e suspensões.
-- [x] Atualizar E2E: 8 cards, 5 datas, semifinal, final, 3ª colocada, ausência de amistoso/shootout.
+- [x] Atualizar E2E: 8 cards, 4 datas, semifinal, final, 3ª colocada, ausência de amistoso/shootout.
 - [x] Atualizar `scripts/check-build.ts`: rota `jogos/semi/`, termos proibidos e ausência de JS.
 - [x] Rodar `npm run validate`, `npm run check`, `npm test`, `npm run build`, `npm run build:test`, `npm run test:build`, `npm run test:e2e` e `npm run verify`.
 - [x] Commits `feat(dados)`, `feat(dominio)`, `feat(ui)`, `test:` e `chore(build)`.

@@ -165,15 +165,15 @@ describe('pipeline de dados', () => {
     const data = validData();
     delete match(data, 'g1').events[0].minute;
     delete match(data, 'g1').events[1].assistPlayerId;
-    delete match(data, 'g2').walkover.note;
+    delete match(data, 'g3').walkover.note;
 
     const result = validateCompetition(data);
     expect(result.errors).toEqual([]);
     const g1 = match({ matches: result.competition?.matches } as any, 'g1');
-    const g2 = match({ matches: result.competition?.matches } as any, 'g2');
+    const g3 = match({ matches: result.competition?.matches } as any, 'g3');
     expect(g1.events[0].minute).toBeNull();
     expect(g1.events[1].assistPlayerId).toBeNull();
-    expect(g2.walkover.note).toBeNull();
+    expect(g3.walkover.note).toBeNull();
   });
 
   it('parseCompetition lança DataValidationError com os issues agregados', () => {

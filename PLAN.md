@@ -42,7 +42,7 @@ Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal 
 ### Fatia 4 — Páginas
 
 - Início nos cinco estados (`beforeCup`, `duringGroup`, `groupComplete`, `semiComplete`, `afterFinal`).
-- Jogos: lista por data (5 datas) e detalhe com eventos, W.O. e desfalques; sem shootout.
+- Jogos: lista por data (4 datas) e detalhe com eventos, W.O. e desfalques; sem shootout.
 - Classificação: 13 colunas, provisória, sorteio e critérios.
 - Times: elenco ativo, badge <5, suspensão, histórico e estatísticas coletivas das 8 partidas, sem colunas de pênaltis.
 - Estatísticas: artilharia, assistências, cartões e gols contra.
@@ -86,7 +86,7 @@ Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal 
 
 - Atualizar `data/2026/copa.yaml` para 8 partidas: adicionar `semi`, manter `final`, preencher `semifinalists`/`finalists` como `null` antes da competição e remover `shootout`/`friendly`.
 - Atualizar schema, validação, tipos e domínio: snapshots `semifinalists`/`finalists`, `winnerOf` com vantagem do empate, 3ª colocada como perdedora da semifinal e suspensões pelo caminho real do time.
-- Atualizar UI, fixture, testes e `check-build` para semifinal, final, 8 cards, 5 datas, ausência de amistoso/shootout e rotas `jogos/semi/`.
+- Atualizar UI, fixture, testes e `check-build` para semifinal, final, 8 cards, 4 datas, ausência de amistoso/shootout e rotas `jogos/semi/`.
 - Critério: `npm run verify` passa; build de produção com 8 partidas; nenhuma referência a amistoso, shootout, 3º lugar ou 4º lugar em dados, UI ou `dist/`.
 
 ## Marcos
@@ -100,8 +100,7 @@ Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal 
 | 24/11/2026 | Primeira rodada |
 | 26/11/2026 | Segunda rodada |
 | 01/12/2026 | Terceira rodada |
-| 02/12/2026 | Semifinal |
-| 03/12/2026 | Final |
+| 03/12/2026 | Semifinal e final |
 | 04/12/2026 | Retrospectiva |
 
 ## Riscos de execução
