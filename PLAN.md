@@ -82,6 +82,8 @@ Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal 
 
 ### Fatia 9 — Migração para o formato v2.0
 
+**Status:** concluída em 20/11/2026 — `npm run verify` verde (validate, check, 332 testes unitários/de dados, build com 18 páginas e 0 KB de JS de cliente, 77 testes E2E).
+
 - Atualizar `data/2026/copa.yaml` para 8 partidas: adicionar `semi`, manter `final`, preencher `semifinalists`/`finalists` como `null` antes da competição e remover `shootout`/`friendly`.
 - Atualizar schema, validação, tipos e domínio: snapshots `semifinalists`/`finalists`, `winnerOf` com vantagem do empate, 3ª colocada como perdedora da semifinal e suspensões pelo caminho real do time.
 - Atualizar UI, fixture, testes e `check-build` para semifinal, final, 8 cards, 5 datas, ausência de amistoso/shootout e rotas `jogos/semi/`.
