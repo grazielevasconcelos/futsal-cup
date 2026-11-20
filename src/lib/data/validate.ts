@@ -5,7 +5,8 @@ import {
   canonicalOrder,
 } from '../domain/order';
 import { buildPlayerTeamMap, isEligibleAt } from '../domain/players';
-import { deriveScore } from '../domain/score';
+import { isGroupComplete, isSemiComplete } from '../domain/playoffs';
+import { resolveMatchTeams, winnerOf } from '../domain/score';
 import { DrawRequiredError, rankTeams } from '../domain/standings';
 import { localDateInSaoPaulo } from '../domain/time';
 import type {
@@ -30,7 +31,7 @@ import { normalizeText, uniqueKey } from './text';
 
 const TEAM_IDS: readonly TeamId[] = ['ta', 'tb', 'tc'];
 const GROUP_IDS: readonly MatchId[] = ['g1', 'g2', 'g3', 'g4', 'g5', 'g6'];
-const MATCH_IDS: readonly MatchId[] = [...GROUP_IDS, 'final'];
+const MATCH_IDS: readonly MatchId[] = [...GROUP_IDS, 'semi', 'final'];
 
 export interface SemanticValidationOptions {
   readonly now?: Date;
@@ -51,13 +52,16 @@ function isGroupMatch(match: Match): match is GroupMatch {
 
 function matchParticipants(
   match: Match,
-  finalists: Competition['finalists'],
+  competition: Competition,
 ): { readonly homeTeamId: TeamId; readonly awayTeamId: TeamId } | null {
-  if (match.stage === 'group') {
-    return { homeTeamId: match.homeTeamId, awayTeamId: match.awayTeamId };
+  try {
+    return resolveMatchTeams(match, {
+      semifinalists: competition.semifinalists,
+      finalists: competition.finalists,
+    });
+  } catch {
+    return null;
   }
-  if (finalists === null) return null;
-  return { homeTeamId: finalists.final[0], awayTeamId: finalists.final[1] };
 }
 
 function eventReferences(event: Event): readonly PlayerId[] {
@@ -69,6 +73,12 @@ function eventReferences(event: Event): readonly PlayerId[] {
 
 function reasonLabel(reason: 'direct' | 'secondYellow'): string {
   return reason === 'direct' ? 'vermelho direto' : 'segundo amarelo';
+}
+
+function stageForId(matchId: MatchId): Match['stage'] {
+  if (matchId === 'semi') return 'semi';
+  if (matchId === 'final') return 'final';
+  return 'group';
 }
 
 export function validateSemantics(
@@ -266,7 +276,7 @@ export function validateSemantics(
     if (current === undefined) continue;
 
     for (const [index, match] of competition.matches.entries()) {
-      const participants = matchParticipants(match, competition.finalists);
+      const participants = matchParticipants(match, competition);
       if (participants === null) continue;
       if (participants.homeTeamId === current.team.id || participants.awayTeamId === current.team.id) {
         continue;
@@ -307,18 +317,34 @@ export function validateSemantics(
   }
   const missingMatches = MATCH_IDS.filter((id) => !uniqueMatchIds.has(id));
   const extraMatches = [...uniqueMatchIds].filter((id) => !MATCH_IDS.includes(id));
-  if (missingMatches.length > 0 || extraMatches.length > 0 || matchIds.length !== 7) {
+  if (
+    missingMatches.length > 0 ||
+    extraMatches.length > 0 ||
+    matchIds.length !== MATCH_IDS.length
+  ) {
     errors.push(
       issue(
         'VAL-011',
         ['matches'],
-        'Exatamente g1, g2, g3, g4, g5, g6 e final.',
+        'Exatamente g1, g2, g3, g4, g5, g6, semi e final.',
         matchIds.join(', ') || '<lista vazia>',
-        `O conjunto de partidas deve ser exatamente g1…g6 e final. Ausentes: ${missingMatches.join(', ') || 'nenhuma'}. Inesperadas: ${extraMatches.join(', ') || 'nenhuma'}.`,
+        `O conjunto de partidas deve ser exatamente g1…g6, semi e final. Ausentes: ${missingMatches.join(', ') || 'nenhuma'}. Inesperadas: ${extraMatches.join(', ') || 'nenhuma'}.`,
       ),
     );
   }
   for (const [index, match] of competition.matches.entries()) {
+    const expectedStage = stageForId(match.id);
+    if (match.stage !== expectedStage) {
+      errors.push(
+        issue(
+          'VAL-011',
+          ['matches', index, 'stage'],
+          `stage "${expectedStage}" para ${match.id}.`,
+          formatValue(match.stage),
+          `A partida ${match.id} deve ter stage "${expectedStage}".`,
+        ),
+      );
+    }
     if (match.stage === 'group') {
       const expected = EXPECTED_GROUP_MATCHUPS[match.id as keyof typeof EXPECTED_GROUP_MATCHUPS];
       if (expected !== undefined && match.round !== expected.round) {
@@ -445,7 +471,7 @@ export function validateSemantics(
     );
   });
 
-  /* VAL-014 — status × eventos/W.O./shootout */
+  /* VAL-014 — status × eventos/W.O. */
   for (const [index, match] of competition.matches.entries()) {
     if (match.status === 'finished' && match.startsAt === null) {
       errors.push(
@@ -460,20 +486,19 @@ export function validateSemantics(
     }
 
     if (match.status !== 'finished') {
-      if (match.events.length > 0 || match.walkover !== null || match.shootout !== null) {
+      if (match.events.length > 0 || match.walkover !== null) {
         errors.push(
           issue(
             'VAL-014',
             ['matches', index],
-            'Partida não encerrada sem eventos, W.O. ou shootout.',
+            'Partida não encerrada sem eventos ou W.O.',
             [
               `${match.events.length} evento(s)`,
               match.walkover === null ? null : 'W.O.',
-              match.shootout === null ? null : 'shootout',
             ]
               .filter((item): item is string => item !== null)
               .join(', '),
-            `A partida ${match.id} está ${match.status === 'postponed' ? 'adiada' : 'agendada'} e não pode ter eventos, W.O. ou shootout.`,
+            `A partida ${match.id} está ${match.status === 'postponed' ? 'adiada' : 'agendada'} e não pode ter eventos ou W.O.`,
           ),
         );
       }
@@ -504,41 +529,72 @@ export function validateSemantics(
           ['matches', currentIndex, 'startsAt'],
           `${current.id} depois de ${previous.id} na ordem canônica.`,
           `${current.startsAt} (${previous.id}: ${previous.startsAt})`,
-          `A ordem canônica é g1 → g2 → g3 → g4 → g5 → g6 → final, com horários distintos. ${current.id} não pode começar em ${current.startsAt} depois de ${previous.id} em ${previous.startsAt}.`,
+          `A ordem canônica é g1 → g2 → g3 → g4 → g5 → g6 → semi → final, com horários distintos. ${current.id} não pode começar em ${current.startsAt} depois de ${previous.id} em ${previous.startsAt}.`,
         ),
       );
       break;
     }
   }
 
-  /* VAL-016 — fase final × grupo */
-  const groupComplete =
-    groupMatches.length === 6 && groupMatches.every((match) => match.status === 'finished');
+  /* VAL-016 — progressão do mata-mata */
+  const groupComplete = isGroupComplete(competition);
+  const semiComplete = isSemiComplete(competition);
+  const semiMatch = matchById.get('semi');
   const finalMatch = matchById.get('final');
+
+  if (semiMatch !== undefined) {
+    if (semiMatch.status === 'finished' && !groupComplete) {
+      errors.push(
+        issue(
+          'VAL-016',
+          ['matches', matchIndex(competition.matches, 'semi')],
+          'Grupo completo antes da semifinal.',
+          'Semifinal encerrada com partidas de grupo pendentes.',
+          'A semifinal não pode ser encerrada antes de as 6 partidas de grupo terminarem.',
+        ),
+      );
+    }
+
+    if (
+      competition.semifinalists === null &&
+      (semiMatch.events.length > 0 || semiMatch.walkover !== null)
+    ) {
+      errors.push(
+        issue(
+          'VAL-016',
+          ['matches', matchIndex(competition.matches, 'semi')],
+          'Semifinal sem dados competitivos enquanto semifinalists é nulo.',
+          'Eventos ou W.O. presentes.',
+          'A semifinal só pode ter eventos ou W.O. quando `semifinalists` estiver definido.',
+        ),
+      );
+    }
+  }
+
   if (finalMatch !== undefined) {
-    if (finalMatch.status === 'finished' && !groupComplete) {
+    if (finalMatch.status === 'finished' && !semiComplete) {
       errors.push(
         issue(
           'VAL-016',
           ['matches', matchIndex(competition.matches, 'final')],
-          'Grupo completo antes da final.',
-          'Final encerrada com partidas de grupo pendentes.',
-          'A final não pode ser encerrada antes de as 6 partidas de grupo terminarem.',
+          'Semifinal encerrada antes da final.',
+          'Final encerrada com a semifinal pendente.',
+          'A final não pode ser encerrada antes de a semifinal terminar.',
         ),
       );
     }
 
     if (
       competition.finalists === null &&
-      (finalMatch.events.length > 0 || finalMatch.walkover !== null || finalMatch.shootout !== null)
+      (finalMatch.events.length > 0 || finalMatch.walkover !== null)
     ) {
       errors.push(
         issue(
           'VAL-016',
           ['matches', matchIndex(competition.matches, 'final')],
           'Final sem dados competitivos enquanto finalists é nulo.',
-          'Eventos, W.O. ou shootout presentes.',
-          'A final só pode ter eventos, W.O. ou shootout quando `finalists` estiver definido.',
+          'Eventos ou W.O. presentes.',
+          'A final só pode ter eventos ou W.O. quando `finalists` estiver definido.',
         ),
       );
     }
@@ -566,60 +622,125 @@ export function validateSemantics(
     }
   }
 
-  /* VAL-017 / VAL-018 — finalistas e sorteio */
+  /* VAL-017 / VAL-018 — snapshots do mata-mata e sorteio */
+  let ranking: ReturnType<typeof rankTeams> | null = null;
+  let drawRequired = false;
+  try {
+    ranking = rankTeams(competition);
+  } catch (error) {
+    if (error instanceof DrawRequiredError) {
+      drawRequired = true;
+      if (groupComplete && competition.drawOrder === null) {
+        errors.push(
+          issue(
+            'VAL-018',
+            ['drawOrder'],
+            'Ordem de sorteio registrada quando a classificação final empata.',
+            'null',
+            'A classificação final chegou ao sorteio, mas `drawOrder` não foi informado. Registre a ordem do sorteio em `drawOrder`.',
+          ),
+        );
+      }
+    } else {
+      throw error;
+    }
+  }
+
   if (groupComplete) {
-    let ranking: ReturnType<typeof rankTeams> | null = null;
-    let drawRequired = false;
-    try {
-      ranking = rankTeams(competition);
-    } catch (error) {
-      if (error instanceof DrawRequiredError) {
-        drawRequired = true;
-        if (competition.drawOrder === null) {
+    if (!drawRequired && ranking !== null) {
+      const second = ranking.rows[1];
+      const third = ranking.rows[2];
+      if (second !== undefined && third !== undefined) {
+        const expected: readonly [TeamId, TeamId] = [second.teamId, third.teamId];
+        if (competition.semifinalists === null) {
           errors.push(
             issue(
-              'VAL-018',
-              ['drawOrder'],
-              'Ordem de sorteio registrada quando a classificação final empata.',
+              'VAL-017',
+              ['semifinalists'],
+              `semifinalists: [${expected[0]}, ${expected[1]}]`,
               'null',
-              'A classificação final chegou ao sorteio, mas `drawOrder` não foi informado. Registre a ordem do sorteio em `drawOrder`.',
+              'As 6 partidas de grupo terminaram; informe `semifinalists` com o 2º e o 3º da classificação.',
+            ),
+          );
+        } else if (
+          competition.semifinalists[0] !== expected[0] ||
+          competition.semifinalists[1] !== expected[1]
+        ) {
+          const oldSemifinalists = competition.semifinalists.join(', ');
+          errors.push(
+            issue(
+              'VAL-017',
+              ['semifinalists'],
+              `semifinalists: [${expected[0]}, ${expected[1]}]`,
+              `semifinalists: [${oldSemifinalists}]`,
+              `Semifinalistas divergentes da classificação. Antigos: [${oldSemifinalists}]. Novos: [${expected[0]}, ${expected[1]}]. Atualize \`semifinalists\` para confirmar a correção e explique a mudança em \`notices\`.`,
             ),
           );
         }
-      } else {
-        throw error;
       }
     }
+  } else if (competition.semifinalists !== null) {
+    errors.push(
+      issue(
+        'VAL-017',
+        ['semifinalists'],
+        'null enquanto o grupo não termina.',
+        `semifinalists: [${competition.semifinalists.join(', ')}]`,
+        '`semifinalists` deve ser null enquanto as 6 partidas de grupo não terminarem.',
+      ),
+    );
+  }
 
-    if (!drawRequired && ranking !== null) {
-      const expected: readonly [TeamId, TeamId] = [
-        ranking.rows[0]?.teamId ?? 'ta',
-        ranking.rows[1]?.teamId ?? 'tb',
-      ];
-      if (competition.finalists === null) {
-        errors.push(
-          issue(
-            'VAL-017',
-            ['finalists'],
-            `final: [${expected[0]}, ${expected[1]}]`,
-            'null',
-            'As 6 partidas de grupo terminaram; informe `finalists` com o 1º e o 2º da classificação.',
-          ),
+  if (semiComplete) {
+    if (competition.semifinalists === null) {
+      errors.push(
+        issue(
+          'VAL-017',
+          ['semifinalists'],
+          'semifinalists definidos antes de encerrar a semifinal.',
+          'null',
+          'A semifinal foi encerrada, mas `semifinalists` está nulo. Preencha o snapshot com o 2º e o 3º da classificação.',
+        ),
+      );
+    } else if (!drawRequired && ranking !== null && semiMatch !== undefined) {
+      const first = ranking.rows[0];
+      if (first !== undefined) {
+        const winner = winnerOf(
+          semiMatch,
+          {
+            semifinalists: competition.semifinalists,
+            finalists: competition.finalists,
+          },
+          playerTeams,
         );
-      } else if (
-        competition.finalists.final[0] !== expected[0] ||
-        competition.finalists.final[1] !== expected[1]
-      ) {
-        const oldFinalists = competition.finalists.final.join(', ');
-        errors.push(
-          issue(
-            'VAL-017',
-            ['finalists'],
-            `final: [${expected[0]}, ${expected[1]}]`,
-            `final: [${oldFinalists}]`,
-            `Finalistas divergentes da classificação. Antigos: final [${oldFinalists}]. Novos: final [${expected[0]}, ${expected[1]}]. Atualize \`finalists\` para confirmar a correção.`,
-          ),
-        );
+        if (winner !== null) {
+          const expected: readonly [TeamId, TeamId] = [first.teamId, winner];
+          if (competition.finalists === null) {
+            errors.push(
+              issue(
+                'VAL-017',
+                ['finalists'],
+                `finalists: [${expected[0]}, ${expected[1]}]`,
+                'null',
+                'A semifinal terminou; informe `finalists` com o 1º da classificação e a vencedora da semifinal.',
+              ),
+            );
+          } else if (
+            competition.finalists[0] !== expected[0] ||
+            competition.finalists[1] !== expected[1]
+          ) {
+            const oldFinalists = competition.finalists.join(', ');
+            errors.push(
+              issue(
+                'VAL-017',
+                ['finalists'],
+                `finalists: [${expected[0]}, ${expected[1]}]`,
+                `finalists: [${oldFinalists}]`,
+                `Finalistas divergentes da classificação e do resultado da semifinal. Antigos: [${oldFinalists}]. Novos: [${expected[0]}, ${expected[1]}]. Atualize \`finalists\` para confirmar a correção e explique a mudança em \`notices\`.`,
+              ),
+            );
+          }
+        }
       }
     }
   } else if (competition.finalists !== null) {
@@ -627,16 +748,16 @@ export function validateSemantics(
       issue(
         'VAL-017',
         ['finalists'],
-        'null enquanto o grupo não termina.',
-        `final: [${competition.finalists.final.join(', ')}]`,
-        '`finalists` deve ser null enquanto as 6 partidas de grupo não terminarem.',
+        'null enquanto a semifinal não termina.',
+        `finalists: [${competition.finalists.join(', ')}]`,
+        '`finalists` deve ser null enquanto a semifinal não terminar.',
       ),
     );
   }
 
   /* VAL-019 — elenco da partida */
   for (const [index, match] of competition.matches.entries()) {
-    const participants = matchParticipants(match, competition.finalists);
+    const participants = matchParticipants(match, competition);
     if (participants === null) continue;
 
     match.events.forEach((event, eventIndex) => {
@@ -669,7 +790,7 @@ export function validateSemantics(
     if (match.startsAt === null) continue;
     const startsAt = Date.parse(match.startsAt);
     if (!Number.isFinite(startsAt)) continue;
-    const participants = matchParticipants(match, competition.finalists);
+    const participants = matchParticipants(match, competition);
     if (participants === null) continue;
 
     const checked = new Set<PlayerId>();
@@ -744,7 +865,7 @@ export function validateSemantics(
             ['matches', index, 'events', eventIndex, 'assistPlayerId'],
             `Jogadora do time da marcadora (${scorer.team.id}).`,
             `${event.assistPlayerId} (time ${assistant.team.id})`,
-            `A assistência deve ser do mesmo time da marcadora e não pode ser a própria marcadora.`,
+            'A assistência deve ser do mesmo time da marcadora e não pode ser a própria marcadora.',
           ),
         );
       }
@@ -841,20 +962,19 @@ export function validateSemantics(
       );
     }
 
-    if (match.shootout !== null) {
+    const participants = matchParticipants(match, competition);
+    if (participants === null) {
       errors.push(
         issue(
           'VAL-024',
-          ['matches', index, 'shootout'],
-          'W.O. sem shootout.',
-          formatValue(match.shootout),
-          `A partida ${match.id} tem W.O. e shootout; os dois não podem coexistir.`,
+          ['matches', index, 'walkover'],
+          'Participantes definidos pelo snapshot antes do W.O.',
+          'Sem participantes definidos.',
+          `A partida ${match.id} tem W.O., mas os participantes ainda não estão definidos. Preencha o snapshot correspondente.`,
         ),
       );
+      continue;
     }
-
-    const participants = matchParticipants(match, competition.finalists);
-    if (participants === null) continue;
     if (
       walkover.winnerTeamId !== participants.homeTeamId &&
       walkover.winnerTeamId !== participants.awayTeamId
@@ -866,68 +986,6 @@ export function validateSemantics(
           `Vencedor entre ${participants.homeTeamId} e ${participants.awayTeamId}.`,
           walkover.winnerTeamId,
           `O W.O. de ${match.id} aponta um vencedor que não participa da partida.`,
-        ),
-      );
-    }
-  }
-
-  /* VAL-025 — shootout */
-  for (const [index, match] of competition.matches.entries()) {
-    if (match.shootout === null) continue;
-    const shootout = match.shootout;
-
-    if (match.stage !== 'final') {
-      errors.push(
-        issue(
-          'VAL-025',
-          ['matches', index, 'shootout'],
-          'Shootout apenas na final.',
-          match.stage,
-          `A partida ${match.id} é de grupo e não pode ter shootout.`,
-        ),
-      );
-    }
-    if (match.status !== 'finished') {
-      errors.push(
-        issue(
-          'VAL-025',
-          ['matches', index, 'shootout'],
-          'Shootout apenas em partida finished.',
-          match.status,
-          `A partida ${match.id} tem shootout, mas não está encerrada.`,
-        ),
-      );
-    }
-    if (match.walkover !== null) {
-      errors.push(
-        issue(
-          'VAL-025',
-          ['matches', index, 'shootout'],
-          'Shootout sem W.O.',
-          'W.O. presente',
-          `A partida ${match.id} tem W.O. e shootout; remova o shootout.`,
-        ),
-      );
-    }
-    if (shootout.home === shootout.away) {
-      errors.push(
-        issue(
-          'VAL-025',
-          ['matches', index, 'shootout'],
-          'Valores diferentes nos pênaltis.',
-          `${shootout.home} x ${shootout.away}`,
-          `O shootout de ${match.id} não pode terminar empatado; a disputa precisa de um vencedor.`,
-        ),
-      );
-    }
-    if (shootout.home < 0 || shootout.away < 0) {
-      errors.push(
-        issue(
-          'VAL-025',
-          ['matches', index, 'shootout'],
-          'Valores inteiros maiores ou iguais a zero.',
-          `${shootout.home} x ${shootout.away}`,
-          `O shootout de ${match.id} não pode ter valores negativos.`,
         ),
       );
     }
@@ -984,36 +1042,6 @@ export function validateSemantics(
     }
   }
 
-  /* VAL-030 — shootout obrigatório */
-  if (finalMatch !== undefined && finalMatch.status === 'finished' && competition.finalists !== null) {
-    const score = deriveScore(finalMatch, competition.finalists, playerTeams);
-    if (score !== null) {
-      const tied = score.home === score.away;
-      if (tied && finalMatch.shootout === null) {
-        errors.push(
-          issue(
-            'VAL-030',
-            ['matches', matchIndex(competition.matches, 'final'), 'shootout'],
-            'Shootout quando o tempo normal termina empatado.',
-            'null',
-            `A final terminou ${score.home} x ${score.away} no tempo normal e precisa de shootout para definir a campeã.`,
-          ),
-        );
-      }
-      if (!tied && finalMatch.shootout !== null) {
-        errors.push(
-          issue(
-            'VAL-030',
-            ['matches', matchIndex(competition.matches, 'final'), 'shootout'],
-            'Shootout apenas com empate no tempo normal.',
-            `${score.home} x ${score.away} no tempo normal`,
-            `A final terminou ${score.home} x ${score.away} no tempo normal; o shootout só é permitido em empate. Remova o shootout.`,
-          ),
-        );
-      }
-    }
-  }
-
   /* VAL-031 — avisos */
   competition.notices.forEach((notice, index) => {
     const normalized = normalizeText(notice.message);
@@ -1028,67 +1056,6 @@ export function validateSemantics(
       ),
     );
   });
-
-  /* VAL-033 — amistoso */
-  if (competition.friendly !== null) {
-    const friendly = competition.friendly;
-    if (finalMatch !== undefined) {
-      if (friendly.date !== finalMatch.date) {
-        errors.push(
-          issue(
-            'VAL-033',
-            ['friendly', 'date'],
-            `Mesma data da final (${finalMatch.date}).`,
-            friendly.date,
-            `O amistoso deve ocorrer na mesma data da final (${finalMatch.date}). Corrija \`friendly.date\` ou remova o metadado.`,
-          ),
-        );
-      }
-
-      if (finalMatch.startsAt !== null) {
-        const friendlyInstant = Date.parse(friendly.startsAt);
-        const finalInstant = Date.parse(finalMatch.startsAt);
-        if (
-          Number.isFinite(friendlyInstant) &&
-          Number.isFinite(finalInstant) &&
-          friendlyInstant >= finalInstant
-        ) {
-          errors.push(
-            issue(
-              'VAL-033',
-              ['friendly', 'startsAt'],
-              `Horário anterior à final (${finalMatch.startsAt}).`,
-              friendly.startsAt,
-              `O amistoso deve ocorrer antes da final, que começa em ${finalMatch.startsAt}. Corrija \`friendly.startsAt\` ou remova o metadado.`,
-            ),
-          );
-        }
-      }
-    }
-
-    if (normalizeText(friendly.venue) === '') {
-      errors.push(
-        issue(
-          'VAL-033',
-          ['friendly', 'venue'],
-          'Local não vazio.',
-          formatValue(friendly.venue),
-          'Informe o local do amistoso ou remova o metadado `friendly`.',
-        ),
-      );
-    }
-    if (normalizeText(friendly.note) === '') {
-      errors.push(
-        issue(
-          'VAL-033',
-          ['friendly', 'note'],
-          'Nota não vazia.',
-          formatValue(friendly.note),
-          'Informe uma nota sobre o amistoso ou remova o metadado `friendly`.',
-        ),
-      );
-    }
-  }
 
   /* VAL-W01 — elenco abaixo de 7 ativas */
   for (const team of competition.teams) {

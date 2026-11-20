@@ -40,15 +40,15 @@ const SCORE_FIELDS = new Set([
   'goalsAgainst',
 ]);
 
-const FINAL_FORBIDDEN_FIELDS = new Set(['homeTeamId', 'awayTeamId']);
+const KNOCKOUT_FORBIDDEN_FIELDS = new Set(['homeTeamId', 'awayTeamId']);
 
-function isFinalMatchAt(raw: unknown, path: IssuePath): boolean {
+function isKnockoutMatchAt(raw: unknown, path: IssuePath): boolean {
   const [collection, index] = path;
   if (collection !== 'matches' || typeof index !== 'number') return false;
   const match = getAtPath(raw, ['matches', index]);
-  return (
-    match !== null && typeof match === 'object' && (match as Record<string, unknown>).id === 'final'
-  );
+  if (match === null || typeof match !== 'object') return false;
+  const value = match as Record<string, unknown>;
+  return value.id === 'semi' || value.id === 'final' || value.stage === 'semi' || value.stage === 'final';
 }
 
 function toIssuePath(path: readonly PropertyKey[]): IssuePath {
@@ -112,6 +112,32 @@ export function mapSchemaIssues(error: ZodError, raw: unknown, source: string): 
         const fieldPath = [...path, key];
         const readablePath = formatPath(fieldPath);
 
+        if (key === 'friendly' && item.path.length === 0) {
+          issues.push(
+            issue(
+              'VAL-002',
+              fieldPath,
+              'Nenhum amistoso na v2.0.',
+              formatValue(key),
+              'Campo `friendly` removido na v2.0: não existe amistoso. Remova o bloco e use apenas as 8 partidas oficiais (g1…g6, semi e final).',
+            ),
+          );
+          continue;
+        }
+
+        if (key === 'shootout' && item.path[0] === 'matches') {
+          issues.push(
+            issue(
+              'VAL-002',
+              fieldPath,
+              'Nenhum shootout na v2.0.',
+              formatValue(key),
+              'Campo `shootout` removido na v2.0: empates não têm pênaltis nem shootout. Remova o campo; a definição usa a vantagem do empate.',
+            ),
+          );
+          continue;
+        }
+
         if (PRIVACY_FIELDS.has(key)) {
           issues.push(
             issue(
@@ -120,19 +146,6 @@ export function mapSchemaIssues(error: ZodError, raw: unknown, source: string): 
               'Apenas id, nickname, position, joinedAt e leftAt.',
               formatValue(key),
               `Campo de privacidade proibido em ${readablePath}: \`${key}\`. Remova o campo; a privacidade permite apenas id, nickname, position, joinedAt e leftAt.`,
-            ),
-          );
-          continue;
-        }
-
-        if (item.path[0] === 'friendly') {
-          issues.push(
-            issue(
-              'VAL-033',
-              fieldPath,
-              'Apenas date, startsAt, venue e note.',
-              formatValue(key),
-              `Campo de partida não é permitido no amistoso: \`${key}\` em ${readablePath}. O amistoso é um metadado informativo e não tem status, eventos, placar, W.O. ou shootout.`,
             ),
           );
           continue;
@@ -151,14 +164,14 @@ export function mapSchemaIssues(error: ZodError, raw: unknown, source: string): 
           continue;
         }
 
-        if (FINAL_FORBIDDEN_FIELDS.has(key) && isFinalMatchAt(raw, path)) {
+        if (KNOCKOUT_FORBIDDEN_FIELDS.has(key) && isKnockoutMatchAt(raw, path)) {
           issues.push(
             issue(
               'VAL-027',
               fieldPath,
-              'A final usa finalists e round: null.',
+              'A semifinal usa semifinalists e a final usa finalists; round: null.',
               formatValue(key),
-              `A partida final não possui \`${key}\`. Os times vêm de \`finalists\`; remova o campo e mantenha \`round: null\`.`,
+              `A partida de mata-mata não possui \`${key}\`. Os times vêm de \`semifinalists\`/\`finalists\`; remova o campo e mantenha \`round: null\`.`,
             ),
           );
           continue;
@@ -171,16 +184,16 @@ export function mapSchemaIssues(error: ZodError, raw: unknown, source: string): 
 
     if (
       item.path[item.path.length - 1] === 'round' &&
-      isFinalMatchAt(raw, path.slice(0, 2))
+      isKnockoutMatchAt(raw, path.slice(0, 2))
     ) {
       const fieldPath = path;
       issues.push(
         issue(
           'VAL-027',
           fieldPath,
-          'round: null para a final.',
+          'round: null para semi e final.',
           formatValue(getAtPath(raw, fieldPath)),
-          'A partida final deve ter `round: null`. Os times vêm de `finalists`; não há rodada na final.',
+          'As partidas de mata-mata devem ter `round: null`. Os times vêm dos snapshots; não há rodada na semifinal ou na final.',
         ),
       );
       continue;

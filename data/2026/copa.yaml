@@ -158,7 +158,6 @@ matches:
     venue: null # local a definir
     status: "scheduled"
     walkover: null
-    shootout: null
     events: []
 
   - id: "g2"
@@ -171,7 +170,6 @@ matches:
     venue: null # local a definir
     status: "scheduled"
     walkover: null
-    shootout: null
     events: []
 
   - id: "g3"
@@ -184,7 +182,6 @@ matches:
     venue: null # local a definir
     status: "scheduled"
     walkover: null
-    shootout: null
     events: []
 
   - id: "g4"
@@ -197,7 +194,6 @@ matches:
     venue: null # local a definir
     status: "scheduled"
     walkover: null
-    shootout: null
     events: []
 
   - id: "g5"
@@ -210,7 +206,6 @@ matches:
     venue: null # local a definir
     status: "scheduled"
     walkover: null
-    shootout: null
     events: []
 
   - id: "g6"
@@ -223,7 +218,16 @@ matches:
     venue: null # local a definir
     status: "scheduled"
     walkover: null
-    shootout: null
+    events: []
+
+  - id: "semi"
+    stage: "semi"
+    round: null
+    date: "2026-12-02"
+    startsAt: null # horário a definir
+    venue: null # local a definir
+    status: "scheduled"
+    walkover: null
     events: []
 
   - id: "final"
@@ -234,10 +238,9 @@ matches:
     venue: null # local a definir
     status: "scheduled"
     walkover: null
-    shootout: null
     events: []
 
+semifinalists: null
 finalists: null
 drawOrder: null
-friendly: null
 notices: []

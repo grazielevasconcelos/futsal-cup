@@ -113,12 +113,14 @@ const walkoverSchema = z
   })
   .strict();
 
-const shootoutSchema = z
-  .object({
-    home: z.number().int().min(0),
-    away: z.number().int().min(0),
-  })
-  .strict();
+const matchBaseShape = {
+  date: dateOnly,
+  startsAt: isoDateTime.nullable(),
+  venue: z.string().min(1).max(120).nullable(),
+  status,
+  walkover: walkoverSchema.nullable(),
+  events: z.array(eventSchema),
+} as const;
 
 const groupMatchSchema = z
   .object({
@@ -127,13 +129,16 @@ const groupMatchSchema = z
     round: z.union([z.literal(1), z.literal(2), z.literal(3)]),
     homeTeamId: teamId,
     awayTeamId: teamId,
-    date: dateOnly,
-    startsAt: isoDateTime.nullable(),
-    venue: z.string().min(1).max(120).nullable(),
-    status,
-    walkover: walkoverSchema.nullable(),
-    shootout: shootoutSchema.nullable(),
-    events: z.array(eventSchema),
+    ...matchBaseShape,
+  })
+  .strict();
+
+const semiFinalMatchSchema = z
+  .object({
+    id: z.literal('semi'),
+    stage: z.literal('semi'),
+    round: z.null(),
+    ...matchBaseShape,
   })
   .strict();
 
@@ -142,34 +147,20 @@ const finalMatchSchema = z
     id: z.literal('final'),
     stage: z.literal('final'),
     round: z.null(),
-    date: dateOnly,
-    startsAt: isoDateTime.nullable(),
-    venue: z.string().min(1).max(120).nullable(),
-    status,
-    walkover: walkoverSchema.nullable(),
-    shootout: shootoutSchema.nullable(),
-    events: z.array(eventSchema),
+    ...matchBaseShape,
   })
   .strict();
 
-const matchSchema = z.discriminatedUnion('stage', [groupMatchSchema, finalMatchSchema]);
+const matchSchema = z.discriminatedUnion('stage', [
+  groupMatchSchema,
+  semiFinalMatchSchema,
+  finalMatchSchema,
+]);
 
 /* ---------- envelope ---------- */
 
-const finalistsSchema = z
-  .object({
-    final: z.tuple([teamId, teamId]),
-  })
-  .strict();
-
-const friendlySchema = z
-  .object({
-    date: dateOnly,
-    startsAt: isoDateTime,
-    venue: z.string().min(1).max(120),
-    note: z.string().min(1).max(300),
-  })
-  .strict();
+const semifinalistsSchema = z.tuple([teamId, teamId]);
+const finalistsSchema = z.tuple([teamId, teamId]);
 
 const noticeSchema = z
   .object({
@@ -183,10 +174,10 @@ export const competitionSchema = z
     edition: z.literal(2026),
     timezone: z.literal('America/Sao_Paulo'),
     teams: z.array(teamSchema).length(3),
-    matches: z.array(matchSchema).length(7),
+    matches: z.array(matchSchema).length(8),
+    semifinalists: semifinalistsSchema.nullable(),
     finalists: finalistsSchema.nullable(),
     drawOrder: z.array(teamId).length(3).nullable(),
-    friendly: friendlySchema.nullable(),
     notices: z.array(noticeSchema),
   })
   .strict();
