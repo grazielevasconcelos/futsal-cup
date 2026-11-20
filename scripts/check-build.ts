@@ -4,7 +4,15 @@ import { gzipSync } from 'node:zlib';
 
 const distDirectory = 'dist';
 const errors: string[] = [];
-const forbiddenTerms = ['sesc', 'airbnb', '@font-face'];
+const forbiddenTerms = [
+  'sesc',
+  'airbnb',
+  '@font-face',
+  'amistoso',
+  'shootout',
+  'disputa de pênaltis',
+  'prorrogação',
+];
 const proprietaryFontPattern = /font-family\s*:[^;}]*(?:cereal|circular)/i;
 const playerIdPattern = /\bp-\d{3}\b/;
 
@@ -42,7 +50,7 @@ const requiredFiles = [
   'times/index.html',
   'estatisticas/index.html',
   'fase-final/index.html',
-  ...['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'final'].map(
+  ...['g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'semi', 'final'].map(
     (matchId) => `jogos/${matchId}/index.html`,
   ),
   ...['ta', 'tb', 'tc'].map((teamId) => `times/${teamId}/index.html`),
