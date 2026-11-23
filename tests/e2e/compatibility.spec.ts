@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Browser, type Page } from '@playwright/test';
 
 const routes = [
   '',
@@ -16,6 +16,27 @@ async function expectNoPageOverflow(page: Page, path: string): Promise<void> {
   expect(hasOverflow, path).toBe(false);
 }
 
+async function expectNativeMenuWithoutJavaScript(browser: Browser): Promise<void> {
+  const context = await browser.newContext({
+    baseURL: 'http://127.0.0.1:4322/futsal-cup/',
+    javaScriptEnabled: false,
+    viewport: { width: 320, height: 800 },
+  });
+
+  try {
+    const page = await context.newPage();
+    await page.goto('');
+    const menu = page.locator('details.menu-mobile');
+    await menu.locator('summary').focus();
+    await page.keyboard.press('Enter');
+    await expect(menu).toHaveAttribute('open', '');
+    await expect(page.getByRole('navigation', { name: 'Principal (menu móvel)' })).toBeVisible();
+    await expect(page.locator('.theme-toggle')).toBeHidden();
+  } finally {
+    await context.close();
+  }
+}
+
 test.describe('compatibilidade entre navegadores', () => {
   test('as rotas principais carregam em 320px sem overflow', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 800 });
@@ -29,7 +50,7 @@ test.describe('compatibilidade entre navegadores', () => {
     }
   });
 
-  test('o menu móvel abre e fecha pelo teclado sem JavaScript', async ({ page }) => {
+  test('o menu móvel abre e fecha pelo teclado', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 800 });
     await page.goto('');
 
@@ -45,6 +66,10 @@ test.describe('compatibilidade entre navegadores', () => {
 
     await page.keyboard.press('Space');
     await expect(menu).not.toHaveAttribute('open', '');
+  });
+
+  test('o menu nativo continua funcional sem JavaScript', async ({ browser }) => {
+    await expectNativeMenuWithoutJavaScript(browser);
   });
 
   test('o skip link e a tabela larga funcionam pelo teclado', async ({ page }) => {

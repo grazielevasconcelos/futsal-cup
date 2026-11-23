@@ -43,6 +43,95 @@ async function tabUntilFocused(page: Page, selector: string, maxTabs = 60): Prom
 }
 
 test.describe('qualidade e acessibilidade', () => {
+  test('o tema claro é o padrão e a alternância salva a preferência', async ({ page }) => {
+    await page.goto('');
+
+    const root = page.locator('html');
+    const toggle = page.getByRole('button', { name: 'Tema escuro' });
+    await expect(root).toHaveAttribute('data-theme', 'light');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(page.locator('meta[name="color-scheme"]')).toHaveAttribute(
+      'content',
+      'light dark',
+    );
+
+    await toggle.click();
+    await expect(root).toHaveAttribute('data-theme', 'dark');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect
+      .poll(() => page.evaluate(() => localStorage.getItem('futsal-cup-theme')))
+      .toBe('dark');
+    await expect
+      .poll(() => page.locator('body').evaluate((body) => getComputedStyle(body).backgroundColor))
+      .toBe('rgb(22, 22, 24)');
+
+    await toggle.click();
+    await expect(root).toHaveAttribute('data-theme', 'light');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect
+      .poll(() => page.evaluate(() => localStorage.getItem('futsal-cup-theme')))
+      .toBe('light');
+  });
+
+  test('a preferência de tema persiste entre rotas e recarregamentos', async ({ page }) => {
+    await page.goto('');
+    await page.getByRole('button', { name: 'Tema escuro' }).click();
+
+    await page.goto('jogos/');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect(page.getByRole('button', { name: 'Tema escuro' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+
+    await page.reload();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  });
+
+  test('o controle de tema funciona pelo teclado', async ({ page }) => {
+    await page.goto('');
+    await tabUntilFocused(page, '.theme-toggle');
+    await expect(page.locator('.theme-toggle')).toBeFocused();
+
+    await page.keyboard.press('Space');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await page.keyboard.press('Enter');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  });
+
+  test('a alternância continua funcional se o armazenamento local falhar', async ({ page }) => {
+    await page.addInitScript(() => {
+      Storage.prototype.getItem = () => {
+        throw new Error('armazenamento indisponível');
+      };
+      Storage.prototype.setItem = () => {
+        throw new Error('armazenamento indisponível');
+      };
+    });
+    await page.goto('');
+
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await page.getByRole('button', { name: 'Tema escuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  });
+
+  test('a impressão mantém o tema claro mesmo com a tela no escuro', async ({ page }) => {
+    await page.goto('');
+    await page.getByRole('button', { name: 'Tema escuro' }).click();
+    await page.emulateMedia({ media: 'print' });
+
+    const printStyles = await page.evaluate(() => ({
+      colorScheme: getComputedStyle(document.documentElement).colorScheme,
+      background: getComputedStyle(document.body).backgroundColor,
+      text: getComputedStyle(document.body).color,
+    }));
+    expect(printStyles).toEqual({
+      colorScheme: 'light',
+      background: 'rgb(255, 255, 255)',
+      text: 'rgb(34, 34, 34)',
+    });
+  });
+
   test('as páginas não fazem requisições de terceiros', async ({ page }) => {
     const externalRequests: string[] = [];
 
@@ -230,11 +319,17 @@ test.describe('qualidade e acessibilidade', () => {
   test('todas as rotas não têm violações sérias de acessibilidade', async ({ page }) => {
     for (const path of routes) {
       await page.goto(path);
-      const results = await new AxeBuilder({ page }).analyze();
-      const seriousViolations = results.violations.filter(
-        (violation) => violation.impact === 'serious' || violation.impact === 'critical',
-      );
-      expect(seriousViolations, path).toEqual([]);
+      for (const theme of ['light', 'dark'] as const) {
+        const currentTheme = await page.locator('html').getAttribute('data-theme');
+        if (currentTheme !== theme) {
+          await page.getByRole('button', { name: 'Tema escuro' }).click();
+        }
+        const results = await new AxeBuilder({ page }).analyze();
+        const seriousViolations = results.violations.filter(
+          (violation) => violation.impact === 'serious' || violation.impact === 'critical',
+        );
+        expect(seriousViolations, `${path} (${theme})`).toEqual([]);
+      }
     }
   });
 });

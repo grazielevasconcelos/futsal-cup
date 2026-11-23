@@ -10,7 +10,7 @@ Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal 
 
 - A fonte única de dados é `data/2026/copa.yaml`; nada de resultados ou classificação no HTML.
 - Regras de negócio em funções puras, determinísticas e testáveis.
-- Sem JavaScript no cliente, sem backend, sem login e sem analytics.
+- JavaScript local mínimo somente para alternar/persistir o tema; sem backend, login ou analytics.
 - Mobile-first, WCAG 2.2 AA, 320px sem overflow e tokens do projeto.
 - Validação bloqueante antes do build; o site anterior permanece no ar em caso de falha.
 - Commits em Conventional Commits.
@@ -48,7 +48,7 @@ Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal 
 - Estatísticas: artilharia, assistências, cartões e gols contra.
 - Fase final: semifinal, final, vantagem do empate textual, card da final antes da semi com o 1º e “Vencedora da semifinal”, pódio de 3.
 - 404 e metadados.
-- Critério: todas as rotas estáticas, sem JS de cliente e sem overflow em 320px.
+- Critério: todas as rotas estáticas, sem JS externo (o tema da v2.1 usa apenas script inline) e sem overflow em 320px.
 
 ### Fatia 5 — Qualidade e publicação
 
@@ -78,16 +78,38 @@ Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal 
 - Substituir o fixture de temporada encerrada em `data/2026/copa.yaml` por uma fonte pré-competição: 3 times provisórios, elencos vazios, 7 partidas `scheduled`, sem eventos, W.O., shootout, finalistas, sorteio ou amistoso.
 - Preservar a temporada concluída em `tests/fixtures/valida.yaml` e usá-la nos testes de domínio, componentes e no build de teste do E2E.
 - Separar `dist/` (produção) de `dist-test/` (E2E), sem publicar dados de exemplo.
-- Critério: `npm run validate` sem erros e com avisos de elenco; `npm run verify` passa; a fonte pública não contém resultados nem elencos fictícios; o build de produção continua sem JS de cliente.
+- Critério: `npm run validate` sem erros e com avisos de elenco; `npm run verify` passa; a fonte pública não contém resultados nem elencos fictícios; o build de produção continua sem JS externo (a partir da v2.1, admite apenas o script inline de tema).
 
 ### Fatia 9 — Migração para o formato v2.0
 
-**Status:** concluída em 20/11/2026 — `npm run verify` verde (validate, check, 332 testes unitários/de dados, build com 18 páginas e 0 KB de JS de cliente, 77 testes E2E).
+**Status:** concluída em 20/11/2026 — validação, check, testes unitários/de dados, build estático e testes E2E passaram. A decisão posterior de tema claro/escuro permite apenas o script local de tema.
 
 - Atualizar `data/2026/copa.yaml` para 8 partidas: adicionar `semi`, manter `final`, preencher `semifinalists`/`finalists` como `null` antes da competição e remover `shootout`/`friendly`.
 - Atualizar schema, validação, tipos e domínio: snapshots `semifinalists`/`finalists`, `winnerOf` com vantagem do empate, 3ª colocada como perdedora da semifinal e suspensões pelo caminho real do time.
 - Atualizar UI, fixture, testes e `check-build` para semifinal, final, 8 cards, 4 datas, ausência de amistoso/shootout e rotas `jogos/semi/`.
 - Critério: `npm run verify` passa; build de produção com 8 partidas; nenhuma referência a amistoso, shootout, 3º lugar ou 4º lugar em dados, UI ou `dist/`.
+
+### Fatia 10 — Tema claro/escuro (v2.1)
+
+**Status:** concluída em 20/11/2026 — `npm run verify` verde com 360 testes unitários/de dados e 90 testes E2E.
+
+- Atualizar `PRD.md`, `SPEC.md` e `AGENTS.md` para permitir somente o script inline/local de tema e documentar o comportamento claro/escuro.
+- Criar aliases escuros em `src/styles/tokens.css`, validar contraste AA nos dois temas e manter impressão no tema claro.
+- Adicionar controle acessível no cabeçalho, inicializar `data-theme` antes do CSS e persistir `futsal-cup-theme` em `localStorage`, com fallback claro.
+- Ajustar `scripts/check-build.ts` para permitir exatamente um script inline ≤1 KB gzip por página, sem JS externo.
+- Cobrir padrão claro, alternância, teclado, persistência, falha de armazenamento, impressão e axe nos dois temas.
+- Critério: tema claro padrão; preferência preservada entre páginas/recarregamentos no mesmo navegador; nenhuma requisição adicional; `npm run verify` passa.
+
+### Fatia 11 — Passe visual (v2.2)
+
+**Status:** em andamento em 22/11/2026 — implementação concluída; validação final pendente.
+
+- Adicionar tokens de tracking, largura mínima de atalhos, tamanhos de logo e barra de gradiente; atualizar `SPEC.md`, `AGENTS.md`, `docs/decisoes-v2.2.md` e testes de tokens.
+- Refinar tipografia, cabeçalhos, badges, tabelas, estados vazios, gaps e banner de avisos.
+- Tornar cards de partida e de time clicáveis na área inteira, com o título como nome acessível e foco no card.
+- Criar painel de placar, cabeçalho horizontal de time, logo menor nos cards, estatísticas em 2 colunas e pódio com a campeã destacada.
+- Corrigir a duplicação da seção “Campeã”/“Pódio” na Início e manter os textos de estado.
+- Critério: `npm run verify` passa; 320px sem overflow; nenhum JS, fonte, foto, cor ou animação de transform nova.
 
 ## Marcos
 
@@ -95,6 +117,7 @@ Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal 
 |---|---|
 | 12/11/2026 | PRD v1.1, SPEC v1.2 e documentos alinhados |
 | 18/11/2026 | PRD/SPEC/AGENTS v2.0 e migração do formato |
+| 20/11/2026 | PRD/SPEC/AGENTS v2.1 e tema claro/escuro |
 | 18–20/11/2026 | Implementação |
 | 21–23/11/2026 | Testes, dados de exemplo e congelamento |
 | 24/11/2026 | Primeira rodada |
@@ -116,5 +139,6 @@ Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal 
 - `npm run verify` passa localmente e no CI.
 - `data/2026/copa.yaml` válido, com 3 times e 8 partidas (`g1`…`g6`, `semi`, `final`), sem amistoso ou shootout.
 - Nenhuma rota/link/placeholder de Regulamento, amistoso ou 3º lugar; a 3ª colocada é a perdedora da semifinal.
-- Nenhum JS de cliente, termo proibido, fonte proprietária, foto ou dado pessoal no `dist/`.
+- Somente script inline local de tema (≤1 KB gzip); nenhum JS externo, termo proibido, fonte proprietária, foto ou dado pessoal no `dist/`.
+- Tema claro padrão; tema escuro acessível, persistente no navegador e com fallback claro se o armazenamento falhar.
 - Site publicado no GitHub Pages e acessível antes de 24/11/2026.

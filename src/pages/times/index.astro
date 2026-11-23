@@ -51,13 +51,19 @@ const positionByTeam = new Map(ranking.rows.map((row) => [row.teamId, row.positi
 
               return (
                 <li>
-                  <article class="card">
-                    <TeamBadges activeCount={active} />
-                    <TeamLogo logo={team.logo} />
-                    <h3 class="card__title">
-                      <a href={withBase(`/times/${team.id}/`)}>{formatTeamLabel(team)}</a>
-                    </h3>
-                    <p class="meta">
+                  <article class="card team-card">
+                    <div class="team-card__header">
+                      <TeamLogo logo={team.logo} />
+                      <div class="team-card__heading">
+                        <TeamBadges activeCount={active} />
+                        <h3 class="card__title">
+                          <a class="card__link" href={withBase(`/times/${team.id}/`)}>
+                            {formatTeamLabel(team)}
+                          </a>
+                        </h3>
+                      </div>
+                    </div>
+                    <p class="meta team-card__meta">
                       {position === undefined ? 'Sem posição' : `${position}º na classificação`} ·{' '}
                       {active} atletas ativas
                     </p>

@@ -29,13 +29,50 @@ const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url).href;
 ---
 
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="no-js">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    <meta name="color-scheme" content="light" />
+    <meta name="color-scheme" content="light dark" />
+    <script is:inline data-theme-script>
+      (() => {
+        const root = document.documentElement;
+        const storageKey = 'futsal-cup-theme';
+        const buttonSelector = '.theme-toggle';
+
+        root.classList.remove('no-js');
+
+        const updateButton = () => {
+          const button = document.querySelector(buttonSelector);
+          if (button) button.setAttribute('aria-pressed', String(root.dataset.theme === 'dark'));
+        };
+
+        let theme = 'light';
+        try {
+          if (localStorage.getItem(storageKey) === 'dark') theme = 'dark';
+        } catch {
+          /* O tema claro continua disponível quando o armazenamento não puder ser lido. */
+        }
+        root.dataset.theme = theme;
+
+        document.addEventListener('DOMContentLoaded', () => {
+          const button = document.querySelector(buttonSelector);
+          updateButton();
+          button?.addEventListener('click', () => {
+            theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+            root.dataset.theme = theme;
+            updateButton();
+            try {
+              localStorage.setItem(storageKey, theme);
+            } catch {
+              /* A alternância continua funcionando nesta página sem persistência. */
+            }
+          });
+        });
+      })();
+    </script>
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" href={withBase('/favicon.svg')} type="image/svg+xml" />
 

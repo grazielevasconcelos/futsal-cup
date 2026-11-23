@@ -64,7 +64,7 @@ for (const file of requiredFiles) {
 
 const javascriptFiles = relativeFiles.filter((file) => /\.(?:js|mjs|cjs)$/i.test(file));
 if (javascriptFiles.length > 0) {
-  fail(`JavaScript de cliente encontrado em dist/: ${javascriptFiles.join(', ')}`);
+  fail(`Arquivo JavaScript externo não permitido encontrado em dist/: ${javascriptFiles.join(', ')}`);
 }
 
 const referenceFiles = relativeFiles.filter((file) => /airbnb/i.test(file));
@@ -143,8 +143,24 @@ for (const file of htmlFiles) {
     }
   }
 
-  if (html.includes('<script')) {
-    fail(`Tag <script> encontrada em dist/${relativePath}`);
+  const scripts = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)];
+  if (scripts.length !== 1) {
+    fail(`Esperada exatamente uma inicialização inline do tema em dist/${relativePath}; encontradas ${scripts.length}.`);
+  }
+
+  const themeScript = scripts[0];
+  if (themeScript !== undefined) {
+    const attributes = themeScript[1] ?? '';
+    const content = themeScript[2] ?? '';
+    if (!/\bdata-theme-script(?:\s|$)/i.test(attributes) || /\bsrc\s*=/i.test(attributes)) {
+      fail(`Script inesperado em dist/${relativePath}; somente o script inline de tema é permitido.`);
+    }
+    if (!content.includes('futsal-cup-theme') || !content.includes('localStorage')) {
+      fail(`Inicialização do tema sem leitura da preferência local em dist/${relativePath}.`);
+    }
+    if (gzipSync(Buffer.from(content)).byteLength > 1024) {
+      fail(`JavaScript inline acima de 1 KB gzip em dist/${relativePath}.`);
+    }
   }
 
   if (!html.includes('lang="pt-BR"')) {
@@ -269,4 +285,6 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log(`Build válido: ${htmlFiles.length} HTML, ${cssFiles.length} CSS, 0 KB de JS de cliente.`);
+console.log(
+  `Build válido: ${htmlFiles.length} HTML, ${cssFiles.length} CSS e script inline de tema ≤ 1 KB gzip.`,
+);

@@ -2,7 +2,7 @@
 
 Checklist de execução do MVP. Marque apenas o que estiver realmente concluído.
 
-> As seções 0–8 registram a implementação histórica da v1.1. A seção 9 acompanha a migração para o formato v2.0 (8 partidas, semifinal, final e vantagem do empate), que substitui as decisões anteriores.
+> As seções 0–8 registram a implementação histórica da v1.1. A seção 9 acompanha a migração para o formato v2.0 (8 partidas, semifinal, final e vantagem do empate), que substitui as decisões anteriores. A seção 10 registra o tema claro/escuro da v2.1.
 
 ## 0. Documentação e alinhamento (histórico v1.1)
 
@@ -152,6 +152,58 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 
 - [x] Atualizar factories e testes unitários/de dados para snapshots, vantagem do empate, W.O. no mata-mata e suspensões.
 - [x] Atualizar E2E: 8 cards, 4 datas, semifinal, final, 3ª colocada, ausência de amistoso/shootout.
-- [x] Atualizar `scripts/check-build.ts`: rota `jogos/semi/`, termos proibidos e ausência de JS.
+- [x] Atualizar `scripts/check-build.ts`: rota `jogos/semi/`, termos proibidos e ausência de JS externo (o script inline de tema é permitido a partir da v2.1).
 - [x] Rodar `npm run validate`, `npm run check`, `npm test`, `npm run build`, `npm run build:test`, `npm run test:build`, `npm run test:e2e` e `npm run verify`.
 - [x] Commits `feat(dados)`, `feat(dominio)`, `feat(ui)`, `test:` e `chore(build)`.
+
+## 10. Tema claro/escuro (v2.1)
+
+### 10.1 Documentação
+
+- [x] Atualizar `PRD.md` para v2.1 (tema claro padrão, alternância acessível, preferência local e critérios de aceite).
+- [x] Atualizar `SPEC.md` para v2.1 (script inline de tema, tokens escuros, contraste, impressão, orçamento e testes).
+- [x] Atualizar `AGENTS.md` (exceção de JavaScript limitada ao tema, aliases claros/escuros e contraste nos dois temas).
+- [x] Criar `docs/decisoes-v2.1.md` e citá-lo no PRD, na SPEC e no README.
+- [x] Atualizar `PLAN.md` e `TASKS.md`.
+- [ ] Commits `feat(ui)`, `test:` e `docs:` do tema criados após a revisão final.
+
+### 10.2 Implementação
+
+- [x] Adicionar `:root[data-theme="dark"]` em `src/styles/tokens.css`, com cores e sombras próprias.
+- [x] Fixar o tema claro na impressão, independentemente da preferência de tela.
+- [x] Inicializar `data-theme` em `BaseLayout.astro` antes do CSS, lendo `futsal-cup-theme` do `localStorage`.
+- [x] Adicionar botão acessível de tema no cabeçalho, com `aria-pressed` e ícones sol/lua decorativos.
+- [x] Alternar e persistir o tema com um único script inline, sem rede, cookies ou frameworks.
+- [x] Garantir fallback claro quando a leitura falhar e alternância funcional quando a gravação falhar.
+
+### 10.3 Testes e build
+
+- [x] Validar tokens e contraste AA dos pares claros e escuros (`tests/unit/tokens.test.ts`).
+- [x] Cobrir tema padrão, alternância, persistência entre rotas, teclado, falha de armazenamento e impressão (`tests/e2e/quality.spec.ts`).
+- [x] Rodar axe nas rotas principais nos temas claro e escuro.
+- [x] Permitir no `scripts/check-build.ts` exatamente um script inline de tema ≤1 KB gzip e nenhum JS externo.
+- [x] Rodar `npm run verify` completo.
+
+## 11. Passe visual (v2.2)
+
+### 11.1 Documentação e tokens
+
+- [x] Adicionar `--tracking-display`, `--tracking-heading`, `--shortcut-min`, `--team-logo-size`, `--team-logo-size-lg`, `--accent-bar-width` e `--accent-bar-height`.
+- [x] Atualizar `SPEC.md` §10.2, §11.2, §11.4, §11.6 e §11.8.
+- [x] Atualizar `AGENTS.md` e criar `docs/decisoes-v2.2.md`.
+- [x] Atualizar `tests/unit/tokens.test.ts` para os novos tokens.
+
+### 11.2 Interface
+
+- [x] Adicionar barra de gradiente, eyebrow em caixa alta, tracking, `text-wrap` e números tabulares.
+- [x] Adicionar `:active`, `:focus-within`, link estendido nos cards e chevrons de navegação.
+- [x] Ajustar gaps, badges, tabelas, estados vazios e banner de avisos.
+- [x] Criar painel de placar nos cards e no detalhe da partida.
+- [x] Tornar o cabeçalho do time horizontal, reduzir o logo nos cards e manter estatísticas em 2 colunas.
+- [x] Destacar a campeã no pódio e remover a seção duplicada na Início.
+- [x] Ajustar atalhos para 1/2/3 colunas conforme a largura.
+
+### 11.3 Validação
+
+- [ ] Capturar screenshots antes/depois em 320, 390, 768 e 1280, claro/escuro.
+- [ ] Rodar `npm run validate`, `npm run check`, `npm test`, `npm run build`, `npm run test:build`, `npm run test:e2e` e `npm run verify`.

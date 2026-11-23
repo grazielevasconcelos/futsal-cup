@@ -58,12 +58,6 @@ const finalMatch = competition.matches.find((match) => match.id === 'final');
 const semiMatch = competition.matches.find((match) => match.id === 'semi');
 const podium =
   state === 'afterFinal' || state === 'semiComplete' ? buildPodium(competition) : null;
-const championName =
-  podium === null || podium.champion === null
-    ? null
-    : teams.get(podium.champion) === undefined
-      ? null
-      : formatTeamLabel(teams.get(podium.champion)!);
 const thirdName =
   podium === null || podium.third === null
     ? null
@@ -103,7 +97,8 @@ const standingsCaption =
   notices={competition.notices}
 >
   <div class="page">
-    <div class="page-header">
+    <div class="page-header page-header--home">
+      <p class="page-header__eyebrow">Edição 2026 · Futsal feminino</p>
       <h1>{SITE_NAME}</h1>
       <p class="lead">
         Acompanhe a competição: jogos, classificação, times, estatísticas e fase final.
@@ -259,35 +254,37 @@ const standingsCaption =
           {(topScorer !== undefined || assistLeader !== undefined) && (
             <section class="section" aria-labelledby="destaques">
               <h2 id="destaques">Destaques individuais</h2>
-              {topScorer !== undefined && (
-                <div>
-                  <h3>Artilharia</h3>
-                  <p>
-                    {topScorer.nickname} ({teams.get(topScorer.teamId) === undefined
-                      ? topScorer.teamId
-                      : formatTeamLabel(teams.get(topScorer.teamId)!)})
-                    — {topScorer.goals} gols
-                  </p>
-                  {leaderNote(scorers, (item) => item.goals) !== null && (
-                    <p class="meta">{leaderNote(scorers, (item) => item.goals)}</p>
-                  )}
-                </div>
-              )}
-              {assistLeader !== undefined && (
-                <div>
-                  <h3>Assistências</h3>
-                  <p>
-                    {assistLeader.nickname} (
-                    {teams.get(assistLeader.teamId) === undefined
-                      ? assistLeader.teamId
-                      : formatTeamLabel(teams.get(assistLeader.teamId)!)}) —{' '}
-                    {assistLeader.assists} assistências
-                  </p>
-                  {leaderNote(assists, (item) => item.assists) !== null && (
-                    <p class="meta">{leaderNote(assists, (item) => item.assists)}</p>
-                  )}
-                </div>
-              )}
+              <div class="highlight-grid">
+                {topScorer !== undefined && (
+                  <article class="highlight-card">
+                    <h3>Artilharia</h3>
+                    <p>
+                      {topScorer.nickname} ({teams.get(topScorer.teamId) === undefined
+                        ? topScorer.teamId
+                        : formatTeamLabel(teams.get(topScorer.teamId)!)})
+                      — {topScorer.goals} gols
+                    </p>
+                    {leaderNote(scorers, (item) => item.goals) !== null && (
+                      <p class="meta">{leaderNote(scorers, (item) => item.goals)}</p>
+                    )}
+                  </article>
+                )}
+                {assistLeader !== undefined && (
+                  <article class="highlight-card">
+                    <h3>Assistências</h3>
+                    <p>
+                      {assistLeader.nickname} (
+                      {teams.get(assistLeader.teamId) === undefined
+                        ? assistLeader.teamId
+                        : formatTeamLabel(teams.get(assistLeader.teamId)!)}) —{' '}
+                      {assistLeader.assists} assistências
+                    </p>
+                    {leaderNote(assists, (item) => item.assists) !== null && (
+                      <p class="meta">{leaderNote(assists, (item) => item.assists)}</p>
+                    )}
+                  </article>
+                )}
+              </div>
             </section>
           )}
         </>
@@ -418,16 +415,9 @@ const standingsCaption =
     {
       state === 'afterFinal' && (
         <>
-          <section class="section" aria-labelledby="campea">
-            <h2 id="campea">Campeã</h2>
-            <p class="home-champion">
-              Campeã: {championName ?? 'a definir'}
-            </p>
-          </section>
-
           {podium !== null && podium.champion !== null && (
-            <section class="section" aria-labelledby="podio">
-              <h2 id="podio">Pódio</h2>
+            <section class="section" aria-labelledby="campea">
+              <h2 id="campea">Campeã</h2>
               <PodiumList podium={podium} teams={teams} />
             </section>
           )}

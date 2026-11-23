@@ -6,6 +6,10 @@ interface Props {
 const { activeCount } = Astro.props;
 ---
 
-<p class="badge-list">
-  {activeCount < 5 && <span class="badge">Elenco em formação</span>}
-</p>
+{
+  activeCount < 5 && (
+    <p class="badge-list">
+      <span class="badge">Elenco em formação</span>
+    </p>
+  )
+}

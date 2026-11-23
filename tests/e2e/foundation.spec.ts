@@ -37,7 +37,7 @@ test.describe('fundação do site', () => {
     await expect(page.locator('#conteudo')).toBeFocused();
   });
 
-  test('o menu móvel abre sem JavaScript', async ({ page }) => {
+  test('o menu móvel abre pelo elemento nativo details', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 800 });
     await page.goto('');
 

@@ -208,7 +208,10 @@ test.describe('páginas da competição', () => {
     await expect(
       page.getByRole('heading', { level: 2, name: 'Campeã' }),
     ).toBeVisible();
-    await expect(page.getByText('Campeã: Time C')).toBeVisible();
+    const champion = page.locator('.podium__item--champion');
+    await expect(champion).toContainText('Campeã');
+    await expect(champion).toContainText('Time C');
+    await expect(page.getByRole('heading', { level: 2, name: 'Pódio' })).toHaveCount(0);
     await expect(page.getByRole('heading', { level: 2, name: 'Resultado da final' })).toBeVisible();
     await expect(page.getByText('Informativo — não é partida oficial')).toHaveCount(0);
     await expect(page.getByText('Amistoso')).toHaveCount(0);

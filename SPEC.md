@@ -1,14 +1,18 @@
 # SPEC — Copa de Futsal Feminino Vila Mariana 2026
 
-**Versão:** 2.0  
-**Data:** 18/11/2026  
+**Versão:** 2.2
+**Data:** 22/11/2026
 **Status:** Aceito  
-**Fonte de produto:** `PRD.md` v2.0 + `AGENTS.md` v2.0  
-**Registro de decisões:** `docs/decisoes-v2.0.md`
+**Fonte de produto:** `PRD.md` v2.1 + `AGENTS.md` v2.2
+**Registro de decisões:** `docs/decisoes-v2.2.md` (passe visual); `docs/decisoes-v2.1.md` (tema); `docs/decisoes-v2.0.md` (formato)
 
-Esta é a especificação técnica normativa do site. Ela está subordinada ao `PRD.md` (produto) e ao `AGENTS.md` (restrições do repositório). Em caso de conflito, prevalecem o PRD e o AGENTS; as interpretações e emendas estão registradas na §15. O alinhamento do PRD/AGENTS com a v2.0 foi aplicado. `PLAN.md` e `TASKS.md` são documentos de execução subordinados a esta SPEC.
+Esta é a especificação técnica normativa do site. Ela está subordinada ao `PRD.md` (produto) e ao `AGENTS.md` (restrições do repositório). Em caso de conflito, prevalecem o PRD e o AGENTS; as interpretações e emendas estão registradas na §15. O alinhamento do PRD/AGENTS com a v2.2 foi aplicado. `PLAN.md` e `TASKS.md` são documentos de execução subordinados a esta SPEC.
 
 > **Mudança de formato na v2.0 (18/11/2026):** a edição 2026 passa a ter **8 partidas oficiais**: 6 classificatórias em turno e returno (`g1`…`g6`), **1 semifinal** (`semi`, 2º x 3º) e **1 final** (`final`, 1º x vencedora da semifinal). O 2º e o 1º colocados têm **vantagem do empate** na semifinal e na final, respectivamente. Empates encerram no tempo normal: **não há prorrogação, pênaltis ou shootout**. A **3ª colocada é a perdedora da semifinal**; não há disputa de 3º lugar nem 4º lugar. O **amistoso do 3º colocado foi removido** e os campos `friendly` e `shootout` são proibidos com mensagem de migração. As emendas estão na §15 e foram refletidas no PRD v2.0 e no AGENTS v2.0.
+>
+> **Mudança de tema na v2.1 (20/11/2026):** tema claro como padrão e tema escuro selecionável; um script inline mínimo lê/grava a preferência no `localStorage` (`futsal-cup-theme`). O script não usa rede, frameworks, hidratação, cookies ou dados pessoais. A exceção ao zero-JS fica limitada a esse comportamento.
+>
+> **Passe visual na v2.2 (22/11/2026):** refinamento de tipografia, hierarquia, cards clicáveis por inteiro, painel de placar, cabeçalho de time horizontal e destaque da campeã. Não altera regras da competição, dados, rotas ou JavaScript; não adiciona cores, fontes, fotos ou animações de transform.
 
 ---
 
@@ -91,7 +95,7 @@ Os IDs são estáveis: renomear uma seção não altera o ID. Um ID não pode se
 |---|---|---|
 | SPEC-001 | Uma única fonte versionada por edição (`data/2026/copa.yaml`); nenhum dado de competição duplicado em HTML/componentes. | Teste de fonte única e varredura de dados hardcoded. |
 | SPEC-002 | Dados inválidos bloqueiam o build com todos os erros agregados em pt-BR. | `npm run validate`, fixtures inválidas, build. |
-| SPEC-003 | Zero JavaScript de cliente no MVP. | Varredura de `dist/` e teste E2E de requisições. |
+| SPEC-003 | JavaScript de cliente limitado ao script inline de tema: inicializar, alternar e persistir `light`/`dark` em `localStorage`; sem scripts externos, frameworks, hidratação ou chamadas de rede. | `npm run test:build` e E2E de estado/persistência. |
 | SPEC-004 | Site 100% estático no GitHub Pages, sem backend, banco ou login. | Build estático e workflow Pages. |
 | SPEC-005 | Classificação, placar, cartões, suspensões e estatísticas são sempre derivados dos eventos. | Testes de funções puras. |
 | SPEC-006 | Determinismo: mesma fonte + mesma versão de build produzem a mesma classificação e estatísticas. | Testes de repetição e ordenação. |
@@ -102,7 +106,7 @@ Os IDs são estáveis: renomear uma seção não altera o ID. Um ID não pode se
 | SPEC-011 | FR-10 (Regulamento) adiado: sem rota, link, página ou placeholder. | Varredura de rotas e links. |
 | SPEC-012 | FR-20 (histórico de alterações) futuro: não implementar no MVP. | Revisão de escopo. |
 | SPEC-013 | Cores, tipografia, espaçamento, raios, sombras e movimento vêm de tokens do projeto. | Teste de tokens e varredura de estilos. |
-| SPEC-014 | Orçamento: 0 KB de JS de cliente, CSS < 30 KB gzip, sem fontes externas e sem imagens de pessoas. | `npm run test:build`. |
+| SPEC-014 | Orçamento: script inline de tema ≤ 1 KB gzip por página, CSS < 30 KB gzip, sem fontes externas e sem imagens de pessoas. | `npm run test:build`. |
 | SPEC-015 | Nenhum segredo, analytics, cookie de rastreamento ou requisição de terceiros. | Varredura e teste E2E de rede. |
 | SPEC-016 | **OBSOLETO na v2.0:** o amistoso do 3º colocado foi removido. Não existe `friendly` nem partida não oficial; campos antigos geram erro de migração. | Schema estrito, validação `VAL-002` e testes de ausência na UI. |
 | SPEC-017 | O formato de 2026 tem 3 times e **8 partidas oficiais**: 6 de grupo em turno e returno + 1 semifinal + 1 final. Não há partida de 3º lugar nem 4º lugar. | Schema, validação, rotas e testes. |
@@ -131,6 +135,7 @@ O nome da instituição **NÃO DEVE** aparecer em interface, título, metadados,
 - Suspensões automáticas e bloqueio de eventos, considerando o caminho do time no chaveamento.
 - Fase final com `semifinalists` e `finalists` validados, **semifinal**, **final** e **pódio de 3**: campeã, vice-campeã e 3ª colocada.
 - Estatísticas individuais e coletivas das **8 partidas oficiais**, sem campanha de pênaltis.
+- Tema claro padrão e tema escuro selecionável, com preferência local no navegador.
 - Páginas Início, Jogos, Classificação, Times, Estatísticas, Fase final e 404.
 - Validação bloqueante, avisos de build, CI e deploy no GitHub Pages.
 - Acessibilidade AA, SEO básico e performance em 4G.
@@ -146,8 +151,9 @@ O nome da instituição **NÃO DEVE** aparecer em interface, título, metadados,
 - Histórico de edições anteriores, multi-competição, busca, filtros com JS.
 - Notificações, chat, pagamentos, streaming, ingressos.
 - W.O. automático, detecção de jogadoras em quadra, automação de desistência de time inteiro.
-- Regulamento (FR-10, adiado), modo escuro, impressão/PDF, analytics.
-- Tema escuro, fontes proprietárias, imagens de pessoas e logotipos sem relação com os times. Logos dos times enviados pela organização são opcionais e servidos localmente.
+- Regulamento (FR-10, adiado), impressão/PDF e analytics.
+- Fontes proprietárias, imagens de pessoas e logotipos sem relação com os times. Logos dos times enviados pela organização são opcionais e servidos localmente.
+- Persistência em servidor da preferência de tema: a escolha vive somente no `localStorage` do navegador.
 - `PLAN.md` e `TASKS.md` nesta etapa.
 
 ### 2.4 Adiado e futuro
@@ -260,7 +266,7 @@ data/2026/copa.yaml
 [4] páginas Astro (getStaticPaths, layouts, componentes)
         │
         ▼
-dist/ (HTML + CSS; 0 KB de JS)
+ dist/ (HTML + CSS + inicializador inline mínimo do tema)
         │
         ▼
 GitHub Actions → GitHub Pages
@@ -337,7 +343,8 @@ O build **NÃO DEVE** consultar APIs, bancos, arquivos de outras edições ou o 
 - Cada rota é um arquivo HTML pré-renderizado. Não há SSR, middleware, API routes ou ilhas.
 - `getStaticPaths` gera `/jogos/g1/`…`/jogos/g6/`, `/jogos/final/` e `/times/ta/`…`/times/tc/`.
 - Links internos usam `import.meta.env.BASE_URL` (helper `withBase`), nunca `/` absoluto sem base.
-- Nenhum `client:*`, `<script>` ou import de framework de UI.
+- Nenhum `client:*` ou import de framework de UI.
+- Única exceção de script: inicializador inline de tema em `BaseLayout.astro`, antes do CSS renderizado, para aplicar a preferência salva sem flash de tema. Não criar arquivos JS externos nem scripts para outros recursos.
 - 404: `src/pages/404.astro` **DEVE** produzir `dist/404.html` (comportamento nativo do Astro; verificado no teste de build).
 
 ### 4.5 Fronteiras de código
@@ -1781,7 +1788,7 @@ Cada página **DEVE**:
 2. Definir `title`, `description`, `canonicalPath` e `activeNav`.
 3. Renderizar um único `<h1>`, com seções `<h2>`/`<h3>` em ordem.
 4. Não conter dados de times, partidas, resultados ou estatísticas hardcoded.
-5. Não conter `client:*`, `<script>` ou chamadas de rede.
+5. Não conter `client:*`, scripts externos ou chamadas de rede; o único script permitido é o inline de tema em `BaseLayout.astro`.
 6. Usar `withBase()` para todos os links internos.
 7. Renderizar estados vazios explícitos quando não houver dados.
 
@@ -1790,7 +1797,7 @@ Cada página **DEVE**:
 | Componente | Props principais | Obrigações |
 |---|---|---|
 | `BaseLayout.astro` | `title`, `description`, `canonicalPath`, `activeNav`, `noindex?` | `<html lang="pt-BR">`, skip link, header, nav, `<main id="conteudo">`, footer, notices, meta tags. Carrega os times da fonte oficial e repassa ao cabeçalho. |
-| `SiteHeader.astro` | `activeNav`, `activeTeamId?`, `teams` | Nome público, nav desktop, `<details>` “Menu” no mobile, submenu de Times, `aria-current="page"`. |
+| `SiteHeader.astro` | `activeNav`, `activeTeamId?`, `teams` | Nome público, nav desktop, `<details>` “Menu” no mobile, submenu de Times, controle acessível de tema, `aria-current="page"`. |
 | `NavList.astro` | `activeNav`, `activeTeamId?`, `teams` | Seis seções; submenu de Times com um link por time vindo dos dados; `aria-current` único. |
 | `HomeShortcuts.astro` | `teams` | Atalhos para Jogos, Times e Classificação, mais os três times com links diretos. |
 | `SiteFooter.astro` | `buildTimestamp` | Nome público, “Atualizado em … (horário de Brasília)”, sem instituição/Airbnb/analytics. |
@@ -1872,11 +1879,14 @@ Ordem do documento:
 <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
 <header>
   <a href="/futsal-cup/">Copa de Futsal Feminino Vila Mariana 2026</a>
-  <nav aria-label="Principal"> ... 6 seções + submenu de Times ... </nav>   // desktop
-  <details class="menu-mobile">
-    <summary>Menu</summary>
-    <nav aria-label="Principal (menu móvel)"> ... 6 seções + 3 times ... </nav>
-  </details>
+  <div class="site-header__actions">
+    <nav aria-label="Principal"> ... 6 seções + submenu de Times ... </nav>   // desktop
+    <details class="menu-mobile">
+      <summary>Menu</summary>
+      <nav aria-label="Principal (menu móvel)"> ... 6 seções + 3 times ... </nav>
+    </details>
+    <button class="theme-toggle" aria-label="Tema escuro" aria-pressed="false"> ... </button>
+  </div>
 </header>
 <aside aria-labelledby="avisos-title"> ... notices, se houver ... </aside>
 <main id="conteudo" tabindex="-1"> ... </main>
@@ -1888,10 +1898,18 @@ Ordem do documento:
 - No desktop, o submenu abre com `:hover` e `:focus-within`, sem JavaScript, posicionado sobre o conteúdo com `--shadow-floating` e `--z-nav-submenu`; fecha quando o ponteiro sai ou o foco tabula para fora.
 - No mobile, ao abrir `<details>` “Menu”, os três links de times ficam sempre visíveis como lista indentada, sem um segundo toque.
 - `aria-current="page"` no link ativo, uma única vez por navegação, com indicador visual que não depende só de cor (sublinhado + peso). Em `/times/`, marca Times; em `/times/{id}/`, marca o time no submenu e mantém Times destacado como seção, sem segundo `aria-current`.
+- O item de nav com submenu exibe um chevron decorativo em CSS (`::after`), sem texto alternativo e sem animação de transform.
 - O `<summary>` “Menu” é focável, tem alvo mínimo de 44×44px e funciona com Enter/Espaço nativamente.
+- O botão “Tema escuro” tem alvo mínimo de 44×44px, ícones decorativos ocultos da árvore acessível e `aria-pressed` sincronizado ao tema aplicado.
+- O claro é o padrão. A inicialização lê `localStorage["futsal-cup-theme"]` antes do CSS; apenas o valor exato `dark` ativa o escuro. Sem preferência, valor inválido ou falha de leitura, usa claro.
+- Ao ativar o botão, alterna `data-theme` no elemento raiz e tenta persistir `light`/`dark`. Falha de escrita não bloqueia a alternância na página atual.
+- Sem JavaScript, o botão de tema é ocultado (classe `no-js` removida na inicialização) e o site permanece no tema claro.
+- A preferência é local ao perfil do navegador/dispositivo, sem servidor, conta, cookie ou sincronização.
 - No desktop (`min-width: 768px`), o menu mobile fica oculto e a nav desktop visível; no mobile, o contrário. Apenas uma nav é exibida por vez.
 - Não há JS para abrir/fechar o menu; `<details>` nativo resolve.
 - O header não é sticky (evita foco obscurecido).
+- Cards de partida e de time usam link estendido: o título é o nome acessível e a área clicável cobre o card inteiro. O foco desenha o anel no card e não há controles interativos aninhados.
+- Cada `.page-header` tem uma barra de gradiente decorativa (largura `--accent-bar-width`, altura `--accent-bar-height`) sem texto sobreposto.
 - O rodapé contém o nome público e “Atualizado em {data} às {hora} (horário de Brasília)”. Não contém instituição, Airbnb, analytics, cookies ou links de terceiros.
 - O skip link é o primeiro elemento focável e fica visível ao receber foco.
 
@@ -2092,6 +2110,8 @@ Seções, nesta ordem:
 | UI-STATS-01 | Sem dados | Mensagem de estado vazio. |
 | UI-STATS-02 | Fora do elenco | Marca textual “fora do elenco ativo”. |
 | UI-FINAL-01/02/03/04 | Fase final | Conforme §10.8. |
+| UI-THEME-01 | Tema padrão | Claro se não houver preferência `dark` salva ou se a leitura falhar. |
+| UI-THEME-02 | Alternância | Botão acessível troca tema, ícone e `aria-pressed`; grava `light`/`dark`; erro de gravação não bloqueia a tela atual. |
 | UI-404-01 | Não encontrada | 404 com link. |
 
 ### 10.11 SEO, metadados e favicon
@@ -2102,9 +2122,9 @@ Seções, nesta ordem:
 - Open Graph: `og:title`, `og:description`, `og:url`, `og:type=website`, `og:site_name`. Sem `og:image`.
 - 404: `noindex`, sem canonical/OG.
 - Favicon `public/favicon.svg`: 32×32, monograma tipográfico simples “CF” ou “Copa”, fundo coral e texto branco ou vice-versa, sem logotipos/marcas da Airbnb ou da instituição. Caminho público `/futsal-cup/favicon.svg`.
-- `meta name="color-scheme" content="light"`.
+- `meta name="color-scheme" content="light dark"`; `color-scheme` CSS acompanha `data-theme`. O claro é o primeiro/padrão.
 - Sem `robots.txt` obrigatório; sem sitemap no MVP.
-- Nenhuma imagem OG, foto, fonte externa ou script de terceiros.
+- Nenhuma imagem OG, foto, fonte externa ou script de terceiros. Não há arquivo JS externo; somente o script inline local da §10.2.
 
 ---
 
@@ -2117,11 +2137,13 @@ Seções, nesta ordem:
 - Identidade coral/pink em acentos, títulos grandes e detalhes; nunca atrás de tabelas ou em grandes áreas.
 - Sem fotos de jogadoras e sem imagens de pessoas. A hierarquia vem de tipografia, cor e espaço.
 - Acessibilidade vence o estilo em qualquer conflito.
-- Tema claro apenas; sem modo escuro no MVP.
+- Tema claro por padrão e tema escuro escolhido manualmente; não seguir automaticamente o tema do sistema.
 
 ### 11.2 Camada de tokens
 
 A referência `airbnb-design-tokens.css` é interna e indicativa. Para evitar publicar nomes de fontes proprietárias e nomes de marca no CSS final, o projeto **NÃO DEVE** importar o arquivo integralmente. Ele **DEVE** criar `src/styles/tokens.css` com os valores necessários, renomeados para tokens do projeto, documentando a correspondência nesta SPEC. Essa é uma extensão da referência, não uma alteração dos valores originais.
+
+Os valores claros abaixo são os aliases padrão. O seletor `:root[data-theme="dark"]` sobrescreve apenas cores semânticas e sombras. Todos os componentes continuam consumindo os mesmos aliases; os valores escuros são uma adaptação do projeto, não parte da referência visual.
 
 | Token do projeto | Referência | Valor | Uso |
 |---|---|---|---|
@@ -2134,24 +2156,42 @@ A referência `airbnb-design-tokens.css` é interna e indicativa. Para evitar pu
 | `--color-accent-strong` | `--airbnb-pink` | `#e61e4d` | Acento forte, detalhe; não usar em texto normal. |
 | `--color-on-accent` | — | `#222222` | Texto sobre coral. |
 | `--color-focus` | — | `#222222` | Anel de foco. |
+| `--color-text` (escuro) | projeto | `#f5f5f7` | Texto principal no escuro. |
+| `--color-text-muted` (escuro) | projeto | `#b8b8bd` | Texto secundário no escuro. |
+| `--color-surface` (escuro) | projeto | `#161618` | Superfície principal. |
+| `--color-surface-subtle` (escuro) | projeto | `#242427` | Superfície sutil/linhas alternadas. |
+| `--color-border` (escuro) | projeto | `#48484f` | Hairline decorativa. |
+| `--color-accent` (escuro) | projeto | `#ff7a7e` | Acento coral claro. |
+| `--color-accent-strong` (escuro) | projeto | `#ff6b91` | Acento pink claro. |
+| `--color-on-accent` (escuro) | projeto | `#222222` | Texto sobre acento no tema escuro. |
+| `--color-focus` (escuro) | projeto | `#f5f5f7` | Anel de foco no tema escuro. |
 | `--font-family-body` | `--font-body` (substituído) | `-apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif` | Texto; sem fontes proprietárias. |
 | `--text-display-size` / `--text-display-line` | `--text-display` | `48px` / `56px` | Título curto em telas largas. |
 | `--text-heading-1-size` / `--text-heading-1-line` | `--text-heading-1` | `32px` / `36px` | `<h1>`/seções. |
 | `--text-heading-2-size` / `--text-heading-2-line` | `--text-heading-2` | `22px` / `26px` | Subtítulos. |
 | `--text-body-size` / `--text-body-line` | `--text-body` | `16px` / `24px` | Corpo. |
 | `--text-small-size` / `--text-small-line` | `--text-small` | `14px` / `18px` | Tabelas, badges, legendas. |
+| `--tracking-display` | — | `-0.02em` | Tracking de títulos em `display`. |
+| `--tracking-heading` | — | `-0.01em` | Tracking de `h1`–`h3`. |
 | `--space-1`…`--space-6` | `--space-1`…`--space-6` | `8/16/24/32/48/64px` | Espaçamento. |
 | `--radius-small` | `--radius-small` | `8px` | Elementos pequenos. |
 | `--radius-card` | `--radius-card` | `12px` | Cards. |
 | `--radius-pill` | `--radius-pill` | `9999px` | Badges. |
 | `--shadow-card` | `--shadow-card` | `0 6px 16px rgba(0,0,0,0.12)` | Cards. |
 | `--shadow-floating` | `--shadow-floating` | `0 3px 12px rgba(0,0,0,0.15)` | Menu sobreposto. |
+| `--shadow-card` (escuro) | projeto | `0 6px 16px rgba(0,0,0,0.4)` | Cards no tema escuro. |
+| `--shadow-floating` (escuro) | projeto | `0 3px 12px rgba(0,0,0,0.5)` | Elementos sobrepostos no tema escuro. |
+| `--shortcut-min` | — | `10rem` | Largura mínima de cada atalho no grid `auto-fit`. |
+| `--team-logo-size` | — | `5rem` | Logo nos cards de time e no cabeçalho do time no mobile. |
+| `--team-logo-size-lg` | — | `12rem` | Logo no cabeçalho do time a partir de 768px. |
+| `--accent-bar-width` | — | `8rem` | Comprimento da barra de gradiente decorativa. |
+| `--accent-bar-height` | — | `4px` | Espessura da barra de gradiente decorativa. |
 | `--z-nav-submenu` | — | `5` | Sobreposição do submenu de Times no desktop. |
 | `--motion-default` | `--motion-default` | `250ms cubic-bezier(0.2,0,0,1)` | Transições discretas. |
 
 A referência agrupa tamanho e entrelinha no mesmo token; o projeto separa cada par em `*-size` e `*-line` para uso direto em `font-size`/`line-height`.
 
-Tokens técnicos adicionais (também em `tokens.css`): `--page-gutter`, `--content-max`, `--measure`, `--tap-target`, `--border-width`, `--focus-width`, `--focus-offset`, `--table-min-width`, `--z-nav-submenu`, `--gradient-accent`.
+Tokens técnicos adicionais (também em `tokens.css`): `--page-gutter`, `--content-max`, `--measure`, `--tap-target`, `--border-width`, `--focus-width`, `--focus-offset`, `--table-min-width`, `--shortcut-min`, `--team-logo-size`, `--team-logo-size-lg`, `--accent-bar-width`, `--accent-bar-height`, `--z-nav-submenu`, `--gradient-accent`.
 
 - Componentes **NÃO DEVEM** conter hexadecimais, `rgb()`, `hsl()`, sombras ou medidas avulsas; devem consumir tokens.
 - `--color-border` é decorativa; não pode ser a única indicação de foco, erro ou estado.
@@ -2176,6 +2216,20 @@ Pares calculados com luminância relativa WCAG:
 | `--color-focus` sobre `--color-surface`, `--color-surface-subtle`, `--color-accent`, `--color-accent-strong` | 15,91 / 14,85 / 5,21 / 3,53:1 | Anel de foco; atende 3:1 em todos. |
 | `--color-border` sobre `--color-surface` | 1,36:1 | Apenas hairline decorativa. |
 
+Pares do tema escuro (recalculados pelo teste de tokens):
+
+| Par | Contraste aproximado | Uso permitido |
+|---|---:|---|
+| `--color-text` sobre `--color-surface` | 16,60:1 | Texto normal e grande. |
+| `--color-text` sobre `--color-surface-subtle` | 14,22:1 | Texto normal e grande. |
+| `--color-text-muted` sobre `--color-surface` | 9,15:1 | Texto normal. |
+| `--color-text-muted` sobre `--color-surface-subtle` | 7,83:1 | Texto normal. |
+| `--color-accent` sobre `--color-surface` | 7,17:1 | Texto, ícones e detalhes. |
+| `--color-accent-strong` sobre `--color-surface` | 6,68:1 | Texto, ícones e detalhes. |
+| `--color-on-accent` sobre `--color-accent` | 6,32:1 | Texto normal sobre acento. |
+| `--color-focus` sobre `--color-surface` / `--color-surface-subtle` | 16,60 / 14,22:1 | Anel de foco. |
+| `--color-border` sobre `--color-surface` | 1,99:1 | Apenas hairline decorativa. |
+
 - Texto normal exige 4,5:1; texto grande e componentes interativos exigem 3:1.
 - Não usar `--color-text-muted` sobre coral/pink; não usar coral/pink como fundo de texto normal.
 - Gradientes não podem reduzir o contraste de texto; não colocar texto sobre `--gradient-accent`.
@@ -2190,7 +2244,10 @@ Pares calculados com luminância relativa WCAG:
 - `display` só em títulos curtos e telas ≥768px; em telas estreitas, usar heading-1.
 - Preservar o par tamanho/entrelinha; não ajustar entrelinha isoladamente.
 - Largura de linha máxima: `--measure` (68ch) para texto corrido.
-- Não usar `text-transform: uppercase` em blocos longos; apenas em badges curtos, se necessário, com `letter-spacing` tokenizado.
+- Tracking é específico por tamanho: `--tracking-display` (`-0.02em`) em display e `--tracking-heading` (`-0.01em`) em `h1`–`h3`; o corpo fica em `0`.
+- Usar `text-wrap: balance` em títulos e `text-wrap: pretty` em parágrafos, sem depender disso para informação essencial.
+- Números de placar, tabelas e estatísticas usam `font-variant-numeric: tabular-nums`.
+- Não usar `text-transform: uppercase` em blocos longos; apenas no eyebrow curto do cabeçalho e em badges curtos, com `letter-spacing` tokenizado.
 
 ### 11.5 Cores, estados e significado
 
@@ -2202,16 +2259,24 @@ Pares calculados com luminância relativa WCAG:
 - Links: `--color-text` com sublinhado de 2px em `--color-accent`; hover aumenta a espessura do sublinhado. Não usar coral como cor de texto de corpo.
 - Botão primário: fundo `--color-text`, texto `--color-surface`; botão secundário: fundo transparente, texto `--color-text`, borda 2px `--color-text`.
 - Foco: `outline: var(--focus-width) solid var(--color-focus); outline-offset: var(--focus-offset);` e fallback `:focus`. Não remover `outline` sem substituto equivalente.
+- Botão do tema: ícone decorativo sol/lua com `aria-hidden="true"`; estado do tema exposto via `aria-pressed`, sem depender apenas do ícone ou da cor.
 
 ### 11.6 Espaçamento, forma, elevação e movimento
 
 - Base 8px; usar `--space-1`…`--space-6`. Não usar valores intermediários arbitrários.
 - Página: gutter `--space-2` no mobile e `--space-4` a partir de 768px.
-- Cards: padding `--space-3`, raio `--radius-card`, sombra `--shadow-card`.
-- Badges: raio `--radius-pill`, padding vertical `--space-1`/2 e horizontal `--space-2`.
+- Cards: padding `--space-3`, raio `--radius-card`, sombra `--shadow-card`. No hover, usar `--shadow-floating`; no `:active`, mudar apenas cor de fundo/borda, sem transform.
+- Cards de partida e de time: o link do título usa `::after` com `inset: 0` para cobrir o card; o anel de foco é desenhado no card via `:focus-within`.
+- Barra decorativa do cabeçalho: `--gradient-accent`, largura `--accent-bar-width`, altura `--accent-bar-height`, sem texto sobreposto.
+- Badges: raio `--radius-pill`, padding horizontal `--space-2`, `letter-spacing: --letter-spacing-badge` e quebra de linha permitida; não fixar altura.
+- Estatísticas coletivas: grid de 2 colunas em todas as larguras.
+- Logos de time: `--team-logo-size` nos cards e no mobile; `--team-logo-size-lg` no cabeçalho do time a partir de 768px.
+- Tabelas: `vertical-align: middle`, cabeçalhos sem quebra de linha, números tabulares e rolagem contida no contêiner.
+- Estados vazios: borda tracejada com acento em `border-inline-start` e último parágrafo sem margem.
 - Não criar sombras fora dos tokens.
-- Movimento: apenas transições de cor/borda/sublinhado com `--motion-default`. Nada de animação de conteúdo essencial.
+- Movimento: apenas transições de cor/borda/sublinhado/sombra com `--motion-default`. Nada de animação de conteúdo essencial nem de `transform`.
 - `@media (prefers-reduced-motion: reduce)` deve zerar animações/transições e `scroll-behavior`.
+- A impressão usa sempre os tokens claros, mesmo quando a tela está no tema escuro.
 - Não usar parallax, autoplay, carrossel ou vídeo.
 
 ### 11.7 Layout responsivo
@@ -2232,9 +2297,12 @@ Pares calculados com luminância relativa WCAG:
 - `aria-current="page"` no link ativo, uma única vez por navegação; no detalhe do time, o submenu marca o time e a seção Times permanece destacada.
 - Tabelas: `<caption>`, `<th scope="col">`, `<th scope="row">`, `<abbr title>`, sem tabela de layout.
 - Contêiner de rolagem: `role="region"`, `aria-labelledby`, `tabindex="0"`, instrução textual; foco visível.
-- Placar e definição por vantagem do empate com texto acessível completo; não depender de parênteses, cor ou posição.
+- Placar e definição por vantagem do empate com texto acessível completo; não depender de parênteses, cor ou posição. O painel visual do placar mantém o texto acessível em `.visually-hidden`.
 - Suspensões, W.O., sorteio, vantagem do empate e elenco em formação sempre com texto.
+- Cards clicáveis por inteiro: o link do título é o único controle, seu texto é o nome acessível e o foco aparece no card. Não aninhar links ou botões dentro do card.
+- Barra de gradiente, chevrons e demais traços decorativos são CSS sem conteúdo textual e não entram na árvore acessível.
 - Ícones decorativos com `aria-hidden="true"`; ícones informativos com nome acessível.
+- Alternância de tema acessível por teclado; claro padrão; preferência restaurada/persistida no `localStorage`; falhas de armazenamento degradam para tema claro ou alternância apenas na página.
 - `prefers-reduced-motion` respeitado.
 - Zoom 200% sem perda de conteúdo/funcionalidade.
 - Nenhum conteúdo piscante, autoplay ou tempo limite.
@@ -2245,7 +2313,7 @@ Pares calculados com luminância relativa WCAG:
 
 | Métrica | Limite | Verificação |
 |---|---|---|
-| JS de cliente | 0 KB; nenhum arquivo `.js` em `dist/`, nenhum `<script>` | `npm run test:build` |
+| JS de cliente | Um script inline de tema ≤ 1 KB gzip/página; nenhum arquivo JS externo em `dist/` | `npm run test:build` |
 | CSS | < 30 KB gzip por página | `npm run test:build` |
 | HTML | ≤ 60 KB gzip por página | `npm run test:build` |
 | Peso total (HTML+CSS) | ≤ 90 KB gzip por página | `npm run test:build` |
@@ -2257,7 +2325,7 @@ Pares calculados com luminância relativa WCAG:
 - Sem fotos de pessoas. A única exceção raster são logos de times em `public/images/times/`, cada um com no máximo 200 KB e referenciado na fonte. Favicon SVG pequeno.
 - CSS crítico inline? **NÃO** no MVP; um único CSS externo cacheável é suficiente. Evitar `style` inline.
 - Sem prefetch de rotas, sem service worker, sem fontes.
-- O site deve carregar em 4G com uma única requisição HTML + CSS (e favicon opcional).
+- O site deve carregar em 4G com uma única requisição HTML + CSS (e favicon opcional); o script de tema é inline no HTML e não adiciona requisição.
 
 ### 11.10 Conteúdo e privacidade visual
 
@@ -2583,7 +2651,7 @@ Nenhuma variável contém segredo. Não há `.env` versionado.
 |---|---|---|---|
 | Unitários | Vitest | Placar, classificação, desempate, cartões, suspensão, estatísticas, pódio, próximo jogo, formatação, normalização, contraste de tokens. | Sim |
 | Dados | Vitest + fixtures/factories | Schema, todas as validações bloqueantes, avisos, agregação de erros. | Sim |
-| Build | `scripts/check-build.ts` | Rotas, links internos, 404, ausência de Regulamento, 0 KB JS, termos proibidos, fontes proprietárias, orçamento, IDs de jogadora. | Sim |
+| Build | `scripts/check-build.ts` | Rotas, links internos, 404, ausência de Regulamento, script inline de tema ≤1 KB gzip, sem JS externo, termos proibidos, fontes proprietárias, orçamento, IDs de jogadora. | Sim |
 | E2E | Playwright | Navegação, teclado, foco, 320px, tabelas roláveis, meta tags, 404, menu `<details>`. Smoke em Chromium, Firefox e WebKit (Safari desktop e iOS). | Sim |
 | Acessibilidade | Playwright + axe-core | Violações `serious`/`critical` nas rotas principais. | Sim |
 | Manual | Checklist Apêndice D | Leitor de tela, zoom 200%, dispositivos reais, Safari/Firefox/Edge, Lighthouse, inspeção visual. | Antes da publicação |
@@ -2676,7 +2744,7 @@ Os casos abaixo são derivados do AGENTS e do PRD. A matriz completa está no Ap
 - Tabelas com `caption`, `th`, `scope`.
 - Menu `<details>` acessível.
 - Meta tags, canonical, OG, favicon, 404.
-- Ausência de `client:*`, `<script>` e JS em `dist/`.
+- Ausência de `client:*` e de JS externo em `dist/`; somente script inline do tema, dentro do orçamento.
 - Ausência de `airbnb-design-design.md`, `airbnb-design-tokens.css`, fontes proprietárias e termos proibidos em `dist/`.
 
 ### 13.3 Fixtures e factories
@@ -2794,10 +2862,11 @@ npm run verify
 | 32 | Snapshots e correções | `semifinalists`/`finalists` são snapshots validados; divergência após a respectiva partida bloqueia com antigos/novos e exige reconciliação/`notices`. | PRD v2.0 §7.7/§8.1. | Schema, ALG-007, `VAL-016/017` e testes. |
 | 33 | Remoções | `friendly`, card de amistoso, `shootout` e colunas de pênaltis foram removidos; campos antigos geram `VAL-002` com mensagem de migração. | PRD v2.0 §6.2/§7.9/§8. | Schema, validação, UI, build e testes. |
 | 34 | Interface da fase final | Rótulos “Semifinal” e “Final”; a final antes da semi mostra o 1º e “Vencedora da semifinal”; a vantagem do empate é sempre textual; “3ª colocada”. | PRD v2.0 §10.6; AGENTS v2.0. | §10.3/§10.8, componentes e E2E. |
+| 35 | Tema claro/escuro | Claro como padrão; controle manual acessível; `localStorage["futsal-cup-theme"]` persiste a preferência por navegador; fallback claro se ausente/inválido/indisponível. Um script inline ≤1 KB gzip é a única exceção de JavaScript. | PRD v2.1 §6/§8/§9; `docs/decisoes-v2.1.md`. | PRD, AGENTS, tokens, BaseLayout, cabeçalho, orçamento, testes de contraste/E2E. |
 
-As emendas 1–24 foram as decisões históricas da v1.1 e permanecem registradas em `docs/decisoes-v1.1.md`, que não é normativo. Quando qualquer uma delas conflitar com a v2.0 (por exemplo, final única, amistoso ou shootout), prevalecem as emendas 25–34, o `PRD.md` v2.0 e o `AGENTS.md` v2.0.
+As emendas 1–24 foram as decisões históricas da v1.1 e permanecem registradas em `docs/decisoes-v1.1.md`, que não é normativo. Quando qualquer uma delas conflitar com a v2.0 (por exemplo, final única, amistoso ou shootout), prevalecem as emendas 25–34 e a v2.0. Para tema e JavaScript de cliente, prevalece a emenda 35 e os documentos v2.1.
 
-### 15.2 Alinhamento aplicado ao PRD, AGENTS e README
+### 15.2 Alinhamento v2.0 (histórico)
 
 O alinhamento abaixo foi aplicado nesta entrega. A aprovação formal do PRD (§18) está registrada no próprio PRD; o commit `docs` é o registro final e só deve ser declarado concluído depois de existir.
 
@@ -2831,7 +2900,16 @@ O alinhamento abaixo foi aplicado nesta entrega. A aprovação formal do PRD (§
 
 - [ ] Commits `docs(prd)`, `docs(agents)`, `docs(spec)` e `docs:` da v2.0 criados após a revisão final. Não declarar concluído antes de o commit existir.
 
-### 15.3 Conflitos resolvidos
+### 15.3 Alinhamento v2.1 — tema
+
+- [x] `PRD.md` v2.1 define o tema claro por padrão, alternância acessível e persistência local com fallback.
+- [x] `AGENTS.md` v2.1 limita JavaScript no cliente ao script inline/local do tema e define tokens/contraste para os dois temas.
+- [x] `docs/decisoes-v2.1.md` registra o uso namespaced de `localStorage["futsal-cup-theme"]`, limites de privacidade e a ausência de sincronização.
+- [x] `BaseLayout.astro` inicializa a preferência antes do CSS; controle do cabeçalho alterna o tema sem framework ou rede.
+- [x] Testes validam tokens/contraste, orçamento do script, fallback de armazenamento, teclado, persistência entre rotas e axe nos dois temas.
+- [x] Impressão força o tema claro.
+
+### 15.4 Conflitos resolvidos
 
 | Conflito | Resolução |
 |---|---|
@@ -2846,7 +2924,7 @@ O alinhamento abaixo foi aplicado nesta entrega. A aprovação formal do PRD (§
 | PRD v1.1/AGENTS v1.1 previam 7 partidas, final direta 1º x 2º, amistoso e shootout | A v2.0 adota 8 partidas, semifinal 2º x 3º, final 1º x vencedora, vantagem do empate, 3ª colocada como perdedora da semifinal e remoção de `friendly`/`shootout`. Emendas 25–34. |
 | PRD v1.1 definia a 3ª colocada pela classificação do grupo | A v2.0 define a 3ª colocada como perdedora da semifinal; a classificação do grupo define apenas semifinalistas e finalistas. Emenda 29. |
 
-### 15.4 Regra de manutenção
+### 15.5 Regra de manutenção
 
 - Novas decisões de produto exigem atualização do PRD e, se afetarem agentes, do AGENTS.
 - Novas decisões técnicas exigem atualização desta SPEC e, se mudarem o schema, uma emenda.
@@ -2901,7 +2979,7 @@ O alinhamento abaixo foi aplicado nesta entrega. A aprovação formal do PRD (§
 - Não há placar ao vivo, cronômetro, faltas, escalação ou presença.
 - Não há histórico de edições anteriores nem comparação entre edições.
 - Não há área administrativa, login ou edição no site.
-- Não há modo escuro, impressão/PDF ou analytics.
+- Não há impressão/PDF ou analytics.
 - Não há detecção automática de W.O. ou de quantidade de jogadoras em quadra.
 - A retirada de um time não é automatizada: a organização registra um W.O. `withdrawal` em cada partida restante e mantém o elenco/histórico como estão.
 - Não há partida de 3º lugar nem 4º lugar; a 3ª colocada é a perdedora da semifinal.
@@ -2934,7 +3012,7 @@ Nenhuma questão bloqueia a implementação. A UI tem fallback para horário/loc
 - O confronto direto usa os dois jogos e só vale com ambos `finished`.
 - Empate no mata-mata é resolvido pela vantagem do mandante; não há shootout.
 - A retirada de time é W.O. manual por partida.
-- Não há JS de cliente.
+- Não há JS de cliente além do script mínimo de tema especificado na §10.2.
 
 ---
 
@@ -2964,7 +3042,7 @@ Nenhuma questão bloqueia a implementação. A UI tem fallback para horário/loc
 - [ ] `npm run check` passa.
 - [ ] `npm test` passa.
 - [ ] `npm run build` gera `dist/` com todas as rotas.
-- [ ] `npm run test:build` passa (0 KB JS, CSS <30 KB gzip, termos proibidos, rotas, 404).
+- [ ] `npm run test:build` passa (script inline de tema ≤1 KB gzip, sem JS externo, CSS <30 KB gzip, termos proibidos, rotas, 404).
 - [ ] `npm run test:e2e` passa (axe, teclado, 320px, meta tags, 404).
 - [ ] `dist/404.html` existe e funciona.
 - [ ] `/regulamento/` não existe e não aparece em links.
@@ -2977,6 +3055,7 @@ Nenhuma questão bloqueia a implementação. A UI tem fallback para horário/loc
 - [ ] Estatísticas com artilharia, assistências, cartões e gols contra das 8 partidas.
 - [ ] Fase final com semifinal, final, vantagem do empate textual e pódio de 3 sem 4º lugar.
 - [ ] Metadados, canonical, OG sem imagem, favicon e 404.
+- [ ] Tema claro padrão, alternância clara/escura acessível e persistência local entre rotas/recarregamentos.
 - [ ] Nenhum nome da instituição/Airbnb, fonte proprietária, foto ou dado pessoal.
 - [ ] CI/publicação no GitHub Pages funcionando; site anterior preservado em falha.
 - [ ] Checklist manual do Apêndice D assinado.
@@ -2990,7 +3069,7 @@ Nenhuma questão bloqueia a implementação. A UI tem fallback para horário/loc
 4. Nenhuma 10ª ativa, apelido duplicado, jogadora em dois times ou transferência após atuação.
 5. Nenhuma semifinal sem `semifinalists` válido e nenhuma final sem `finalists` válido; correção bloqueia até confirmação. Não há partida de 3º lugar.
 6. Nenhuma rota/link/placeholder de Regulamento, amistoso ou 3º lugar.
-7. Nenhum JS de cliente, fonte externa, imagem de pessoa ou analytics.
+7. Nenhum JS externo ou uso de JavaScript além da alternância/persistência de tema; nenhuma fonte externa, imagem de pessoa ou analytics.
 8. Nenhum texto público com instituição, Airbnb ou dado pessoal.
 9. WCAG 2.2 AA verificado; 320px sem overflow da página.
 10. Empate no mata-mata é comunicado com a vantagem do empate; não há shootout, prorrogação ou pênaltis.
@@ -3776,13 +3855,19 @@ Os IDs `TST-*` são estáveis. Casos removidos na v1.1 (por exemplo, disputa de 
 
 | TST | Regra/FR | Cenário | Ação/fixture | Esperado | Tipo |
 |---|---|---|---|---|---|
-| TST-084 | SPEC-003 | Zero JS | `dist/` | Nenhum `.js`/`<script>` | B |
+| TST-084 | SPEC-003 | **Obsoleto na v2.1** | — | Zero JS foi substituído pelo TST-122 | — |
 | TST-085 | SPEC-014 | Orçamento CSS | `dist/` | <30 KB gzip/página | B |
 | TST-086 | FR-18 | Termos proibidos | `dist/` | Sem Sesc/Airbnb/Circular/fontes | B |
 | TST-087 | AGENTS | Referências fora do build | `dist/` | Sem `airbnb-design-design.md`/tokens | B |
 | TST-088 | FR-17 | IDs de jogadora | `dist/` | Nenhum `p-\d{3}` | B |
 | TST-089 | FR-01 | Dados hardcoded | `src/` | Sem nomes/datas/resultados de times | B |
-| TST-090 | FR-11 | Contraste de tokens | Pares do §11.3 | Todos os usos permitidos passam | U |
+| TST-090 | FR-11/FR-21 | Contraste de tokens | Pares claros e escuros do §11.3 | Todos os usos permitidos passam nos dois temas | U |
+| TST-122 | SPEC-003/014 | Limite e escopo do script | Todas as páginas de `dist/` | Exatamente um script inline de tema ≤1 KB gzip; nenhum arquivo JS externo | B |
+| TST-123 | FR-21 | Tema padrão e controle | Sem preferência salva | Tema claro; botão acessível e não pressionado | E |
+| TST-124 | FR-21 | Alternância de tema | Acionar botão | Tema/ícone/`aria-pressed` atualizados; preferência gravada | E |
+| TST-125 | FR-21 | Persistência local | Navegar e recarregar | Tema salvo é restaurado sem flash | E |
+| TST-126 | FR-21 | Armazenamento indisponível | `localStorage` lança erro | Claro como fallback e alternância funciona na página | E |
+| TST-127 | FR-11/21 | Acessibilidade no tema escuro | Rotas principais | Sem violações serious/critical e contraste dos dois temas aprovado | A/U |
 | TST-091 | NFR-06 | Determinismo | Duas execuções com `SOURCE_DATE_EPOCH` fixo | Classificação, estatísticas e pódio idênticos | U |
 | TST-092 | NFR-06 | Ordem de eventos | Embaralhar eventos | Classificação/stats iguais | U |
 | TST-093 | NFR-06 | Não mutação | Congelar entrada | Nenhuma mutação | U |
@@ -3954,15 +4039,16 @@ Executar antes da primeira partida e a cada inclusão/remoção:
 
 ## Apêndice G — ADRs resumidos
 
-ADRs registram decisões de arquitetura e o porquê. O status de cada uma é **Aceito** nesta SPEC v2.0; mudanças exigem nova ADR ou emenda na §15. As ADRs 015 e 016 foram reescritas na v2.0; o histórico da v1.1 permanece em `docs/decisoes-v1.1.md`.
+ADRs registram decisões de arquitetura e o porquê. O status de cada uma é **Aceito** nesta SPEC v2.1; mudanças exigem nova ADR ou emenda na §15. As ADRs 015 e 016 foram reescritas na v2.0; o histórico da v1.1 permanece em `docs/decisoes-v1.1.md`.
 
-### G.1 ADR-001 — Astro estático com zero JS de cliente
+### G.1 ADR-001 — Astro estático com JavaScript mínimo de cliente
 
-- **Contexto:** site somente leitura, MPA, GitHub Pages, 4G, orçamento de 0 KB de JS e nenhuma interação que exija estado no navegador.
-- **Decisão:** usar Astro com `output: 'static'`, sem framework de UI, sem `client:*` e sem `<script>`. Toda a lógica roda no build.
-- **Consequências:** HTML pré-renderizado, deploy simples e cacheável; menu mobile com `<details>` nativo; qualquer interatividade futura exigirá nova decisão e novo orçamento.
+- **Contexto:** site somente leitura, MPA e GitHub Pages. Tema claro/escuro exige guardar uma preferência local sem backend.
+- **Decisão original (v2.0):** Astro `output: 'static'`, sem framework de UI, `client:*` ou `<script>`.
+- **Emenda (v2.1):** permanece sem framework e hidratação; permite apenas um script inline de até 1 KB gzip para tema, com estado em `localStorage`, sem rede ou dados pessoais.
+- **Consequências:** HTML pré-renderizado e deploy estático/cacheável; menu mobile com `<details>` nativo; a preferência é por navegador/dispositivo e não sincroniza.
 - **Alternativas rejeitadas:** SPA/React (JS e hidratação desnecessários), Next export (runtime e complexidade), HTML escrito à mão (duplicação e validação frágil).
-- **Rastreabilidade:** §4.1, §4.4, §11.9, §12.2; SPEC-003, SPEC-014.
+- **Rastreabilidade:** §4.1, §4.4, §10.2, §11.9, §12.2; SPEC-003, SPEC-014, emenda 35.
 
 ### G.2 ADR-002 — YAML 1.2 único com Zod estrito
 
@@ -4036,12 +4122,12 @@ ADRs registram decisões de arquitetura e o porquê. O status de cada uma é **A
 - **Alternativas rejeitadas:** nome completo na fonte (viola privacidade), mapa criptografado dentro do repo (risco de vazamento e de histórico), UUID (mais longo, sem ganho).
 - **Rastreabilidade:** §5.3, §11.10, Apêndice F; SPEC-007, TST-088.
 
-### G.11 ADR-011 — Fonte do sistema e tema claro
+### G.11 ADR-011 — Fonte do sistema e tema claro por padrão
 
-- **Contexto:** `Airbnb Cereal` e `Circular` são proprietárias; fontes externas pesam e criam dependência de terceiros; o MVP não prevê tema escuro.
-- **Decisão:** pilha de fontes do sistema, sem `@font-face` e sem download; apenas tema claro. Pesos 400–700 e escala fixa.
-- **Consequências:** zero requisições de fonte e boa performance; a identidade visual depende de cor, espaço e tipografia; tema escuro exigirá novos tokens e spec.
-- **Alternativas rejeitadas:** auto-hospedar Cereal/Circular (licença), Google Fonts (terceiro), fonte aberta extra (peso e licença), tema escuro no MVP (escopo).
+- **Contexto:** `Airbnb Cereal` e `Circular` são proprietárias; fontes externas pesam e criam dependência de terceiros. A decisão de tema escuro foi adicionada na v2.1.
+- **Decisão:** pilha de fontes do sistema, sem `@font-face` e sem download; tema claro como padrão e tokens de projeto para claro/escuro. Pesos 400–700 e escala fixa.
+- **Consequências:** zero requisições de fonte e boa performance; a identidade visual depende de cor, espaço e tipografia; os dois temas passam pela mesma validação de contraste.
+- **Alternativas rejeitadas:** auto-hospedar Cereal/Circular (licença), Google Fonts (terceiro), fonte aberta extra (peso e licença).
 - **Rastreabilidade:** §11.4, §11.6; SPEC-014, TST-086.
 
 ### G.12 ADR-012 — GitHub Pages de projeto, deploy por Actions

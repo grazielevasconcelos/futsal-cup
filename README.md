@@ -21,7 +21,7 @@ A edição de 2026 tem **3 times**, **6 partidas na fase classificatória em tur
 | Runtime | Node 26 e npm 11 |
 | Deploy | GitHub Actions + GitHub Pages |
 
-O MVP não usa JavaScript no cliente, backend, banco de dados, login ou área administrativa.
+O site é estático e não usa backend, banco de dados, login ou área administrativa. Um script local mínimo alterna entre os temas claro e escuro e salva a preferência no navegador (`localStorage`); essa escolha não é sincronizada entre dispositivos.
 
 ## Comandos
 
@@ -115,6 +115,8 @@ O CI valida e republica a versão anterior. Não é necessário mexer no ambient
 | [`TASKS.md`](TASKS.md) | Checklist de implementação. |
 | [`docs/guia-atualizacao-mobile.md`](docs/guia-atualizacao-mobile.md) | Guia para registrar resultados pelo app do GitHub no celular. |
 | [`docs/decisoes-v2.0.md`](docs/decisoes-v2.0.md) | Registro das decisões da v2.0 (semifinal, vantagem do empate, 3ª colocada e remoções). |
+| [`docs/decisoes-v2.2.md`](docs/decisoes-v2.2.md) | Registro do passe visual: tipografia, cards clicáveis, placar, times e pódio. |
+| [`docs/decisoes-v2.1.md`](docs/decisoes-v2.1.md) | Registro da decisão de tema claro/escuro e persistência local. |
 | [`docs/decisoes-v1.1.md`](docs/decisoes-v1.1.md) | Registro histórico das decisões da v1.1. |
 
 ## Licença e referências

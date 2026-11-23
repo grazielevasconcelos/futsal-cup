@@ -219,7 +219,7 @@ describe('fase final', () => {
     )?.[0];
 
     expect(podiumHtml).toBeDefined();
-    expect(podiumHtml?.match(/podium__item/g)).toHaveLength(3);
+    expect(podiumHtml?.match(/<li class="podium__item\b/g)).toHaveLength(3);
     expect(podiumHtml).toContain('Campeã');
     expect(podiumHtml).toContain('Vice-campeã');
     expect(podiumHtml).toContain('3ª colocada');

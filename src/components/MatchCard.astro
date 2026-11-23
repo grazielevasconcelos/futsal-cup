@@ -83,7 +83,7 @@ const venue = match.venue ?? 'Local a definir';
     <StatusBadge match={match} now={now} />
   </p>
 
-  <h3 class="match-card__title"><a href={href}>{title}</a></h3>
+  <h3 class="match-card__title"><a class="card__link" href={href}>{title}</a></h3>
 
   <p class="match-card__meta">
     <time datetime={match.date}>{formatDate(match.date)}</time> · {time} · {venue}

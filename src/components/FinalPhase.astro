@@ -30,6 +30,7 @@ const thirdName =
       : formatTeamLabel(teams.get(podium.third)!);
 ---
 
+<div class="final-phase-flow">
 {
   !groupComplete && (
     <section class="section" aria-labelledby="fase-final">
@@ -44,7 +45,6 @@ const thirdName =
     </section>
   )
 }
-
 {
   groupComplete && (
     <section class="section" aria-labelledby="semifinal">
@@ -82,6 +82,7 @@ const thirdName =
     </section>
   )
 }
+</div>
 
 {
   finalFinished && podium !== null && (

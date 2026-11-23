@@ -7,6 +7,8 @@
  */
 
 :root {
+  color-scheme: light;
+
   /* Cor */
   --color-text: #222222;
   --color-text-muted: #717171;
@@ -35,6 +37,10 @@
   --text-body-line: 24px;
   --text-small-size: 14px;
   --text-small-line: 18px;
+
+  /* Tracking: negativo em títulos grandes, neutro no corpo. */
+  --tracking-display: -0.02em;
+  --tracking-heading: -0.01em;
 
   /* Espaçamento */
   --space-1: 8px;
@@ -65,13 +71,52 @@
   --table-min-width: 48rem;
   --letter-spacing-badge: 0.04em;
   --site-title-max: 24ch;
-  --team-logo-size: 12rem;
+  --shortcut-min: 10rem;
+  --team-logo-size: 5rem;
+  --team-logo-size-lg: 12rem;
+  --accent-bar-width: 8rem;
+  --accent-bar-height: 4px;
   --underline-width: 2px;
   --underline-width-hover: 3px;
   --underline-offset: 0.16em;
   --z-skip-link: 10;
   --z-nav-submenu: 5;
   --gradient-accent: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-strong) 100%);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-text: #f5f5f7;
+  --color-text-muted: #b8b8bd;
+  --color-surface: #161618;
+  --color-surface-subtle: #242427;
+  --color-border: #48484f;
+  --color-accent: #ff7a7e;
+  --color-accent-strong: #ff6b91;
+  --color-on-accent: #222222;
+  --color-focus: #f5f5f7;
+
+  --shadow-card: 0 6px 16px rgba(0, 0, 0, 0.4);
+  --shadow-floating: 0 3px 12px rgba(0, 0, 0, 0.5);
+}
+
+@media print {
+  :root,
+  :root[data-theme="dark"] {
+    color-scheme: light;
+    --color-text: #222222;
+    --color-text-muted: #717171;
+    --color-surface: #ffffff;
+    --color-surface-subtle: #f7f7f7;
+    --color-border: #dddddd;
+    --color-accent: #ff5a5f;
+    --color-accent-strong: #e61e4d;
+    --color-on-accent: #222222;
+    --color-focus: #222222;
+    --shadow-card: none;
+    --shadow-floating: none;
+  }
 }
 
 @media (min-width: 48em) {

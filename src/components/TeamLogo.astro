@@ -3,15 +3,16 @@ import { withBase } from '../lib/site';
 
 interface Props {
   logo: string | null;
+  size?: 'default' | 'large';
 }
 
-const { logo } = Astro.props;
+const { logo, size = 'default' } = Astro.props;
 ---
 
 {
   logo !== null && (
     <img
-      class="team-logo"
+      class:list={['team-logo', { 'team-logo--large': size === 'large' }]}
       src={withBase(logo)}
       alt=""
       aria-hidden="true"

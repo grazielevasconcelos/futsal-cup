@@ -1,12 +1,14 @@
 # PRD — Copa de Futsal Feminino Vila Mariana 2026
 
-**Versão:** 2.0  
-**Data:** 18/11/2026  
+**Versão:** 2.1
+**Data:** 20/11/2026
 **Status:** Aceito  
 **Responsável:** Organização da Copa  
 **Público-alvo:** organização, desenvolvimento e jogadoras
 
 > **Nota da v2.0:** esta versão incorpora as decisões de produto de 18/11/2026 registradas em `docs/decisoes-v2.0.md`. A competição passa a ter **8 partidas oficiais**: 6 jogos classificatórios em turno e returno, **1 semifinal** e **1 final**. Não há mais amistoso do 3º colocado nem disputa de pênaltis. A versão 1.1 permanece como registro histórico em `docs/decisoes-v1.1.md`.
+>
+> **Nota da v2.1:** o site passa a oferecer tema claro (padrão) e escuro. A preferência manual é salva localmente no navegador; não há conta, backend, cookie ou sincronização entre dispositivos. Um script pequeno e local é permitido somente para aplicar, alternar e persistir o tema.
 
 > **Nota histórica da v1.1:** a versão 1.1 incorporou as decisões de produto de 12/11/2026 e detalhava uma competição com 7 partidas oficiais, final direta entre 1º e 2º, amistoso informativo do 3º colocado e disputa de pênaltis na final. Esses elementos foram substituídos pela v2.0.
 
@@ -39,13 +41,15 @@ A implementação segue estes documentos:
 | `AGENTS.md` | Restrições do repositório, design, acessibilidade, privacidade e testes. |
 | `SPEC.md` | Especificação técnica normativa: stack, schema, algoritmos, validação, UI, CI e deploy. |
 | `PLAN.md` / `TASKS.md` | Plano e checklist de execução, subordinados ao PRD, ao AGENTS e à SPEC. |
+| `docs/decisoes-v2.2.md` | Registro do passe visual da v2.2; não altera regras de produto. |
 | `docs/decisoes-v2.0.md` | Registro histórico das decisões da v2.0; não é normativo. |
+| `docs/decisoes-v2.1.md` | Registro da decisão de tema claro/escuro e persistência local. |
 | `docs/decisoes-v1.1.md` | Registro histórico das decisões da v1.1; não é normativo. |
 
 Restrições de produto já conhecidas:
 
 - Publicação no **GitHub Pages**.
-- Site **estático**, sem backend próprio e **sem JavaScript no cliente** no MVP.
+- Site **estático**, sem backend próprio. JavaScript de cliente é limitado à alternância e persistência local do tema; não há frameworks, hidratação nem chamadas externas.
 - **Sem área administrativa e sem login** no MVP.
 - A gestão dos dados é feita por uma **fonte de dados versionada**, editada pela organização.
 - O site público é **somente leitura**.
@@ -117,7 +121,8 @@ No MVP não existem contas, login, níveis de permissão ou área administrativa
 - Páginas: Início, Jogos, Classificação, Times, Estatísticas e Fase final.
 - Validação automática dos dados antes da publicação.
 - Publicação no GitHub Pages.
-- Layout mobile-first, em português do Brasil, acessível e sem JavaScript no cliente.
+- Tema claro por padrão e tema escuro selecionável, com preferência salva no navegador.
+- Layout mobile-first, em português do Brasil e acessível. O único JavaScript no cliente é o necessário para o tema.
 
 ### 6.2 Fora do escopo do MVP
 
@@ -133,7 +138,7 @@ No MVP não existem contas, login, níveis de permissão ou área administrativa
 - Prorrogação, disputa de pênaltis, shootout ou cobranças alternadas.
 - Amistoso do 3º colocado ou qualquer partida não oficial.
 - Arbitragem, materiais, logística e cerimonial do evento.
-- Modo escuro, impressão/PDF e analytics como itens obrigatórios.
+- Impressão/PDF e analytics.
 - Login para atletas.
 - Página de Regulamento no MVP (adiada; ver §6.3).
 
@@ -321,6 +326,7 @@ Observações:
 | FR-18 | Nome de exibição | Obrigatório | Usar “Copa de Futsal Feminino Vila Mariana 2026”; não exibir o nome da instituição na interface |
 | FR-19 | Compartilhamento | Desejável | Título e descrição adequados para compartilhamento do link |
 | FR-20 | Histórico de alterações | **FUTURO** | Não obrigatório no MVP; pode ser avaliado em versões futuras |
+| FR-21 | Tema claro e escuro | Desejável | Claro por padrão; alternância acessível; preferência persistida localmente no navegador |
 
 ### 8.1 Regras de validação obrigatórias
 
@@ -362,7 +368,8 @@ Observações:
 - **Manutenibilidade:** fonte de dados legível por humanos, validação clara e histórico via Git.
 - **Segurança:** nenhum segredo no repositório público; sem autenticação no MVP.
 - **Disponibilidade:** depende do GitHub Pages; sem SLA. Em caso de indisponibilidade, a fonte de dados versionada permanece como backup.
-- **Sem JavaScript no cliente:** o MVP não usa scripts, hidratação ou frameworks de cliente.
+- **JavaScript no cliente:** somente um script local mínimo para inicializar, alternar e persistir o tema; sem frameworks, hidratação, chamadas externas ou outros usos de estado.
+- **Tema:** o claro é o padrão, independentemente da configuração do sistema. O tema escolhido fica em `localStorage` no navegador; sem valor salvo ou se o armazenamento falhar, usar claro.
 - **Design:** cores, tipografia, espaçamento, raios, sombras e movimento vêm de tokens do projeto; a referência visual interna não vai para o build.
 
 ---
@@ -571,10 +578,18 @@ Observações:
 
 14. **Interface**
     - Nome de exibição sem o nome da instituição.
-    - Layout mobile-first, em português, acessível e sem JavaScript no cliente.
+    - Tema claro padrão e escuro selecionável; preferência persistida no navegador.
+    - Layout mobile-first, em português e acessível; JavaScript limitado à funcionalidade de tema.
     - Páginas Início, Jogos, Classificação, Times, Estatísticas e Fase final acessíveis.
     - A fase final exibe semifinal e final, com a vantagem do empate indicada textualmente.
     - `/regulamento/` não existe e não aparece em links.
+
+15. **Tema**
+    - Sem preferência salva, o site é exibido no tema claro.
+    - O controle de tema funciona por teclado e informa seu estado acessivelmente.
+    - A escolha escura é mantida entre páginas e recarregamentos no mesmo navegador.
+    - Se `localStorage` estiver indisponível, a página inicia em claro e a alternância ainda funciona na visita atual.
+    - Contraste AA, foco visível, mobile e impressão clara funcionam nos dois temas.
 
 ---
 
@@ -617,7 +632,7 @@ Observações:
 | Contraste insuficiente | Médio | Tokens medidos, testes de contraste e axe |
 | Overflow em 320px | Médio | Mobile-first; tabelas com rolagem acessível; teste E2E |
 | Fonte proprietária no build | Baixo | Pilha do sistema; sem auto-hospedagem de fontes proprietárias |
-| JavaScript acidental | Médio | Sem framework de cliente; teste de `dist/` |
+| JavaScript além do tema | Médio | Build permite apenas o inicializador/alternador local do tema e limita seu orçamento |
 | Build não determinístico | Médio | Funções puras, ordenação estável e lockfile |
 | Perda de dados | Baixo | Histórico no Git e backup da fonte de dados |
 | GitHub Pages indisponível | Baixo | Fonte versionada é o backup; sem SLA |
@@ -629,7 +644,7 @@ Observações:
 
 - Nome de exibição: **Copa de Futsal Feminino Vila Mariana 2026**.
 - O nome da instituição pode aparecer em documentos internos, mas não na interface pública.
-- Site estático no GitHub Pages, sem backend, sem login, sem área administrativa e sem JavaScript no cliente.
+- Site estático no GitHub Pages, sem backend, sem login ou área administrativa. JavaScript local é permitido somente para o tema claro/escuro.
 - Fonte de dados versionada e validada; site somente leitura.
 - Apenas a edição 2026, com estrutura preparada para edições futuras.
 - **3 times** (`ta`, `tb`, `tc`), **6 partidas de grupo em turno e returno**, **1 semifinal** e **1 final**, totalizando **8 partidas oficiais**.
@@ -669,7 +684,7 @@ Estas questões não bloqueiam o MVP e podem ser resolvidas pela organização d
 - Como acomodar novas alunas se todos os times estiverem com 9 ativas.
 - Critério de assistência em casos duvidosos.
 - Data de habilitação do GitHub Pages.
-- Necessidade de modo escuro, impressão/PDF ou analytics no futuro.
+- Necessidade de impressão/PDF ou analytics no futuro.
 
 ---
 

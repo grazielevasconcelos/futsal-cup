@@ -17,15 +17,51 @@ const { activeNav, activeTeamId = null, teams } = Astro.props;
   <div class="site-header__inner">
     <a class="site-title" href={withBase('/')}>{SITE_NAME}</a>
 
-    <nav class="primary-nav" aria-label="Principal">
-      <NavList activeNav={activeNav} activeTeamId={activeTeamId} teams={teams} />
-    </nav>
-
-    <details class="menu-mobile">
-      <summary>Menu</summary>
-      <nav aria-label="Principal (menu móvel)">
+    <div class="site-header__actions">
+      <nav class="primary-nav" aria-label="Principal">
         <NavList activeNav={activeNav} activeTeamId={activeTeamId} teams={teams} />
       </nav>
-    </details>
+
+      <details class="menu-mobile">
+        <summary>Menu</summary>
+        <nav aria-label="Principal (menu móvel)">
+          <NavList activeNav={activeNav} activeTeamId={activeTeamId} teams={teams} />
+        </nav>
+      </details>
+
+      <button
+        class="theme-toggle"
+        type="button"
+        aria-label="Tema escuro"
+        aria-pressed="false"
+        title="Alternar tema claro/escuro"
+      >
+        <svg
+          class="theme-toggle__icon theme-toggle__icon--moon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"></path>
+        </svg>
+        <svg
+          class="theme-toggle__icon theme-toggle__icon--sun"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="4"></circle>
+          <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path>
+        </svg>
+      </button>
+    </div>
   </div>
 </header>

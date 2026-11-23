@@ -8,7 +8,7 @@ Site público, estático e somente leitura da **Copa de Futsal Feminino Vila Mar
 
 A semifinal é disputada entre o **2º e o 3º colocado**, com **vantagem do empate para o 2º**. A final é disputada entre o **1º colocado** e a **vencedora da semifinal**, com **vantagem do empate para o 1º**. Empates encerram a partida no tempo normal: **não há prorrogação, pênaltis, shootout ou cobranças alternadas**. A 3ª colocada é a perdedora da semifinal; não há disputa de 3º lugar nem 4º lugar. Os dados são mantidos em uma fonte versionada e o site é publicado no GitHub Pages.
 
-**Estado atual:** o repositório contém o PRD v2.0, a SPEC v2.0, o plano de execução e as referências visuais. A stack, o schema, os algoritmos e os comandos estão definidos na `SPEC.md`.
+**Estado atual:** o repositório contém o PRD v2.1, a SPEC v2.2, o plano de execução e as referências visuais. A stack, o schema, os algoritmos, os temas, o contrato visual e os comandos estão definidos na `SPEC.md`.
 
 ## Fontes de verdade
 
@@ -20,6 +20,8 @@ Leia antes de implementar qualquer mudança:
 | `SPEC.md` | Especificação técnica normativa: stack, schema, algoritmos, validação, UI, testes, CI e deploy. |
 | `AGENTS.md` | Restrições do repositório, design, acessibilidade, privacidade e testes. |
 | `PLAN.md` / `TASKS.md` | Plano e checklist de execução, subordinados ao PRD, ao AGENTS e à SPEC. |
+| `docs/decisoes-v2.2.md` | Registro do passe visual: tipografia, cards clicáveis, placar, times e pódio. |
+| `docs/decisoes-v2.1.md` | Registro da decisão de tema claro/escuro e persistência local. |
 | `docs/decisoes-v2.0.md` | Registro histórico das decisões da v2.0; não é normativo. |
 | `docs/decisoes-v1.1.md` | Registro histórico das decisões da v1.1; não é normativo. |
 | `context.md` | Contexto original da organização; em caso de conflito, prevalece o PRD. |
@@ -37,7 +39,7 @@ Leia antes de implementar qualquer mudança:
 
 - **Nome público:** "Copa de Futsal Feminino Vila Mariana 2026". O nome da instituição (Sesc) **não pode aparecer** na interface pública, títulos, metadados ou textos exibidos ao público. Em documentação interna, é permitido.
 - **Site estático:** publicação no GitHub Pages, sem backend próprio, sem banco de dados e sem login.
-- **Sem JavaScript no cliente:** o MVP não usa scripts, hidratação, frameworks de cliente ou chamadas externas.
+- **JavaScript no cliente:** permitido somente um script inline/local mínimo para inicializar, alternar e salvar a preferência de tema em `localStorage`. Não adicionar frameworks, hidratação, chamadas externas ou outros scripts sem nova decisão documentada.
 - **Somente leitura:** não existe área administrativa nem edição pelo site no MVP. A edição ocorre apenas na fonte de dados versionada.
 - **Fonte única de dados:** times, jogadoras, partidas e eventos vêm de um único arquivo versionado. Não duplique dados no HTML nem edite resultados/classificação manualmente.
 - **Identidade estável dos times:** preserve os IDs `ta`, `tb` e `tc`, os nomes-base “Time A/B/C” e as URLs derivadas dos IDs; nomes de exibição e logos são opcionais e editáveis. Exiba somente o nome de exibição quando informado, senão o nome-base.
@@ -70,23 +72,32 @@ Os arquivos `airbnb-design-design.md` e `airbnb-design-tokens.css` são uma refe
 - Pesos previstos: 400, 500, 600 e 700. Não use pesos fora dessa faixa nem dependa de variantes que a fonte de fallback não tenha.
 - Não crie passos de texto abaixo de 14px. `display` é para títulos curtos; em telas estreitas, prefira `heading-1` ou `heading-2`.
 - Preserve o par tamanho/entrelinha dos tokens; não ajuste a entrelinha isoladamente sem testar a leitura em mobile.
+- Use `--tracking-display` (`-0.02em`) em display e `--tracking-heading` (`-0.01em`) em títulos; não aplique tracking negativo no corpo.
+- Use `text-wrap: balance` em títulos e `text-wrap: pretty` em parágrafos. Números de placar, tabelas e estatísticas usam `tabular-nums`.
+- O eyebrow do cabeçalho pode usar caixa alta curta com `--letter-spacing-badge`; não use caixa alta em blocos longos.
 
 ### Cores e contraste
 
-- Texto principal: `--color-text` sobre `--color-surface` (15,9:1). Texto secundário: `--color-text-muted` sobre branco (4,9:1). Use `--color-surface` para superfícies e `--color-surface-subtle` para fundos sutis.
-- `--color-accent` e `--color-accent-strong` têm cerca de 3:1 sobre branco: use apenas em texto grande (≥24px ou ≥19px em negrito), ícones ou elementos não textuais. Não use como cor de texto de corpo nem como fundo de texto normal.
-- `--color-accent-strong` fica no limite de 4,5:1 sobre branco. Valide o par exato antes de usá-lo como fundo de texto; gradientes podem reduzir o contraste.
+- Texto, superfícies, bordas, acentos e foco devem ter aliases semânticos para os temas claro e escuro. O tema claro é o padrão; `data-theme="dark"` ativa o escuro.
+- Todo par de texto e componente interativo deve cumprir WCAG AA no tema claro e no escuro: 4,5:1 para texto normal e 3:1 para texto grande e componentes de interface. Testes devem calcular os dois conjuntos de tokens.
+- Acentos coral/pink são para texto grande (≥24px ou ≥19px em negrito), ícones ou elementos não textuais, salvo quando o par exato de tokens for validado para texto normal. Não use o gradiente atrás de texto ou tabelas.
 - `--color-border` é uma hairline decorativa (1,4:1): não use como única indicação de foco, borda de campo ou estado.
 - Não comunique estado (vitória/empate/derrota, classificação, cartão, suspensão, avanço por vantagem do empate) apenas por cor; use também texto, rótulo ou ícone.
 - Todo par de cor usado em texto ou componente interativo deve atender WCAG AA: 4,5:1 para texto normal e 3:1 para texto grande e componentes de interface.
-- Os tokens de referência são de tema claro. Não implemente tema escuro no MVP; isso exigiria spec e novos tokens.
+- A referência visual interna fornece valores de tema claro. O tema escuro usa tokens semânticos do projeto documentados na SPEC; não altere os arquivos de referência.
 
 ### Espaçamento, forma e movimento
 
 - Base de 8px: use `--space-1` a `--space-6` (8, 16, 24, 32, 48 e 64px). Evite valores intermediários arbitrários.
 - Raios: `--radius-small` (8px), `--radius-card` (12px) e `--radius-pill` (9999px). Use `--radius-card` em cards de partidas, times, jogadoras e estatísticas.
 - Elevação: `--shadow-card` para cards e `--shadow-floating` para elementos sobrepostos. Não crie sombras fora dos tokens.
-- Movimento: use `--motion-default` (250ms) em transições discretas e respeite `prefers-reduced-motion: reduce`. Não anime conteúdo essencial nem use movimento para transmitir informação.
+- Movimento: use `--motion-default` (250ms) em transições discretas e respeite `prefers-reduced-motion: reduce`. Não anime conteúdo essencial nem use movimento para transmitir informação. Não adicione animação de `transform`; feedback de toque usa cor/borda.
+- Cabeçalhos de página usam uma barra de gradiente decorativa de `--accent-bar-width` × `--accent-bar-height`, sem texto sobreposto.
+- Cards de partida e de time são clicáveis na área inteira: o link do título cobre o card com `::after` e o foco aparece no card. Não aninhe outros controles.
+- Logos usam `--team-logo-size` (5rem) nos cards e `--team-logo-size-lg` (12rem) no cabeçalho do time em telas ≥768px.
+- Estatísticas coletivas ficam em 2 colunas; atalhos usam `auto-fit` com `--shortcut-min` e no máximo 3 colunas.
+- Badges usam `--radius-pill`, padding horizontal `--space-2` e `--letter-spacing-badge`; não fixe altura.
+- Estados vazios usam borda tracejada com acento em `border-inline-start`; o último parágrafo não tem margem.
 
 ### Adaptação ao produto
 
@@ -103,6 +114,9 @@ Os arquivos `airbnb-design-design.md` e `airbnb-design-tokens.css` são uma refe
 
 - Garanta foco visível com contraste de pelo menos 3:1 contra o fundo e o entorno; não remova `outline` sem substituto equivalente.
 - Use tabelas semânticas com `caption`, `th` e `scope`; não use tabelas apenas para layout. Tabelas largas podem rolar dentro de um contêiner focável e rotulado, mas a página não deve ter overflow horizontal em 320px.
+- Em cards clicáveis, o link do título é o único controle e seu texto é o nome acessível; o foco é desenhado no card. Não coloque links ou botões aninhados.
+- Barra de gradiente e chevrons são decorativos (CSS sem texto) e não entram na árvore acessível.
+- O painel visual do placar mantém o texto acessível completo em `.visually-hidden`; não dependa do número visual nem da cor.
 - Ícones informativos precisam de texto alternativo; ícones decorativos devem usar `aria-hidden="true"`.
 - Respeite zoom de 200% e navegação por teclado sem perda de conteúdo ou funcionalidade.
 
@@ -317,6 +331,12 @@ chore: configura deploy no GitHub Pages
 - Ausência de informação transmitida apenas por cor.
 - Respeito a `prefers-reduced-motion`.
 - Layout sem overflow horizontal da página em 320px; tabelas largas com rolagem acessível.
+- Tokens de tracking, atalhos, logos e barra de gradiente definidos e documentados.
+- Cards de partida e de time clicáveis na área inteira, com o título como nome acessível e foco no card.
+- Painel de placar com texto acessível completo e números tabulares.
+- Cabeçalho de time horizontal, logo menor nos cards e estatísticas em 2 colunas.
+- Pódio com a campeã destacada e sem seção duplicada na Início.
+- Nenhuma animação de `transform` adicionada.
 - `airbnb-design-design.md` fora do build e ausência de arquivos das fontes proprietárias `Airbnb Cereal` e `Circular`.
 - Textos e metadados públicos sem o nome da instituição ou marcas da Airbnb.
 - Ausência de JavaScript de cliente no `dist/`.
