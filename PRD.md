@@ -1,7 +1,7 @@
 # PRD — Copa de Futsal Feminino Vila Mariana 2026
 
-**Versão:** 2.1
-**Data:** 20/11/2026
+**Versão:** 2.2
+**Data:** 24/11/2026
 **Status:** Aceito  
 **Responsável:** Organização da Copa  
 **Público-alvo:** organização, desenvolvimento e jogadoras
@@ -9,6 +9,8 @@
 > **Nota da v2.0:** esta versão incorpora as decisões de produto de 18/11/2026 registradas em `docs/decisoes-v2.0.md`. A competição passa a ter **8 partidas oficiais**: 6 jogos classificatórios em turno e returno, **1 semifinal** e **1 final**. Não há mais amistoso do 3º colocado nem disputa de pênaltis. A versão 1.1 permanece como registro histórico em `docs/decisoes-v1.1.md`.
 >
 > **Nota da v2.1:** o site passa a oferecer tema claro (padrão) e escuro. A preferência manual é salva localmente no navegador; não há conta, backend, cookie ou sincronização entre dispositivos. Um script pequeno e local é permitido somente para aplicar, alternar e persistir o tema.
+>
+> **Nota da v2.2:** impressão A4 retrato e salvamento em PDF pelo navegador entram no escopo. Um guia nativo no rodapé explica as opções recomendadas; não há botão de impressão nem JavaScript adicional.
 
 > **Nota histórica da v1.1:** a versão 1.1 incorporou as decisões de produto de 12/11/2026 e detalhava uma competição com 7 partidas oficiais, final direta entre 1º e 2º, amistoso informativo do 3º colocado e disputa de pênaltis na final. Esses elementos foram substituídos pela v2.0.
 
@@ -123,6 +125,7 @@ No MVP não existem contas, login, níveis de permissão ou área administrativa
 - Publicação no GitHub Pages.
 - Tema claro por padrão e tema escuro selecionável, com preferência salva no navegador.
 - Layout mobile-first, em português do Brasil e acessível. O único JavaScript no cliente é o necessário para o tema.
+- Impressão em A4/PDF pelo navegador, com estilos próprios e guia de configuração sem JavaScript.
 
 ### 6.2 Fora do escopo do MVP
 
@@ -138,7 +141,7 @@ No MVP não existem contas, login, níveis de permissão ou área administrativa
 - Prorrogação, disputa de pênaltis, shootout ou cobranças alternadas.
 - Amistoso do 3º colocado ou qualquer partida não oficial.
 - Arbitragem, materiais, logística e cerimonial do evento.
-- Impressão/PDF e analytics.
+- Analytics.
 - Login para atletas.
 - Página de Regulamento no MVP (adiada; ver §6.3).
 
@@ -590,6 +593,7 @@ Observações:
     - A escolha escura é mantida entre páginas e recarregamentos no mesmo navegador.
     - Se `localStorage` estiver indisponível, a página inicia em claro e a alternância ainda funciona na visita atual.
     - Contraste AA, foco visível, mobile e impressão clara funcionam nos dois temas.
+    - Impressão A4 retrato mantém o conteúdo essencial, não corta tabelas e oferece instruções de impressão/PDF sem JavaScript adicional.
 
 ---
 
@@ -684,7 +688,7 @@ Estas questões não bloqueiam o MVP e podem ser resolvidas pela organização d
 - Como acomodar novas alunas se todos os times estiverem com 9 ativas.
 - Critério de assistência em casos duvidosos.
 - Data de habilitação do GitHub Pages.
-- Necessidade de impressão/PDF ou analytics no futuro.
+- Necessidade de analytics no futuro.
 
 ---
 

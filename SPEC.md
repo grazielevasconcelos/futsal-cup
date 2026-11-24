@@ -1,18 +1,20 @@
 # SPEC — Copa de Futsal Feminino Vila Mariana 2026
 
-**Versão:** 2.2
-**Data:** 22/11/2026
+**Versão:** 2.3
+**Data:** 24/11/2026
 **Status:** Aceito  
-**Fonte de produto:** `PRD.md` v2.1 + `AGENTS.md` v2.2
-**Registro de decisões:** `docs/decisoes-v2.2.md` (passe visual); `docs/decisoes-v2.1.md` (tema); `docs/decisoes-v2.0.md` (formato)
+**Fonte de produto:** `PRD.md` v2.2 + `AGENTS.md` v2.3
+**Registro de decisões:** `docs/decisoes-v2.3.md` (impressão); `docs/decisoes-v2.2.md` (passe visual); `docs/decisoes-v2.1.md` (tema); `docs/decisoes-v2.0.md` (formato)
 
-Esta é a especificação técnica normativa do site. Ela está subordinada ao `PRD.md` (produto) e ao `AGENTS.md` (restrições do repositório). Em caso de conflito, prevalecem o PRD e o AGENTS; as interpretações e emendas estão registradas na §15. O alinhamento do PRD/AGENTS com a v2.2 foi aplicado. `PLAN.md` e `TASKS.md` são documentos de execução subordinados a esta SPEC.
+Esta é a especificação técnica normativa do site. Ela está subordinada ao `PRD.md` (produto) e ao `AGENTS.md` (restrições do repositório). Em caso de conflito, prevalecem o PRD e o AGENTS; as interpretações e emendas estão registradas na §15. O alinhamento do PRD/AGENTS com a v2.3 foi aplicado. `PLAN.md` e `TASKS.md` são documentos de execução subordinados a esta SPEC.
 
 > **Mudança de formato na v2.0 (18/11/2026):** a edição 2026 passa a ter **8 partidas oficiais**: 6 classificatórias em turno e returno (`g1`…`g6`), **1 semifinal** (`semi`, 2º x 3º) e **1 final** (`final`, 1º x vencedora da semifinal). O 2º e o 1º colocados têm **vantagem do empate** na semifinal e na final, respectivamente. Empates encerram no tempo normal: **não há prorrogação, pênaltis ou shootout**. A **3ª colocada é a perdedora da semifinal**; não há disputa de 3º lugar nem 4º lugar. O **amistoso do 3º colocado foi removido** e os campos `friendly` e `shootout` são proibidos com mensagem de migração. As emendas estão na §15 e foram refletidas no PRD v2.0 e no AGENTS v2.0.
 >
 > **Mudança de tema na v2.1 (20/11/2026):** tema claro como padrão e tema escuro selecionável; um script inline mínimo lê/grava a preferência no `localStorage` (`futsal-cup-theme`). O script não usa rede, frameworks, hidratação, cookies ou dados pessoais. A exceção ao zero-JS fica limitada a esse comportamento.
 >
 > **Passe visual na v2.2 (22/11/2026):** refinamento de tipografia, hierarquia, cards clicáveis por inteiro, painel de placar, cabeçalho de time horizontal e destaque da campeã. Não altera regras da competição, dados, rotas ou JavaScript; não adiciona cores, fontes, fotos ou animações de transform.
+>
+> **Impressão na v2.3 (24/11/2026):** páginas preparadas para A4 retrato e PDF pelo navegador, com tema claro, tabelas sem corte e guia nativo no rodapé. Não adiciona botão de impressão ou JavaScript além do tema.
 
 ---
 
@@ -151,7 +153,7 @@ O nome da instituição **NÃO DEVE** aparecer em interface, título, metadados,
 - Histórico de edições anteriores, multi-competição, busca, filtros com JS.
 - Notificações, chat, pagamentos, streaming, ingressos.
 - W.O. automático, detecção de jogadoras em quadra, automação de desistência de time inteiro.
-- Regulamento (FR-10, adiado), impressão/PDF e analytics.
+- Regulamento (FR-10, adiado) e analytics. Impressão/PDF pelo navegador está no escopo conforme a §11.11.
 - Fontes proprietárias, imagens de pessoas e logotipos sem relação com os times. Logos dos times enviados pela organização são opcionais e servidos localmente.
 - Persistência em servidor da preferência de tema: a escolha vive somente no `localStorage` do navegador.
 - `PLAN.md` e `TASKS.md` nesta etapa.
@@ -2275,6 +2277,7 @@ Pares do tema escuro (recalculados pelo teste de tokens):
 - Estados vazios: borda tracejada com acento em `border-inline-start` e último parágrafo sem margem.
 - Não criar sombras fora dos tokens.
 - Movimento: apenas transições de cor/borda/sublinhado/sombra com `--motion-default`. Nada de animação de conteúdo essencial nem de `transform`.
+- A troca de tema não anima `background-color`; superfícies mudam instantaneamente para evitar contraste transitório abaixo de AA.
 - `@media (prefers-reduced-motion: reduce)` deve zerar animações/transições e `scroll-behavior`.
 - A impressão usa sempre os tokens claros, mesmo quando a tela está no tema escuro.
 - Não usar parallax, autoplay, carrossel ou vídeo.
@@ -2305,6 +2308,7 @@ Pares do tema escuro (recalculados pelo teste de tokens):
 - Alternância de tema acessível por teclado; claro padrão; preferência restaurada/persistida no `localStorage`; falhas de armazenamento degradam para tema claro ou alternância apenas na página.
 - `prefers-reduced-motion` respeitado.
 - Zoom 200% sem perda de conteúdo/funcionalidade.
+- Impressão A4 retrato usa sempre tema claro, não corta tabelas e oferece guia nativo de impressão/PDF sem JavaScript adicional.
 - Nenhum conteúdo piscante, autoplay ou tempo limite.
 - Não há formulários no MVP; se houver no futuro, labels e erros acessíveis.
 - Testar com teclado, leitor de tela (NVDA/VoiceOver) e zoom; checklist no Apêndice D.
@@ -2337,6 +2341,18 @@ Pares do tema escuro (recalculados pelo teste de tokens):
 - Textos livres (`notices[].message`) são públicos: use apelidos ou descrições genéricas; nunca inclua nome completo, contato ou outro dado pessoal.
 - Datas por extenso quando ajudar (“Terça-feira, 24/11/2026”); horários em 24h.
 - “Horário de Brasília” no rodapé para explicar o fuso.
+
+### 11.11 Impressão e PDF
+
+- A impressão é iniciada pelos controles do navegador; não há botão `window.print()`, diálogo de impressão ou preferência persistida.
+- `src/styles/print.css` é importado por último em `BaseLayout.astro` e define `@page { size: A4 portrait; margin: 12mm 14mm 16mm; }`.
+- O tema impresso é sempre claro, inclusive quando a tela está em `data-theme="dark"`. Cores, escala tipográfica e sombras vêm dos tokens de impressão em `src/styles/tokens.css`.
+- A navegação, o controle de tema, o skip link, dicas de rolagem, links de retorno, atalhos de navegação e o guia do rodapé não são impressos.
+- Cards e destaques usam grids adequados à largura A4; componentes e linhas de tabela evitam quebras internas quando possível. O rodapé mantém o nome do site e a data de atualização.
+- Tabelas deixam de rolar no papel (`overflow: visible`), removem a largura mínima, repetem o cabeçalho (`table-header-group`) e evitam quebra de linhas. Texto e dados essenciais não podem depender de cores de fundo.
+- Gradientes e badges podem solicitar reprodução exata de cores, mas a leitura não deve depender da opção de gráficos de fundo.
+- O `<details>` “Como imprimir ou salvar em PDF” do rodapé informa A4, retrato, cabeçalhos/rodapés, gráficos de fundo e a opção móvel de salvar como PDF. Deve ser operável por teclado e fica oculto no papel.
+- Testes E2E simulam `media: print`, verificam tema claro, controles ocultos, largura da tabela, grids e repetição do cabeçalho. A conferência visual de PDFs complementa os testes automatizados.
 
 ---
 
@@ -2654,6 +2670,7 @@ Nenhuma variável contém segredo. Não há `.env` versionado.
 | Build | `scripts/check-build.ts` | Rotas, links internos, 404, ausência de Regulamento, script inline de tema ≤1 KB gzip, sem JS externo, termos proibidos, fontes proprietárias, orçamento, IDs de jogadora. | Sim |
 | E2E | Playwright | Navegação, teclado, foco, 320px, tabelas roláveis, meta tags, 404, menu `<details>`. Smoke em Chromium, Firefox e WebKit (Safari desktop e iOS). | Sim |
 | Acessibilidade | Playwright + axe-core | Violações `serious`/`critical` nas rotas principais. | Sim |
+| Impressão | Vitest + Playwright; conferência visual de PDF | Tokens claros, A4, tabelas sem corte, cabeçalho repetido, controles ocultos e guia por teclado. | Sim |
 | Manual | Checklist Apêndice D | Leitor de tela, zoom 200%, dispositivos reais, Safari/Firefox/Edge, Lighthouse, inspeção visual. | Antes da publicação |
 
 - Sem snapshot visual no MVP.
@@ -2743,6 +2760,7 @@ Os casos abaixo são derivados do AGENTS e do PRD. A matriz completa está no Ap
 - Nada transmitido apenas por cor.
 - Tabelas com `caption`, `th`, `scope`.
 - Menu `<details>` acessível.
+- Impressão A4 retrato em tema claro; tabelas sem corte e com cabeçalho repetido; guia de impressão/PDF abre e fecha por teclado sem JavaScript adicional.
 - Meta tags, canonical, OG, favicon, 404.
 - Ausência de `client:*` e de JS externo em `dist/`; somente script inline do tema, dentro do orçamento.
 - Ausência de `airbnb-design-design.md`, `airbnb-design-tokens.css`, fontes proprietárias e termos proibidos em `dist/`.
@@ -2863,8 +2881,9 @@ npm run verify
 | 33 | Remoções | `friendly`, card de amistoso, `shootout` e colunas de pênaltis foram removidos; campos antigos geram `VAL-002` com mensagem de migração. | PRD v2.0 §6.2/§7.9/§8. | Schema, validação, UI, build e testes. |
 | 34 | Interface da fase final | Rótulos “Semifinal” e “Final”; a final antes da semi mostra o 1º e “Vencedora da semifinal”; a vantagem do empate é sempre textual; “3ª colocada”. | PRD v2.0 §10.6; AGENTS v2.0. | §10.3/§10.8, componentes e E2E. |
 | 35 | Tema claro/escuro | Claro como padrão; controle manual acessível; `localStorage["futsal-cup-theme"]` persiste a preferência por navegador; fallback claro se ausente/inválido/indisponível. Um script inline ≤1 KB gzip é a única exceção de JavaScript. | PRD v2.1 §6/§8/§9; `docs/decisoes-v2.1.md`. | PRD, AGENTS, tokens, BaseLayout, cabeçalho, orçamento, testes de contraste/E2E. |
+| 36 | Impressão e PDF | A4 retrato pelo navegador, tema claro, tabelas sem corte e guia nativo `<details>`; sem botão ou JavaScript novo. | PRD v2.2; `docs/decisoes-v2.3.md`. | PRD, AGENTS, SPEC §11.11, tokens, folha de impressão, guia e testes. |
 
-As emendas 1–24 foram as decisões históricas da v1.1 e permanecem registradas em `docs/decisoes-v1.1.md`, que não é normativo. Quando qualquer uma delas conflitar com a v2.0 (por exemplo, final única, amistoso ou shootout), prevalecem as emendas 25–34 e a v2.0. Para tema e JavaScript de cliente, prevalece a emenda 35 e os documentos v2.1.
+As emendas 1–24 foram as decisões históricas da v1.1 e permanecem registradas em `docs/decisoes-v1.1.md`, que não é normativo. Quando qualquer uma delas conflitar com a v2.0 (por exemplo, final única, amistoso ou shootout), prevalecem as emendas 25–34 e a v2.0. Para tema e JavaScript de cliente, prevalece a emenda 35 e os documentos v2.1. Para impressão/PDF, prevalece a emenda 36 e os documentos v2.3; o limite de JavaScript continua sendo o da emenda 35.
 
 ### 15.2 Alinhamento v2.0 (histórico)
 
@@ -2908,6 +2927,7 @@ O alinhamento abaixo foi aplicado nesta entrega. A aprovação formal do PRD (§
 - [x] `BaseLayout.astro` inicializa a preferência antes do CSS; controle do cabeçalho alterna o tema sem framework ou rede.
 - [x] Testes validam tokens/contraste, orçamento do script, fallback de armazenamento, teclado, persistência entre rotas e axe nos dois temas.
 - [x] Impressão força o tema claro.
+- [x] Impressão A4 retrato, tabela sem corte, guia nativo e testes E2E registrados na v2.3.
 
 ### 15.4 Conflitos resolvidos
 
@@ -2979,7 +2999,7 @@ O alinhamento abaixo foi aplicado nesta entrega. A aprovação formal do PRD (§
 - Não há placar ao vivo, cronômetro, faltas, escalação ou presença.
 - Não há histórico de edições anteriores nem comparação entre edições.
 - Não há área administrativa, login ou edição no site.
-- Não há impressão/PDF ou analytics.
+- Não há analytics, geração de PDF no servidor ou numeração de páginas; impressão/PDF ocorre pelo navegador.
 - Não há detecção automática de W.O. ou de quantidade de jogadoras em quadra.
 - A retirada de um time não é automatizada: a organização registra um W.O. `withdrawal` em cada partida restante e mantém o elenco/histórico como estão.
 - Não há partida de 3º lugar nem 4º lugar; a 3ª colocada é a perdedora da semifinal.
@@ -3046,6 +3066,7 @@ Nenhuma questão bloqueia a implementação. A UI tem fallback para horário/loc
 - [ ] `npm run test:e2e` passa (axe, teclado, 320px, meta tags, 404).
 - [ ] `dist/404.html` existe e funciona.
 - [ ] `/regulamento/` não existe e não aparece em links.
+- [x] Impressão A4 retrato em tema claro; tabelas sem corte; guia de impressão/PDF sem JavaScript adicional.
 - [ ] 6 páginas na nav; menu mobile `<details>` funcional.
 - [ ] Início nos cinco estados, sem contagem regressiva.
 - [ ] Jogos agrupados por data; 8 partidas oficiais; sem card ou rota de 3º lugar.
@@ -3868,6 +3889,10 @@ Os IDs `TST-*` são estáveis. Casos removidos na v1.1 (por exemplo, disputa de 
 | TST-125 | FR-21 | Persistência local | Navegar e recarregar | Tema salvo é restaurado sem flash | E |
 | TST-126 | FR-21 | Armazenamento indisponível | `localStorage` lança erro | Claro como fallback e alternância funciona na página | E |
 | TST-127 | FR-11/21 | Acessibilidade no tema escuro | Rotas principais | Sem violações serious/critical e contraste dos dois temas aprovado | A/U |
+| TST-133 | FR-11 | Layout de impressão | Classificação, `media: print` | A4 retrato; controles ocultos; tabela sem overflow e dentro da largura imprimível | E |
+| TST-134 | FR-11 | Tema impresso | Tela em tema escuro, `media: print` | `color-scheme: light`, fundo branco e texto escuro | E |
+| TST-135 | FR-11 | Grids e tabelas no papel | Jogos/classificação, `media: print` | Cards em duas colunas; `thead` como `table-header-group`; linhas sem quebra interna | E/U |
+| TST-136 | FR-11 | Guia de impressão | Rodapé, teclado | `<details>` acessível explica A4, opções do navegador e PDF; sem JS adicional | E |
 | TST-091 | NFR-06 | Determinismo | Duas execuções com `SOURCE_DATE_EPOCH` fixo | Classificação, estatísticas e pódio idênticos | U |
 | TST-092 | NFR-06 | Ordem de eventos | Embaralhar eventos | Classificação/stats iguais | U |
 | TST-093 | NFR-06 | Não mutação | Congelar entrada | Nenhuma mutação | U |

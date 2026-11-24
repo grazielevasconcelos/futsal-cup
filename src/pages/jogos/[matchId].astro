@@ -6,13 +6,15 @@ import { loadCompetition } from '../../lib/data/load';
 import { suspendedFor } from '../../lib/domain/discipline';
 import { isMatchPast } from '../../lib/domain/home';
 import { buildPlayerTeamMap, buildTeamMap } from '../../lib/domain/players';
-import { buildExpectedSemifinalists } from '../../lib/domain/playoffs';
+import { buildExpectedSemifinalists, isGroupComplete } from '../../lib/domain/playoffs';
 import { resolveMatchTeams } from '../../lib/domain/score';
 import { rankTeams } from '../../lib/domain/standings';
 import { formatDate, formatDateHeading, formatTime } from '../../lib/format/date';
 import { buildEventViews } from '../../lib/format/events';
 import { formatStage, walkoverReasonLabel } from '../../lib/format/match';
 import { formatTeamLabel } from '../../lib/format/team';
+import TeamLogo from '../../components/TeamLogo.astro';
+import TeamIdentity from '../../components/TeamIdentity.astro';
 import type { PlayoffSnapshots, TeamId } from '../../lib/domain/types';
 import { getBuildDate, withBase } from '../../lib/site';
 
@@ -49,11 +51,14 @@ let homeName = homeTeam === undefined ? 'A definir' : formatTeamLabel(homeTeam);
 let awayName = awayTeam === undefined ? 'A definir' : formatTeamLabel(awayTeam);
 
 if (resolved === null && match.stage === 'final') {
-  const ranking = rankTeams(competition);
-  const leader = ranking.rows[0];
-  const leaderTeam = leader === undefined ? undefined : teams.get(leader.teamId);
-  homeName = leaderTeam === undefined ? '1º colocado' : formatTeamLabel(leaderTeam);
+  homeName = '1º colocado';
   awayName = 'Vencedora da semifinal';
+  if (isGroupComplete(competition)) {
+    const ranking = rankTeams(competition);
+    const leader = ranking.rows[0];
+    const leaderTeam = leader === undefined ? undefined : teams.get(leader.teamId);
+    if (leaderTeam !== undefined) homeName = formatTeamLabel(leaderTeam);
+  }
 }
 
 if (resolved === null && match.stage === 'semi') {
@@ -120,14 +125,32 @@ const missingSnapshotText =
   notices={competition.notices}
 >
   <div class="page">
-    <p class="meta"><a href={withBase('/jogos/')}>Todos os jogos</a></p>
+    <p class="meta page-back"><a href={withBase('/jogos/')}>Todos os jogos</a></p>
 
     <div class="page-header">
       <p class="badge-list">
         <span class="badge">{formatStage(match)}</span>
         <StatusBadge match={match} now={now} />
       </p>
-      <h1>{resolved === null ? `${homeName} x ${awayName}` : `${homeName} x ${awayName}`}</h1>
+      <h1 class="match-heading">
+        {homeTeam === undefined ? (
+          homeName
+        ) : (
+          <span class="team-identity">
+            {homeName}
+            <TeamLogo logo={homeTeam.logo} size="compact" />
+          </span>
+        )}
+        {' x '}
+        {awayTeam === undefined ? (
+          awayName
+        ) : (
+          <span class="team-identity">
+            {awayName}
+            <TeamLogo logo={awayTeam.logo} size="compact" />
+          </span>
+        )}
+      </h1>
       <p class="meta">
         {formatDateHeading(match.date)} · {time} · {venue}
       </p>
@@ -237,7 +260,9 @@ const missingSnapshotText =
           <h2 id="desfalques">Desfalques por suspensão</h2>
           {absences.map(({ team, players }) => (
             <div>
-              <h3>{formatTeamLabel(team)}</h3>
+              <h3>
+                <TeamIdentity label={formatTeamLabel(team)} logo={team.logo} />
+              </h3>
               {players.length === 0 ? (
                 <p>Nenhum desfalque por suspensão.</p>
               ) : (
@@ -253,16 +278,20 @@ const missingSnapshotText =
       )
     }
 
-    <section class="section" aria-labelledby="navegar">
+    <section class="section section--nav" aria-labelledby="navegar">
       <h2 id="navegar">Continuar</h2>
       <ul>
         <li><a href={withBase('/jogos/')}>Todos os jogos</a></li>
         <li><a href={withBase('/classificacao/')}>Classificação</a></li>
         {resolved !== null && (
           <li>
-            <a href={withBase(`/times/${resolved.homeTeamId}/`)}>{homeName}</a>
+            <a href={withBase(`/times/${resolved.homeTeamId}/`)}>
+              {homeTeam === undefined ? homeName : <TeamIdentity label={homeName} logo={homeTeam.logo} />}
+            </a>
             {' e '}
-            <a href={withBase(`/times/${resolved.awayTeamId}/`)}>{awayName}</a>
+            <a href={withBase(`/times/${resolved.awayTeamId}/`)}>
+              {awayTeam === undefined ? awayName : <TeamIdentity label={awayName} logo={awayTeam.logo} />}
+            </a>
           </li>
         )}
       </ul>

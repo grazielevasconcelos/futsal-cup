@@ -16,9 +16,9 @@ async function expectNoPageOverflow(page: Page, path: string): Promise<void> {
   expect(hasOverflow, path).toBe(false);
 }
 
-async function expectNativeMenuWithoutJavaScript(browser: Browser): Promise<void> {
+async function expectNativeMenuWithoutJavaScript(browser: Browser, baseURL: string): Promise<void> {
   const context = await browser.newContext({
-    baseURL: 'http://127.0.0.1:4322/futsal-cup/',
+    baseURL,
     javaScriptEnabled: false,
     viewport: { width: 320, height: 800 },
   });
@@ -68,8 +68,11 @@ test.describe('compatibilidade entre navegadores', () => {
     await expect(menu).not.toHaveAttribute('open', '');
   });
 
-  test('o menu nativo continua funcional sem JavaScript', async ({ browser }) => {
-    await expectNativeMenuWithoutJavaScript(browser);
+  test('o menu nativo continua funcional sem JavaScript', async ({ browser, page }) => {
+    await page.goto('');
+    const baseURL = new URL(page.url());
+    baseURL.pathname = '/futsal-cup/';
+    await expectNativeMenuWithoutJavaScript(browser, baseURL.href);
   });
 
   test('o skip link e a tabela larga funcionam pelo teclado', async ({ page }) => {

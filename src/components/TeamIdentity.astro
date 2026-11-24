@@ -1,0 +1,16 @@
+---
+import TeamLogo from './TeamLogo.astro';
+
+interface Props {
+  label: string;
+  logo: string | null;
+  size?: 'compact' | 'default' | 'large';
+}
+
+const { label, logo, size = 'compact' } = Astro.props;
+---
+
+<span class="team-identity">
+  <span>{label}</span>
+  <TeamLogo logo={logo} size={size} />
+</span>

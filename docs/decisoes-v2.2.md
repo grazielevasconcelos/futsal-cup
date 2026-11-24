@@ -14,6 +14,7 @@
 - Dar feedback de toque por cor/borda no `:active`, sem animação de `transform`.
 - Transformar o placar em um painel visual centralizado, mantendo o texto acessível completo em `.visually-hidden`.
 - Reduzir o logo dos times para `--team-logo-size` (5rem) nos cards e usar `--team-logo-size-lg` (12rem) apenas no cabeçalho do time a partir de 768px. O cabeçalho do time fica horizontal.
+- Mostrar o escudo ao lado direito do nome nas identificações visuais de times; quando não houver brasão cadastrado, usar um escudo vazio genérico servido como asset local. Em tabelas e links compactos, o escudo usa `--space-3` como largura.
 - Manter as estatísticas coletivas em 2 colunas em todas as larguras.
 - Destacar a campeã no pódio com borda de acento, barra de gradiente e nome em `heading-1`; a Início passa a ter uma única seção “Campeã” com o pódio, sem repetir uma seção “Pódio”.
 - Ajustar atalhos para 1, 2 ou 3 colunas conforme a largura, usando `--shortcut-min` (10rem) e um limite de 3 colunas.
@@ -32,6 +33,7 @@
 - O card inteiro é clicável, mas o foco visível aparece no card e o nome acessível vem do título; não há controles aninhados.
 - A barra de gradiente e os chevrons são CSS decorativo, sem texto na árvore acessível.
 - O placar mantém o texto completo para leitores de tela; a versão visual é apenas um resumo.
+- A troca de tema não anima `background-color`: a superfície muda instantaneamente para não criar um intervalo com contraste abaixo de AA. O feedback de toque continua em cor/borda.
 - Nenhuma página pode ter overflow horizontal em 320px; tabelas largas continuam rolando dentro do contêiner focável.
 
 ## Consequências e limites

@@ -1,6 +1,7 @@
 ---
 import type { StandingRow, Team, TeamId } from '../lib/domain/types';
 import { formatTeamLabel } from '../lib/format/team';
+import TeamLogo from './TeamLogo.astro';
 
 interface Props {
   rows: readonly StandingRow[];
@@ -56,7 +57,10 @@ const hintId = `${labelledBy}-hint`;
             <tr>
               <td>{row.position}º</td>
               <th scope="row">
-                {team === undefined ? row.teamId : formatTeamLabel(team)}
+                <span class="team-identity">
+                  <span>{team === undefined ? row.teamId : formatTeamLabel(team)}</span>
+                  {team !== undefined && <TeamLogo logo={team.logo} size="compact" />}
+                </span>
                 {row.decidedByDraw && (
                   <span class="badge">
                     Sorteio<span class="visually-hidden">: posição definida por sorteio</span>

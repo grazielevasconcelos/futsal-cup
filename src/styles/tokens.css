@@ -116,6 +116,22 @@
     --color-focus: #222222;
     --shadow-card: none;
     --shadow-floating: none;
+
+    /* Escala de papel: medidas em pt para manter a leitura estável no A4. */
+    --text-display-size: 22pt;
+    --text-display-line: 26pt;
+    --text-heading-1-size: 18pt;
+    --text-heading-1-line: 22pt;
+    --text-heading-2-size: 13pt;
+    --text-heading-2-line: 17pt;
+    --text-body-size: 10pt;
+    --text-body-line: 14pt;
+    --text-small-size: 8.5pt;
+    --text-small-line: 11pt;
+    --team-logo-size: 3.5rem;
+    --team-logo-size-lg: 7rem;
+    --print-table-cell-padding-block: 3pt;
+    --print-table-cell-padding-inline: 4pt;
   }
 }
 

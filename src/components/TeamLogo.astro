@@ -3,23 +3,27 @@ import { withBase } from '../lib/site';
 
 interface Props {
   logo: string | null;
-  size?: 'default' | 'large';
+  size?: 'compact' | 'default' | 'large';
 }
 
 const { logo, size = 'default' } = Astro.props;
+const isFallback = logo === null;
 ---
 
-{
-  logo !== null && (
-    <img
-      class:list={['team-logo', { 'team-logo--large': size === 'large' }]}
-      src={withBase(logo)}
-      alt=""
-      aria-hidden="true"
-      width="548"
-      height="600"
-      loading="lazy"
-      decoding="async"
-    />
-  )
-}
+<img
+  class:list={[
+    'team-logo',
+    {
+      'team-logo--compact': size === 'compact',
+      'team-logo--large': size === 'large',
+      'team-logo--fallback': isFallback,
+    },
+  ]}
+  src={withBase(logo ?? '/images/escudo-vazio.svg')}
+  alt=""
+  aria-hidden="true"
+  width="548"
+  height="600"
+  loading="lazy"
+  decoding="async"
+/>

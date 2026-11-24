@@ -7,6 +7,7 @@ import { formatTeamLabel } from '../lib/format/team';
 import EmptyState from './EmptyState.astro';
 import MatchCard from './MatchCard.astro';
 import PodiumList from './PodiumList.astro';
+import TeamIdentity from './TeamIdentity.astro';
 
 interface Props {
   competition: Competition;
@@ -97,7 +98,14 @@ const thirdName =
   semiComplete && !finalFinished && thirdName !== null && (
     <section class="section" aria-labelledby="terceira-colocada">
       <h2 id="terceira-colocada">3ª colocada</h2>
-      <p class="home-champion">3ª colocada: {thirdName}</p>
+      <p class="home-champion">
+        3ª colocada:{' '}
+        {podium?.third === null || podium?.third === undefined || teams.get(podium.third) === undefined ? (
+          thirdName
+        ) : (
+          <TeamIdentity label={thirdName} logo={teams.get(podium.third)!.logo} />
+        )}
+      </p>
       <p class="meta">A 3ª colocada é a perdedora da semifinal.</p>
     </section>
   )

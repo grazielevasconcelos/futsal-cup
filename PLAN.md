@@ -102,7 +102,7 @@ Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal 
 
 ### Fatia 11 — Passe visual (v2.2)
 
-**Status:** em andamento em 22/11/2026 — implementação concluída; validação final pendente.
+**Status:** concluída em 24/11/2026 — implementação, capturas e validação final concluídas.
 
 - Adicionar tokens de tracking, largura mínima de atalhos, tamanhos de logo e barra de gradiente; atualizar `SPEC.md`, `AGENTS.md`, `docs/decisoes-v2.2.md` e testes de tokens.
 - Refinar tipografia, cabeçalhos, badges, tabelas, estados vazios, gaps e banner de avisos.
@@ -110,6 +110,16 @@ Publicar, até 24/11/2026, o site estático e somente leitura da Copa de Futsal 
 - Criar painel de placar, cabeçalho horizontal de time, logo menor nos cards, estatísticas em 2 colunas e pódio com a campeã destacada.
 - Corrigir a duplicação da seção “Campeã”/“Pódio” na Início e manter os textos de estado.
 - Critério: `npm run verify` passa; 320px sem overflow; nenhum JS, fonte, foto, cor ou animação de transform nova.
+
+### Fatia 12 — Impressão e PDF (v2.3)
+
+**Status:** concluída em 24/11/2026 — estilos, guia, testes E2E e conferência de PDFs aprovados.
+
+- Preparar páginas para A4 retrato com tokens claros, grids de papel, tabelas sem corte, cabeçalhos repetidos e regras de quebra.
+- Adicionar ao rodapé um guia `<details>` acessível para imprimir ou salvar em PDF; não adicionar script, botão de impressão ou persistência.
+- Documentar a decisão em `docs/decisoes-v2.3.md` e alinhar PRD, SPEC e AGENTS.
+- Cobrir tokens, CSS de impressão, tema escuro, tabela, grids e guia por teclado nos testes.
+- Critério: validação, check, unitários, builds, checagem de produção e E2E passam; classificação cabe no papel; o build continua com somente o script inline do tema.
 
 ## Marcos
 

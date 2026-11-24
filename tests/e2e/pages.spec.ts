@@ -32,11 +32,12 @@ test.describe('páginas da competição', () => {
     const links = page.locator('.team-grid a');
     await expect(links).toHaveCount(3);
     await expect(links.first()).toHaveAttribute('href', /\/times\/ta\/$/);
-    await expect(page.locator('.team-grid img.team-logo')).toHaveCount(1);
-    await expect(page.locator('.team-grid img.team-logo')).toHaveAttribute(
+    await expect(page.locator('.team-grid img.team-logo')).toHaveCount(3);
+    await expect(page.locator('.team-grid img.team-logo').first()).toHaveAttribute(
       'src',
       /\/images\/times\/ta\.webp$/,
     );
+    await expect(page.locator('.team-grid .team-logo--fallback')).toHaveCount(2);
   });
 
   test('TST-071: a lista de jogos agrupa as oito partidas oficiais por data', async ({
@@ -261,5 +262,26 @@ test.describe('páginas da competição', () => {
       );
       expect(seriousViolations, path).toEqual([]);
     }
+  });
+
+  test('o guia de impressão abre por teclado e explica como salvar em PDF', async ({ page }) => {
+    await page.goto('');
+
+    const guide = page.locator('.print-help');
+    const summary = guide.locator('summary');
+    await expect(guide).not.toHaveAttribute('open', '');
+    await expect(summary).toHaveText('Como imprimir ou salvar em PDF');
+
+    await summary.focus();
+    await page.keyboard.press('Enter');
+    await expect(guide).toHaveAttribute('open', '');
+
+    await expect(guide).toContainText('A4');
+    await expect(guide).toContainText('Cabeçalhos e rodapés');
+    await expect(guide).toContainText('Gráficos de fundo');
+    await expect(guide).toContainText('Salvar como PDF');
+
+    await page.keyboard.press('Enter');
+    await expect(guide).not.toHaveAttribute('open', '');
   });
 });

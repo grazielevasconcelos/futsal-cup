@@ -205,5 +205,27 @@ Checklist de execução do MVP. Marque apenas o que estiver realmente concluído
 
 ### 11.3 Validação
 
-- [ ] Capturar screenshots antes/depois em 320, 390, 768 e 1280, claro/escuro.
-- [ ] Rodar `npm run validate`, `npm run check`, `npm test`, `npm run build`, `npm run test:build`, `npm run test:e2e` e `npm run verify`.
+- [x] Capturar screenshots antes/depois em 320, 390, 768 e 1280, claro/escuro.
+- [x] Rodar `npm run validate`, `npm run check`, `npm test`, `npm run build`, `npm run test:build`, `npm run test:e2e` e `npm run verify`.
+
+## 12. Impressão e PDF (v2.3)
+
+### 12.1 Documentação e tokens
+
+- [x] Registrar a decisão v2.3: impressão CSS e guia nativo, sem JavaScript novo.
+- [x] Alinhar PRD, SPEC, AGENTS e README com o escopo e contrato de impressão.
+- [x] Definir escala tipográfica e logos de impressão nos tokens.
+
+### 12.2 Interface e estilos
+
+- [x] Criar `src/styles/print.css` e importar após as folhas de tela.
+- [x] Adaptar grids, tabelas, navegação, rodapé e quebras para A4 retrato.
+- [x] Adicionar guia `<details>` no rodapé e esconder o guia na impressão.
+- [x] Marcar links de retorno/atalhos de navegação para ocultação no papel.
+
+### 12.3 Testes e validação
+
+- [x] Adicionar testes unitários para tokens, tabelas, paginação e regras CSS.
+- [x] Adicionar testes E2E para tema claro, largura de tabela, grid e guia por teclado.
+- [x] Rodar validação, check, Vitest, build, checagem de produção e suíte E2E em ambiente isolado.
+- [x] Conferir PDFs gerados em Chromium, incluindo classificação e tema escuro.

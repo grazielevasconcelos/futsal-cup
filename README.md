@@ -40,6 +40,8 @@ npm run test:e2e                    # Playwright + axe sobre dist-test/
 npm run verify                      # sequência completa
 ```
 
+Para imprimir ou salvar uma página em PDF, use a opção de impressão do navegador. O guia no rodapé explica as opções recomendadas para papel A4.
+
 Na primeira execução do E2E, instale os três motores:
 
 ```bash

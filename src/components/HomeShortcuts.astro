@@ -2,6 +2,7 @@
 import type { Team } from '../lib/domain/types';
 import { withBase } from '../lib/site';
 import { formatTeamLabel } from '../lib/format/team';
+import TeamIdentity from './TeamIdentity.astro';
 
 interface Props {
   teams: readonly Team[];
@@ -17,7 +18,9 @@ const { teams } = Astro.props;
   {
     teams.map((team) => (
       <li>
-        <a href={withBase(`/times/${team.id}/`)}>{formatTeamLabel(team)}</a>
+        <a href={withBase(`/times/${team.id}/`)}>
+          <TeamIdentity label={formatTeamLabel(team)} logo={team.logo} />
+        </a>
       </li>
     ))
   }

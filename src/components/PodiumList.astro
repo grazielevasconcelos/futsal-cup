@@ -1,6 +1,7 @@
 ---
 import type { Podium, Team, TeamId } from '../lib/domain/types';
 import { formatTeamLabel } from '../lib/format/team';
+import TeamIdentity from './TeamIdentity.astro';
 
 interface Props {
   podium: Podium;
@@ -27,9 +28,15 @@ const places = [
       >
         <p class="meta">{place.label}:</p>
         <p class="podium__team">
-          {teams.get(place.teamId) === undefined
-            ? place.teamId
-            : formatTeamLabel(teams.get(place.teamId)!)}
+          {teams.get(place.teamId) === undefined ? (
+            place.teamId
+          ) : (
+            <TeamIdentity
+              label={formatTeamLabel(teams.get(place.teamId)!)}
+              logo={teams.get(place.teamId)!.logo}
+              size={place.champion ? 'default' : 'compact'}
+            />
+          )}
         </p>
       </li>
     ))

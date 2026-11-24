@@ -26,9 +26,9 @@ const playerCards = rankPlayerCards(playerStats, teams);
 const teamCards = rankTeamCards(teamStats, teams);
 const ownGoals = rankOwnGoals(playerStats, teams);
 
-function teamName(teamId: TeamId): string {
+function teamCell(teamId: TeamId): string | { label: string; logo: string | null } {
   const team = teams.get(teamId);
-  return team === undefined ? '' : formatTeamLabel(team);
+  return team === undefined ? '' : { label: formatTeamLabel(team), logo: team.logo };
 }
 
 function playerLabel(item: PlayerStats): string {
@@ -66,7 +66,7 @@ const teamColumn = { key: 'team', label: 'Time' } as const;
           { key: 'assists', label: 'Assistências', numeric: true },
         ]}
         rows={scorers.map((item, index) => ({
-          cells: [index + 1, playerLabel(item), teamName(item.teamId), item.goals, item.assists],
+          cells: [index + 1, playerLabel(item), teamCell(item.teamId), item.goals, item.assists],
         }))}
         emptyMessage="Ainda não há gols registrados."
         labelledBy="artilharia"
@@ -89,7 +89,7 @@ const teamColumn = { key: 'team', label: 'Time' } as const;
           { key: 'goals', label: 'Gols', numeric: true },
         ]}
         rows={assists.map((item, index) => ({
-          cells: [index + 1, playerLabel(item), teamName(item.teamId), item.assists, item.goals],
+          cells: [index + 1, playerLabel(item), teamCell(item.teamId), item.assists, item.goals],
         }))}
         emptyMessage="Ainda não há assistências registradas."
         labelledBy="assistencias"
@@ -112,7 +112,7 @@ const teamColumn = { key: 'team', label: 'Time' } as const;
           cells: [
             index + 1,
             playerLabel(item),
-            teamName(item.teamId),
+            teamCell(item.teamId),
             item.yellow,
             item.red,
             item.disciplinaryPoints,
@@ -138,7 +138,7 @@ const teamColumn = { key: 'team', label: 'Time' } as const;
           { key: 'disciplinary', label: 'Pontos disciplinares', numeric: true },
         ]}
         rows={teamCards.map((item) => ({
-          cells: [teamName(item.teamId), item.yellow, item.red, item.disciplinaryPoints],
+          cells: [teamCell(item.teamId), item.yellow, item.red, item.disciplinaryPoints],
         }))}
         rowHeaderIndex={0}
         emptyMessage="Ainda não há cartões registrados."
@@ -152,7 +152,7 @@ const teamColumn = { key: 'team', label: 'Time' } as const;
         caption="Gols contra — Copa de Futsal Feminino Vila Mariana 2026"
         columns={[playerColumn, teamColumn, { key: 'ownGoals', label: 'Gols contra', numeric: true }]}
         rows={ownGoals.map((item) => ({
-          cells: [playerLabel(item), teamName(item.teamId), item.ownGoals],
+          cells: [playerLabel(item), teamCell(item.teamId), item.ownGoals],
         }))}
         rowHeaderIndex={0}
         emptyMessage="Ainda não há gols contra registrados."

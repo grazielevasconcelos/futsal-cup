@@ -91,10 +91,11 @@ Os arquivos `airbnb-design-design.md` e `airbnb-design-tokens.css` são uma refe
 - Base de 8px: use `--space-1` a `--space-6` (8, 16, 24, 32, 48 e 64px). Evite valores intermediários arbitrários.
 - Raios: `--radius-small` (8px), `--radius-card` (12px) e `--radius-pill` (9999px). Use `--radius-card` em cards de partidas, times, jogadoras e estatísticas.
 - Elevação: `--shadow-card` para cards e `--shadow-floating` para elementos sobrepostos. Não crie sombras fora dos tokens.
-- Movimento: use `--motion-default` (250ms) em transições discretas e respeite `prefers-reduced-motion: reduce`. Não anime conteúdo essencial nem use movimento para transmitir informação. Não adicione animação de `transform`; feedback de toque usa cor/borda.
+- Movimento: use `--motion-default` (250ms) em transições discretas e respeite `prefers-reduced-motion: reduce`. Não anime conteúdo essencial nem use movimento para transmitir informação. Não adicione animação de `transform`; feedback de toque usa cor/borda. A troca de tema não anima cores de superfície.
+- Impressão: `src/styles/print.css` é importado por último; use A4 retrato, tema claro e os tokens de impressão. Não adicione `window.print()`, diálogos ou JavaScript de impressão. O guia estático usa `<details>` no rodapé.
 - Cabeçalhos de página usam uma barra de gradiente decorativa de `--accent-bar-width` × `--accent-bar-height`, sem texto sobreposto.
 - Cards de partida e de time são clicáveis na área inteira: o link do título cobre o card com `::after` e o foco aparece no card. Não aninhe outros controles.
-- Logos usam `--team-logo-size` (5rem) nos cards e `--team-logo-size-lg` (12rem) no cabeçalho do time em telas ≥768px.
+- Logos usam `--team-logo-size` (5rem) nos cards e `--team-logo-size-lg` (12rem) no cabeçalho do time em telas ≥768px. Em identificações visuais, o escudo fica à direita do nome; sem brasão cadastrado, exiba o escudo vazio genérico local. Em contextos compactos, use `--space-3`.
 - Estatísticas coletivas ficam em 2 colunas; atalhos usam `auto-fit` com `--shortcut-min` e no máximo 3 colunas.
 - Badges usam `--radius-pill`, padding horizontal `--space-2` e `--letter-spacing-badge`; não fixe altura.
 - Estados vazios usam borda tracejada com acento em `border-inline-start`; o último parágrafo não tem margem.
@@ -330,6 +331,7 @@ chore: configura deploy no GitHub Pages
 - Foco visível e navegação por teclado nos componentes interativos.
 - Ausência de informação transmitida apenas por cor.
 - Respeito a `prefers-reduced-motion`.
+- Impressão A4/PDF em tema claro, tabelas sem corte, cabeçalhos repetidos e guia de impressão nativo por teclado.
 - Layout sem overflow horizontal da página em 320px; tabelas largas com rolagem acessível.
 - Tokens de tracking, atalhos, logos e barra de gradiente definidos e documentados.
 - Cards de partida e de time clicáveis na área inteira, com o título como nome acessível e foco no card.

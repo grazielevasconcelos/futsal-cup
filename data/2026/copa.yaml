@@ -21,7 +21,7 @@ teams:
     name: "Time A" # nome-base estável; não usar para renomear publicamente
     displayName: "De primeira FC"
     abbreviation: "TA"
-    logo: "/images/times/ta.webp"
+    logo: "/images/times/ta-alta-resolucao.webp"
     players:
       - id: "p-001"
         nickname: "Aline"

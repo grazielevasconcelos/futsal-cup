@@ -1,0 +1,213 @@
+/*
+ * Regras de impressão.
+ *
+ * Carregada depois dos componentes para recompor o layout em papel A4.
+ * As cores, a tipografia e as sombras vêm do bloco `@media print` de tokens.css.
+ */
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 14mm 16mm;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  body {
+    min-height: auto;
+    background-color: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  .skip-link,
+  .theme-toggle,
+  .primary-nav,
+  .menu-mobile,
+  .site-header__actions,
+  .table-scroll__hint,
+  .page-back,
+  .section--nav,
+  .print-help {
+    display: none;
+  }
+
+  .site-header__inner,
+  .page,
+  .site-footer__inner {
+    width: 100%;
+    max-width: none;
+    padding-inline: 0;
+  }
+
+  .site-header__inner {
+    padding-block: 0 var(--space-1);
+  }
+
+  .site-title {
+    color: var(--color-text-muted);
+    font-size: var(--text-small-size);
+    line-height: var(--text-small-line);
+    text-decoration-line: none;
+  }
+
+  .page {
+    padding-block: var(--space-2) 0;
+  }
+
+  .page-header {
+    margin-bottom: var(--space-2);
+    padding-top: var(--space-2);
+  }
+
+  .page-header--home {
+    margin-bottom: var(--space-3);
+    padding-top: var(--space-2);
+  }
+
+  .page-header::before,
+  .podium__item--champion::before {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .section {
+    margin-top: var(--space-3);
+  }
+
+  .card-grid,
+  .highlight-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+
+  .podium {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  .stat-list {
+    gap: var(--space-1);
+  }
+
+  .card {
+    padding: var(--space-2);
+    box-shadow: none;
+  }
+
+  .card-grid > li,
+  .team-grid > li,
+  .podium > li,
+  .highlight-card,
+  .empty-state,
+  .notice-banner,
+  .event,
+  .score,
+  .site-footer {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .card,
+  .podium__item {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3,
+  .section__header,
+  .match-card__top {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+
+  .table-scroll {
+    overflow: visible;
+    margin-bottom: var(--space-1);
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+  }
+
+  .table-scroll:focus-visible {
+    outline: none;
+  }
+
+  .data-table {
+    font-size: var(--text-small-size);
+    line-height: var(--text-small-line);
+  }
+
+  .data-table--wide {
+    min-width: 0;
+  }
+
+  .data-table caption {
+    padding: 0 0 var(--space-1);
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: var(--print-table-cell-padding-block) var(--print-table-cell-padding-inline);
+  }
+
+  .data-table thead {
+    display: table-header-group;
+  }
+
+  .data-table thead th {
+    background-color: var(--color-surface-subtle);
+    white-space: normal;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .data-table tbody tr:nth-child(even) {
+    background-color: transparent;
+  }
+
+  .data-table tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .badge,
+  .score,
+  .home-champion {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .team-logo,
+  .team-card__header .team-logo {
+    width: var(--team-logo-size);
+  }
+
+  .team-logo--large {
+    width: var(--team-logo-size-lg);
+  }
+
+  .site-footer {
+    margin-top: var(--space-3);
+    background-color: transparent;
+  }
+
+  .site-footer__inner {
+    padding-block: var(--space-1) 0;
+  }
+}

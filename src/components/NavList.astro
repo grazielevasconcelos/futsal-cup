@@ -3,6 +3,7 @@ import type { Team, TeamId } from '../lib/domain/types';
 import { NAV_ITEMS, withBase } from '../lib/site';
 import type { NavKey } from '../lib/site';
 import { formatTeamLabel } from '../lib/format/team';
+import TeamIdentity from './TeamIdentity.astro';
 
 interface Props {
   activeNav?: NavKey | undefined;
@@ -42,7 +43,7 @@ const { activeNav, activeTeamId = null, teams } = Astro.props;
                     href={withBase(`/times/${team.id}/`)}
                     aria-current={activeTeamId === team.id ? 'page' : undefined}
                   >
-                    {formatTeamLabel(team)}
+                    <TeamIdentity label={formatTeamLabel(team)} logo={team.logo} />
                   </a>
                 </li>
               ))}

@@ -1,4 +1,6 @@
 ---
+import TeamIdentity from './TeamIdentity.astro';
+
 interface Column {
   readonly key: string;
   readonly label: string;
@@ -7,7 +9,7 @@ interface Column {
 }
 
 interface Row {
-  readonly cells: readonly (string | number)[];
+  readonly cells: readonly (string | number | { label: string; logo: string | null })[];
 }
 
 interface Props {
@@ -67,9 +69,15 @@ const hintId = `${labelledBy}-hint`;
           <tbody>
             {rows.map((row) => (
               <tr>
-                {row.cells.map((cell, index) =>
-                  index === rowHeaderIndex ? (
-                    <th scope="row">{cell}</th>
+                {row.cells.map((cell, index) => {
+                  const content =
+                    typeof cell === 'object' ? (
+                      <TeamIdentity label={cell.label} logo={cell.logo} />
+                    ) : (
+                      cell
+                    );
+                  return index === rowHeaderIndex ? (
+                    <th scope="row">{content}</th>
                   ) : (
                     <td
                       class:list={[
@@ -79,10 +87,10 @@ const hintId = `${labelledBy}-hint`;
                         },
                       ]}
                     >
-                      {cell}
+                      {content}
                     </td>
-                  ),
-                )}
+                  );
+                })}
               </tr>
             ))}
           </tbody>

@@ -132,8 +132,62 @@ test.describe('qualidade e acessibilidade', () => {
     });
   });
 
+  test('a impressão oculta controles e não corta a tabela de classificação', async ({ page }) => {
+    // Largura útil aproximada de A4 retrato com as margens laterais de 14 mm.
+    await page.setViewportSize({ width: 688, height: 1123 });
+    await page.goto('classificacao/');
+    await page.emulateMedia({ media: 'print' });
+
+    await expect(page.locator('.primary-nav')).toBeHidden();
+    await expect(page.locator('.theme-toggle')).toBeHidden();
+    await expect(page.locator('.skip-link')).toBeHidden();
+    await expect(page.locator('.print-help')).toBeHidden();
+    await expect(page.locator('.table-scroll__hint')).toBeHidden();
+
+    const overflow = await page
+      .locator('.table-scroll')
+      .evaluate((element) => getComputedStyle(element).overflowX);
+    expect(overflow).toBe('visible');
+
+    const layout = await page.evaluate(() => {
+      const table = document.querySelector('table.data-table');
+      if (table === null) throw new Error('Tabela de classificação ausente');
+
+      return {
+        tableWidth: table.getBoundingClientRect().width,
+        pageWidth: document.documentElement.clientWidth,
+        scrollWidth: document.documentElement.scrollWidth,
+      };
+    });
+
+    expect(layout.tableWidth).toBeLessThanOrEqual(layout.pageWidth);
+    expect(layout.scrollWidth).toBeLessThanOrEqual(layout.pageWidth);
+  });
+
+  test('a impressão usa duas colunas e repete o cabeçalho das tabelas', async ({ page }) => {
+    await page.setViewportSize({ width: 794, height: 1123 });
+    await page.goto('jogos/');
+    await page.emulateMedia({ media: 'print' });
+
+    const columns = await page
+      .locator('.card-grid')
+      .first()
+      .evaluate((element) => getComputedStyle(element).gridTemplateColumns.split(' ').length);
+    expect(columns).toBe(2);
+
+    await page.goto('classificacao/');
+    await page.emulateMedia({ media: 'print' });
+
+    const headerDisplay = await page
+      .locator('table.data-table thead')
+      .evaluate((element) => getComputedStyle(element).display);
+    expect(headerDisplay).toBe('table-header-group');
+  });
+
   test('as páginas não fazem requisições de terceiros', async ({ page }) => {
+    await page.goto('');
     const externalRequests: string[] = [];
+    const siteOrigin = new URL(page.url()).origin;
 
     page.on('request', (request) => {
       const url = request.url();
@@ -141,7 +195,7 @@ test.describe('qualidade e acessibilidade', () => {
         return;
       }
 
-      if (new URL(url).origin !== 'http://127.0.0.1:4322') {
+      if (new URL(url).origin !== siteOrigin) {
         externalRequests.push(url);
       }
     });

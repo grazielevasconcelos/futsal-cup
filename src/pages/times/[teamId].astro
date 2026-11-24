@@ -54,10 +54,9 @@ const historyCaption = `Atletas com histórico na edição — ${teamLabel} — 
   notices={competition.notices}
 >
   <div class="page">
-    <p class="meta"><a href={withBase('/times/')}>Todos os times</a></p>
+    <p class="meta page-back"><a href={withBase('/times/')}>Todos os times</a></p>
 
     <div class="page-header team-header">
-      <TeamLogo logo={team.logo} size="large" />
       <div class="team-header__content">
         <TeamBadges activeCount={active.length} />
         <h1>{teamLabel}</h1>
@@ -68,6 +67,7 @@ const historyCaption = `Atletas com histórico na edição — ${teamLabel} — 
           · {active.length} atletas ativas
         </p>
       </div>
+      <TeamLogo logo={team.logo} size="large" />
     </div>
 
     <section class="section" aria-labelledby="estatisticas-coletivas">

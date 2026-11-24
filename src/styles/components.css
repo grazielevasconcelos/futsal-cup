@@ -563,7 +563,9 @@ th .badge {
 
 .team-card__header .team-logo {
   flex: none;
+  order: 2;
   margin: 0;
+  margin-inline-start: auto;
 }
 
 .team-card__heading {
@@ -590,6 +592,10 @@ th .badge {
   margin: 0;
 }
 
+.team-logo--compact {
+  width: var(--space-3);
+}
+
 .team-header {
   display: flex;
   align-items: center;
@@ -598,10 +604,30 @@ th .badge {
 
 .team-header .team-logo {
   flex: none;
+  order: 2;
+  margin-inline-start: auto;
 }
 
 .team-header__content {
+  order: 1;
   min-width: 0;
+}
+
+.team-identity {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+.team-identity .team-logo {
+  flex: none;
+}
+
+.data-table .team-logo--compact {
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .team-header__content .badge-list {
@@ -632,6 +658,31 @@ th .badge {
   height: var(--space-2);
   background-color: var(--color-accent);
   content: "";
+}
+
+.print-help {
+  margin-top: var(--space-1);
+}
+
+.print-help summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--space-3);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.print-help ol {
+  margin: var(--space-1) 0 0;
+  padding-left: var(--space-3);
+}
+
+.print-help li {
+  margin-bottom: var(--space-1);
+}
+
+.print-help li:last-child {
+  margin-bottom: 0;
 }
 
 @media (min-width: 48em) {

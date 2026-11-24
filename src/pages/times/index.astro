@@ -53,7 +53,6 @@ const positionByTeam = new Map(ranking.rows.map((row) => [row.teamId, row.positi
                 <li>
                   <article class="card team-card">
                     <div class="team-card__header">
-                      <TeamLogo logo={team.logo} />
                       <div class="team-card__heading">
                         <TeamBadges activeCount={active} />
                         <h3 class="card__title">
@@ -62,6 +61,7 @@ const positionByTeam = new Map(ranking.rows.map((row) => [row.teamId, row.positi
                           </a>
                         </h3>
                       </div>
+                      <TeamLogo logo={team.logo} />
                     </div>
                     <p class="meta team-card__meta">
                       {position === undefined ? 'Sem posição' : `${position}º na classificação`} ·{' '}

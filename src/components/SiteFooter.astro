@@ -8,5 +8,21 @@ const updatedAt = formatBuildTimestamp(getBuildDate());
   <div class="site-footer__inner">
     <p><a href={withBase('/')}>{SITE_NAME}</a></p>
     <p>Atualizado em {updatedAt} (horário de Brasília).</p>
+
+    <details class="print-help">
+      <summary>Como imprimir ou salvar em PDF</summary>
+      <ol>
+        <li>Escolha papel <strong>A4</strong>, orientação retrato e margens padrão.</li>
+        <li>
+          Desmarque <strong>Cabeçalhos e rodapés</strong> para não incluir data e URL do
+          navegador.
+        </li>
+        <li>
+          Marque <strong>Gráficos de fundo</strong> para manter as cores dos badges e da barra
+          de destaque.
+        </li>
+        <li>No celular, escolha a opção <strong>Salvar como PDF</strong> na impressão.</li>
+      </ol>
+    </details>
   </div>
 </footer>

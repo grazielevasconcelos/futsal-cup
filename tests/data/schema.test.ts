@@ -48,7 +48,7 @@ describe('pipeline de dados', () => {
     expect(result.competition?.teams.find((item) => item.id === 'ta')).toMatchObject({
       name: 'Time A',
       displayName: 'De primeira FC',
-      logo: '/images/times/ta.webp',
+      logo: '/images/times/ta-alta-resolucao.webp',
     });
     expect(result.competition?.teams.find((item) => item.id === 'tb')).toMatchObject({
       name: 'Time B',

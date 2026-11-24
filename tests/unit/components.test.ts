@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import FinalPhase from '../../src/components/FinalPhase.astro';
 import HomeShortcuts from '../../src/components/HomeShortcuts.astro';
+import MatchCard from '../../src/components/MatchCard.astro';
 import NavList from '../../src/components/NavList.astro';
 import PodiumList from '../../src/components/PodiumList.astro';
 import TeamBadges from '../../src/components/TeamBadges.astro';
@@ -42,9 +43,10 @@ async function renderShortcuts(): Promise<string> {
 }
 
 function findLink(html: string, label: string): string {
-  const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const match = html.match(new RegExp(`<a\\b[^>]*>\\s*${escaped}\\s*</a>`));
-  if (match === null) {
+  const match = [...html.matchAll(/<a\b[^>]*>([\s\S]*?)<\/a>/g)].find(
+    (item) => item[1]?.replace(/<[^>]*>/g, '').trim() === label,
+  );
+  if (match === undefined) {
     throw new Error(`Link não encontrado: ${label}`);
   }
   return match[0];
@@ -70,6 +72,13 @@ async function renderFinalPhase(competition: Competition): Promise<string> {
   const container = await AstroContainer.create();
   return container.renderToString(FinalPhase, {
     props: { competition, now: new Date('2026-12-04T12:00:00-03:00') },
+  });
+}
+
+async function renderMatchCard(match: Match, competition: Competition): Promise<string> {
+  const container = await AstroContainer.create();
+  return container.renderToString(MatchCard, {
+    props: { match, competition, now: new Date('2026-11-24T12:00:00-03:00') },
   });
 }
 
@@ -128,13 +137,24 @@ describe('logo de time', () => {
     expect(html).toContain('alt=""');
   });
 
-  it('não renderiza imagem quando não há logo', async () => {
+  it('usa o escudo local vazio quando não há logo', async () => {
     const html = await renderTeamLogo(null);
-    expect(html).not.toContain('<img');
+    expect(html).toContain('team-logo--fallback');
+    expect(html).toContain(`src="${withBase('/images/escudo-vazio.svg')}"`);
   });
 });
 
 describe('fase final', () => {
+  it('não trata a liderança provisória como 1º colocado na final antes do fim do grupo', async () => {
+    const incompleteCompetition = makeCompetition({
+      matches: [...groupMatches('scheduled'), makeSemi({ status: 'scheduled' }), makeFinal({ status: 'scheduled' })],
+    });
+    const html = await renderMatchCard(makeFinal({ status: 'scheduled' }), incompleteCompetition);
+
+    expect(html.replace(/<[^>]*>/g, '')).toContain('1º colocado x Vencedora da semifinal');
+    expect(html).not.toContain('De primeira FC x Vencedora da semifinal');
+  });
+
   it('TST-078: não mostra pódio antes do fim do grupo', async () => {
     const competition = makeCompetition({
       matches: [
@@ -154,7 +174,7 @@ describe('fase final', () => {
   it('TST-078: mostra a semifinal entre o 2º e o 3º com o grupo completo', async () => {
     const html = await renderFinalPhase(groupCompleteCompetition());
 
-    expect(html).toContain('Time TB x Time TC');
+    expect(html.replace(/<[^>]*>/g, '')).toContain('Time TB x Time TC');
     expect(html).toContain(`href="${withBase('/jogos/semi/')}"`);
     expect(html).not.toContain('Confrontos a definir');
   });
@@ -204,9 +224,9 @@ describe('fase final', () => {
 
     const html = await renderFinalPhase(competition);
 
-    expect(html).toContain('3ª colocada: Time TC');
+    expect(html.replace(/<[^>]*>/g, '')).toContain('3ª colocada: Time TC');
     expect(html).toContain('A 3ª colocada é a perdedora da semifinal.');
-    expect(html).toContain('Time TA x Time TB');
+    expect(html.replace(/<[^>]*>/g, '')).toContain('Time TA x Time TB');
     expect(html).toContain(`href="${withBase('/jogos/final/')}"`);
     expect(html).not.toContain('id="podio"');
     expect(html).not.toContain('podium__item');

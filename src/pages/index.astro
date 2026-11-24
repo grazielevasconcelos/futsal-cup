@@ -24,6 +24,8 @@ import {
 import type { PlayerStats } from '../lib/domain/types';
 import { formatDate, formatDateHeading } from '../lib/format/date';
 import { formatTeamLabel } from '../lib/format/team';
+import TeamLogo from '../components/TeamLogo.astro';
+import TeamIdentity from '../components/TeamIdentity.astro';
 import { getBuildDate, SITE_DESCRIPTION, SITE_NAME, withBase } from '../lib/site';
 
 const competition = loadCompetition();
@@ -128,7 +130,7 @@ const standingsCaption =
             )}
           </section>
 
-          <section class="section" aria-labelledby="atalhos">
+          <section class="section section--nav" aria-labelledby="atalhos">
             <h2 id="atalhos">Atalhos</h2>
             <HomeShortcuts teams={competition.teams} />
           </section>
@@ -235,7 +237,12 @@ const standingsCaption =
                       <th scope="row">
                         {teams.get(row.teamId) === undefined
                           ? row.teamId
-                          : formatTeamLabel(teams.get(row.teamId)!)}
+                          : (
+                            <span class="team-identity">
+                              <span>{formatTeamLabel(teams.get(row.teamId)!)}</span>
+                              <TeamLogo logo={teams.get(row.teamId)!.logo} size="compact" />
+                            </span>
+                          )}
                       </th>
                       <td class="data-table__numeric">{row.points}</td>
                       <td class="data-table__numeric">{row.played}</td>
@@ -259,9 +266,15 @@ const standingsCaption =
                   <article class="highlight-card">
                     <h3>Artilharia</h3>
                     <p>
-                      {topScorer.nickname} ({teams.get(topScorer.teamId) === undefined
-                        ? topScorer.teamId
-                        : formatTeamLabel(teams.get(topScorer.teamId)!)})
+                      {topScorer.nickname} (
+                      {teams.get(topScorer.teamId) === undefined ? (
+                        topScorer.teamId
+                      ) : (
+                        <TeamIdentity
+                          label={formatTeamLabel(teams.get(topScorer.teamId)!)}
+                          logo={teams.get(topScorer.teamId)!.logo}
+                        />
+                      )})
                       — {topScorer.goals} gols
                     </p>
                     {leaderNote(scorers, (item) => item.goals) !== null && (
@@ -274,9 +287,14 @@ const standingsCaption =
                     <h3>Assistências</h3>
                     <p>
                       {assistLeader.nickname} (
-                      {teams.get(assistLeader.teamId) === undefined
-                        ? assistLeader.teamId
-                        : formatTeamLabel(teams.get(assistLeader.teamId)!)}) —{' '}
+                      {teams.get(assistLeader.teamId) === undefined ? (
+                        assistLeader.teamId
+                      ) : (
+                        <TeamIdentity
+                          label={formatTeamLabel(teams.get(assistLeader.teamId)!)}
+                          logo={teams.get(assistLeader.teamId)!.logo}
+                        />
+                      )}) —{' '}
                       {assistLeader.assists} assistências
                     </p>
                     {leaderNote(assists, (item) => item.assists) !== null && (
@@ -370,7 +388,17 @@ const standingsCaption =
           {thirdName !== null && (
             <section class="section" aria-labelledby="terceira-colocada">
               <h2 id="terceira-colocada">3ª colocada</h2>
-              <p class="home-champion">3ª colocada: {thirdName}</p>
+              <p class="home-champion">
+                3ª colocada:{' '}
+                {podium?.third === null || podium?.third === undefined || teams.get(podium.third) === undefined ? (
+                  thirdName
+                ) : (
+                  <TeamIdentity
+                    label={thirdName}
+                    logo={teams.get(podium.third)!.logo}
+                  />
+                )}
+              </p>
               <p class="meta">A 3ª colocada é a perdedora da semifinal.</p>
             </section>
           )}

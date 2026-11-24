@@ -1,7 +1,7 @@
 ---
 import type { Competition, Match, PlayoffSnapshots, TeamId } from '../lib/domain/types';
 import { buildPlayerTeamMap, buildTeamMap } from '../lib/domain/players';
-import { buildExpectedSemifinalists } from '../lib/domain/playoffs';
+import { buildExpectedSemifinalists, isGroupComplete } from '../lib/domain/playoffs';
 import { resolveMatchTeams } from '../lib/domain/score';
 import { rankTeams } from '../lib/domain/standings';
 import { formatDate, formatTime } from '../lib/format/date';
@@ -13,6 +13,7 @@ import { withBase } from '../lib/site';
 import { formatTeamLabel } from '../lib/format/team';
 import Score from './Score.astro';
 import StatusBadge from './StatusBadge.astro';
+import TeamLogo from './TeamLogo.astro';
 
 interface Props {
   match: Match;
@@ -51,11 +52,14 @@ let awayName =
       : formatTeamLabel(teams.get(resolved.awayTeamId)!);
 
 if (resolved === null && match.stage === 'final') {
-  const ranking = rankTeams(competition);
-  const leader = ranking.rows[0];
-  const leaderTeam = leader === undefined ? undefined : teams.get(leader.teamId);
-  homeName = leaderTeam === undefined ? '1º colocado' : formatTeamLabel(leaderTeam);
+  homeName = '1º colocado';
   awayName = 'Vencedora da semifinal';
+  if (isGroupComplete(competition)) {
+    const ranking = rankTeams(competition);
+    const leader = ranking.rows[0];
+    const leaderTeam = leader === undefined ? undefined : teams.get(leader.teamId);
+    if (leaderTeam !== undefined) homeName = formatTeamLabel(leaderTeam);
+  }
 }
 
 if (resolved === null && match.stage === 'semi') {
@@ -71,10 +75,11 @@ if (resolved === null && match.stage === 'semi') {
   }
 }
 
-const title = `${homeName} x ${awayName}`;
 const href = withBase(`/jogos/${match.id}/`);
 const time = match.startsAt === null ? 'Horário a definir' : formatTime(match.startsAt);
 const venue = match.venue ?? 'Local a definir';
+const homeTeam = resolved === null ? undefined : teams.get(resolved.homeTeamId);
+const awayTeam = resolved === null ? undefined : teams.get(resolved.awayTeamId);
 ---
 
 <article class="card match-card">
@@ -83,7 +88,27 @@ const venue = match.venue ?? 'Local a definir';
     <StatusBadge match={match} now={now} />
   </p>
 
-  <h3 class="match-card__title"><a class="card__link" href={href}>{title}</a></h3>
+  <h3 class="match-card__title">
+    <a class="card__link" href={href}>
+      {homeTeam === undefined ? (
+        homeName
+      ) : (
+        <span class="team-identity">
+          {homeName}
+          <TeamLogo logo={homeTeam.logo} size="compact" />
+        </span>
+      )}
+      {' x '}
+      {awayTeam === undefined ? (
+        awayName
+      ) : (
+        <span class="team-identity">
+          {awayName}
+          <TeamLogo logo={awayTeam.logo} size="compact" />
+        </span>
+      )}
+    </a>
+  </h3>
 
   <p class="match-card__meta">
     <time datetime={match.date}>{formatDate(match.date)}</time> · {time} · {venue}
