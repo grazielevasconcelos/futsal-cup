@@ -24,7 +24,6 @@ import {
 import type { PlayerStats } from '../lib/domain/types';
 import { formatDate, formatDateHeading } from '../lib/format/date';
 import { formatTeamLabel } from '../lib/format/team';
-import TeamLogo from '../components/TeamLogo.astro';
 import TeamIdentity from '../components/TeamIdentity.astro';
 import { getBuildDate, SITE_DESCRIPTION, SITE_NAME, withBase } from '../lib/site';
 
@@ -211,46 +210,13 @@ const standingsCaption =
 
           <section class="section" aria-labelledby="resumo-classificacao">
             <h2 id="resumo-classificacao">Classificação</h2>
-            <p class="badge-list">
-              <span class="badge">Classificação provisória</span>
-            </p>
-            <div
-              class="table-scroll"
-              role="region"
-              aria-labelledby="resumo-classificacao"
-              tabindex="0"
-            >
-              <table class="data-table">
-                <caption>Resumo da classificação da fase classificatória</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Posição</th>
-                    <th scope="col">Time</th>
-                    <th scope="col" class="data-table__numeric">Pontos</th>
-                    <th scope="col" class="data-table__numeric">Jogos</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {ranking.rows.map((row) => (
-                    <tr>
-                      <td>{row.position}º</td>
-                      <th scope="row">
-                        {teams.get(row.teamId) === undefined
-                          ? row.teamId
-                          : (
-                            <span class="team-identity">
-                              <span>{formatTeamLabel(teams.get(row.teamId)!)}</span>
-                              <TeamLogo logo={teams.get(row.teamId)!.logo} size="compact" />
-                            </span>
-                          )}
-                      </th>
-                      <td class="data-table__numeric">{row.points}</td>
-                      <td class="data-table__numeric">{row.played}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <StandingsTable
+              rows={ranking.rows}
+              teams={teams}
+              provisional={false}
+              caption={standingsCaption}
+              labelledBy="resumo-classificacao"
+            />
             <p class="meta">
               <a href={withBase('/classificacao/')}>Ver classificação completa</a>
               {' · '}
