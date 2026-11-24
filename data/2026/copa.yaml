@@ -5,8 +5,9 @@
 # IDs e nomes-base dos times são estáveis; a UI usa displayName quando preenchido.
 # Logos são opcionais e devem apontar para assets locais em public/images/times/.
 #
-# Estado atual: pré-competição. Elencos definidos em 17/11/2026; nomes públicos
-# dos times B e C ainda provisórios. IDs e URLs são estáveis. Horários confirmados:
+# Estado atual: pré-competição. Elencos definidos em 17/11/2026.
+# Nome público do time B ainda provisório; time C definido como "Sem Horas".
+# IDs e URLs são estáveis. Horários confirmados:
 # primeiro jogo do dia às 18h45 e segundo às 19h20, no 7º andar. Vi é a única goleira; as demais jogadoras atuam na linha.
 # Não registre resultados fictícios.
 #
@@ -118,9 +119,9 @@ teams:
 
   - id: "tc"
     name: "Time C"
-    displayName: null
+    displayName: "Sem Horas"
     abbreviation: "TC"
-    logo: null
+    logo: "/images/times/tc-sem-horas.webp"
     players:
       - id: "p-017"
         nickname: "Camila Arana"
