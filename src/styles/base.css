@@ -103,11 +103,11 @@ a:hover {
 }
 
 .site-header__inner {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
+  column-gap: var(--space-2);
+  row-gap: var(--space-1);
   width: 100%;
   max-width: var(--content-max);
   margin: 0 auto;
@@ -115,6 +115,8 @@ a:hover {
 }
 
 .site-header__actions {
+  grid-column: 2;
+  justify-self: end;
   display: flex;
   align-items: center;
   gap: var(--space-1);
@@ -167,7 +169,8 @@ html[data-theme="dark"] .theme-toggle__icon--sun {
 }
 
 .site-title {
-  max-width: var(--site-title-max);
+  grid-column: 1 / -1;
+  max-width: none;
   font-size: var(--text-body-size);
   line-height: var(--text-body-line);
   font-weight: var(--font-weight-bold);
@@ -243,6 +246,10 @@ html[data-theme="dark"] .theme-toggle__icon--sun {
   margin: 0;
   padding: 0 0 0 var(--space-2);
   list-style: none;
+}
+
+.nav-submenu .team-identity > span {
+  white-space: nowrap;
 }
 
 .nav-submenu a {
@@ -402,6 +409,22 @@ html[data-theme="dark"] .theme-toggle__icon--sun {
 }
 
 @media (min-width: 48em) {
+  .site-header__inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .site-title {
+    max-width: var(--site-title-max);
+  }
+
+  .site-header__actions {
+    grid-column: auto;
+    justify-self: auto;
+  }
+
   .primary-nav {
     display: block;
   }
@@ -409,9 +432,11 @@ html[data-theme="dark"] .theme-toggle__icon--sun {
   .nav-submenu {
     position: absolute;
     top: 100%;
-    left: 0;
+    right: 0;
     z-index: var(--z-nav-submenu);
     display: none;
+    width: max-content;
+    max-width: calc(100vw - var(--space-4));
     min-width: 100%;
     padding: var(--space-1) 0;
     border: var(--border-width) solid var(--color-border);
@@ -426,6 +451,8 @@ html[data-theme="dark"] .theme-toggle__icon--sun {
   }
 
   .nav-submenu a {
+    width: max-content;
+    min-width: 100%;
     padding: 0 var(--space-2);
   }
 

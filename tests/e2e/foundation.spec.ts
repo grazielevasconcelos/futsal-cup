@@ -57,6 +57,29 @@ test.describe('fundação do site', () => {
     }
   });
 
+  test('o cabeçalho móvel organiza título e ações sem quebra acidental', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 800 });
+    await page.goto('');
+
+    const title = page.locator('.site-title');
+    const actions = page.locator('.site-header__actions');
+    const menuButton = page.locator('.menu-mobile summary');
+    const themeButton = page.locator('.theme-toggle');
+
+    const titleBox = await title.boundingBox();
+    const actionsBox = await actions.boundingBox();
+    const menuBox = await menuButton.boundingBox();
+    const themeBox = await themeButton.boundingBox();
+
+    expect(titleBox).not.toBeNull();
+    expect(actionsBox).not.toBeNull();
+    expect(menuBox).not.toBeNull();
+    expect(themeBox).not.toBeNull();
+    expect(titleBox!.y + titleBox!.height).toBeLessThanOrEqual(actionsBox!.y);
+    expect(Math.abs(menuBox!.y - themeBox!.y)).toBeLessThanOrEqual(1);
+    expect(actionsBox!.x + actionsBox!.width).toBeLessThanOrEqual(320);
+  });
+
   test('o submenu de Times abre com hover e fecha ao sair', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('');
@@ -69,6 +92,23 @@ test.describe('fundação do site', () => {
     await expect(submenu).toBeVisible();
     await expect(submenu.getByRole('link')).toHaveCount(3);
     await expect(desktopNav.getByRole('link')).toHaveCount(9);
+
+    const labels = ['De primeira FC', 'Time B de Bola', 'Sem Horas'];
+    const teamLabels = submenu.locator('.team-identity > span');
+    for (const [index, label] of labels.entries()) {
+      await teamLabels.nth(index).evaluate((element, text) => {
+        element.textContent = text;
+      }, label);
+      await expect(teamLabels.nth(index)).toHaveCSS('white-space', 'nowrap');
+    }
+
+    const submenuBounds = await submenu.boundingBox();
+    expect(submenuBounds).not.toBeNull();
+    expect(submenuBounds!.x + submenuBounds!.width).toBeLessThanOrEqual(1280);
+    const submenuScrolls = await submenu.evaluate(
+      (element) => element.scrollWidth > element.clientWidth,
+    );
+    expect(submenuScrolls).toBe(false);
 
     await page.getByRole('heading', { level: 1 }).hover();
     await expect(submenu).toBeHidden();
