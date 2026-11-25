@@ -175,7 +175,18 @@ matches:
     venue: "7º andar"
     status: "scheduled"
     walkover: null
-    events: []
+    events: 
+      - type: "goal"
+        playerId: "p-003"
+        assistPlayerId: "p-004"
+        minute: 13
+        penalty: false
+      - type: "goal"
+        playerId: "p-010"
+        assistPlayerId: "p-011"
+        minute: 18
+        penalty: false
+
 
   - id: "g2"
     stage: "group"
@@ -187,7 +198,17 @@ matches:
     venue: "7º andar"
     status: "scheduled"
     walkover: null
-    events: []
+    events:
+      - type: "goal"
+        playerId: "p-008"
+        assistPlayerId: "p-004"
+        minute: 17
+        penalty: false
+      - type: "goal"
+        playerId: "p-023"
+        assistPlayerId: "p-018"
+        minute: 8
+        penalty: false
 
   - id: "g3"
     stage: "group"
