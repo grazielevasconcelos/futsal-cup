@@ -15,6 +15,8 @@ describe('fonte pública 2026', () => {
     const teamB = result.competition?.teams.find((team) => team.id === 'tb');
     expect(teamB?.players.filter((player) => player.leftAt === null)).toHaveLength(9);
     expect(teamB?.players.find((player) => player.id === 'p-025')?.nickname).toBe('Elisa');
+    expect(teamB?.displayName).toBe('Time B de Bola');
+    expect(teamB?.logo).toBe('/images/times/tb-time-bola.webp');
 
     const teamC = result.competition?.teams.find((team) => team.id === 'tc');
     expect(teamC?.displayName).toBe('Sem Horas');

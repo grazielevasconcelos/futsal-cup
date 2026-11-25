@@ -52,8 +52,8 @@ describe('pipeline de dados', () => {
     });
     expect(result.competition?.teams.find((item) => item.id === 'tb')).toMatchObject({
       name: 'Time B',
-      displayName: null,
-      logo: null,
+      displayName: 'Time B de Bola',
+      logo: '/images/times/tb-time-bola.webp',
     });
   });
 

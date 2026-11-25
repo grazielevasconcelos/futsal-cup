@@ -6,7 +6,7 @@
 # Logos são opcionais e devem apontar para assets locais em public/images/times/.
 #
 # Estado atual: pré-competição. Elencos definidos em 17/11/2026.
-# Nome público do time B ainda provisório; time C definido como "Sem Horas".
+# Times B e C: "Time B de Bola" e "Sem Horas".
 # IDs e URLs são estáveis. Horários confirmados:
 # primeiro jogo do dia às 18h45 e segundo às 19h20, no 7º andar. Vi é a única goleira; as demais jogadoras atuam na linha.
 # Não registre resultados fictícios.
@@ -67,9 +67,9 @@ teams:
 
   - id: "tb"
     name: "Time B"
-    displayName: null
+    displayName: "Time B de Bola"
     abbreviation: "TB"
-    logo: null
+    logo: "/images/times/tb-time-bola.webp"
     players:
       - id: "p-009"
         nickname: "Ani"
