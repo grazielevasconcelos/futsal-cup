@@ -116,6 +116,7 @@ a:hover {
 
 .site-header__actions {
   grid-column: 2;
+  grid-row: 1;
   justify-self: end;
   display: flex;
   align-items: center;
@@ -169,11 +170,15 @@ html[data-theme="dark"] .theme-toggle__icon--sun {
 }
 
 .site-title {
-  grid-column: 1 / -1;
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
   max-width: none;
   font-size: var(--text-body-size);
   line-height: var(--text-body-line);
   font-weight: var(--font-weight-bold);
+  text-align: left;
+  text-wrap: balance;
   text-decoration-line: none;
 }
 
@@ -259,6 +264,7 @@ html[data-theme="dark"] .theme-toggle__icon--sun {
 }
 
 .menu-mobile {
+  position: relative;
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-small);
   background-color: var(--color-surface);
@@ -274,7 +280,19 @@ html[data-theme="dark"] .theme-toggle__icon--sun {
 }
 
 .menu-mobile[open] summary {
-  border-bottom: var(--border-width) solid var(--color-border);
+  border-bottom-color: transparent;
+}
+
+.menu-mobile > nav[aria-label="Principal (menu móvel)"] {
+  position: absolute;
+  z-index: var(--z-nav-submenu);
+  inset-block-start: calc(100% + var(--space-1));
+  inset-inline-end: 0;
+  width: min(18rem, calc(100vw - var(--space-4)));
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-small);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-floating);
 }
 
 .menu-mobile .nav-list {

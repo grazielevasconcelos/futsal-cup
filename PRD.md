@@ -331,6 +331,8 @@ Observações:
 | FR-20 | Histórico de alterações | **FUTURO** | Não obrigatório no MVP; pode ser avaliado em versões futuras |
 | FR-21 | Tema claro e escuro | Desejável | Claro por padrão; alternância acessível; preferência persistida localmente no navegador |
 
+O selo oficial da Copa de 2026 pode aparecer no cabeçalho da página inicial como identidade visual decorativa; o nome público permanece em texto HTML acessível.
+
 ### 8.1 Regras de validação obrigatórias
 
 - Exatamente **3 times** na edição 2026, com IDs `ta`, `tb` e `tc`.

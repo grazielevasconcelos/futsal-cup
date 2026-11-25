@@ -79,15 +79,18 @@ if (fontFiles.length > 0) {
 
 const rasterFiles = relativeFiles.filter((file) => /\.(?:png|jpe?g|gif|webp|avif)$/i.test(file));
 const unsupportedRasterFiles = rasterFiles.filter(
-  (file) => !/^images\/times\/[a-z0-9-]+\.(?:png|jpe?g|webp)$/i.test(file),
+  (file) =>
+    !/^images\/times\/[a-z0-9-]+\.(?:png|jpe?g|webp)$/i.test(file) &&
+    file !== 'images/brand/copa-vila-mariana-2026.webp',
 );
 if (unsupportedRasterFiles.length > 0) {
   fail(`Imagem raster fora dos logos locais de times em dist/: ${unsupportedRasterFiles.join(', ')}`);
 }
 for (const file of rasterFiles) {
   const size = statSync(join(distDirectory, file)).size;
-  if (size > 200 * 1024) {
-    fail(`Logo raster acima de 200 KB em dist/${file}: ${size} bytes`);
+  const maxSize = file === 'images/brand/copa-vila-mariana-2026.webp' ? 120 * 1024 : 200 * 1024;
+  if (size > maxSize) {
+    fail(`Imagem raster acima do limite de ${Math.round(maxSize / 1024)} KB em dist/${file}: ${size} bytes`);
   }
 }
 

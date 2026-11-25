@@ -42,12 +42,24 @@ test.describe('fundação do site', () => {
     await page.goto('');
 
     const menu = page.locator('details.menu-mobile');
+    const header = page.locator('.site-header');
+    const headerBefore = await header.boundingBox();
     await expect(menu).not.toHaveAttribute('open', '');
     await page.getByText('Menu', { exact: true }).click();
     await expect(menu).toHaveAttribute('open', '');
 
     const mobileNav = page.getByRole('navigation', { name: 'Principal (menu móvel)' });
     await expect(mobileNav.getByRole('link')).toHaveCount(9);
+    const headerAfter = await header.boundingBox();
+    const navBox = await mobileNav.boundingBox();
+    const summaryBox = await menu.locator('summary').boundingBox();
+    expect(headerBefore).not.toBeNull();
+    expect(headerAfter).not.toBeNull();
+    expect(navBox).not.toBeNull();
+    expect(summaryBox).not.toBeNull();
+    expect(headerAfter!.height).toBe(headerBefore!.height);
+    expect(navBox!.y).toBeGreaterThanOrEqual(summaryBox!.y + summaryBox!.height);
+    expect(navBox!.x + navBox!.width).toBeLessThanOrEqual(320);
 
     const submenu = mobileNav.locator('.nav-submenu');
     await expect(submenu).toBeVisible();
@@ -57,7 +69,7 @@ test.describe('fundação do site', () => {
     }
   });
 
-  test('o cabeçalho móvel organiza título e ações sem quebra acidental', async ({ page }) => {
+  test('o cabeçalho móvel mantém o título à esquerda das ações', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 800 });
     await page.goto('');
 
@@ -75,7 +87,11 @@ test.describe('fundação do site', () => {
     expect(actionsBox).not.toBeNull();
     expect(menuBox).not.toBeNull();
     expect(themeBox).not.toBeNull();
-    expect(titleBox!.y + titleBox!.height).toBeLessThanOrEqual(actionsBox!.y);
+    expect(titleBox!.x + titleBox!.width).toBeLessThanOrEqual(actionsBox!.x);
+    expect(titleBox!.y).toBeLessThanOrEqual(actionsBox!.y);
+    expect(titleBox!.y + titleBox!.height).toBeGreaterThanOrEqual(
+      actionsBox!.y + actionsBox!.height,
+    );
     expect(Math.abs(menuBox!.y - themeBox!.y)).toBeLessThanOrEqual(1);
     expect(actionsBox!.x + actionsBox!.width).toBeLessThanOrEqual(320);
   });

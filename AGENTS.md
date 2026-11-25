@@ -105,7 +105,7 @@ Os arquivos `airbnb-design-design.md` e `airbnb-design-tokens.css` são uma refe
 - O DLS é otimizado para fotografia e produtos de viagem. Este site é orientado a dados e não exibe fotos de jogadoras (privacidade e desempenho em 4G).
 - Adapte a intenção, não clone: aproveite a paleta coral/pink, a tipografia arredondada, o espaçamento generoso e os cards de 12px; priorize a leitura de tabelas, resultados e estatísticas.
 - Não exiba fotos de jogadoras. Evite imagens de pessoas reais; prefira composição tipográfica, cor e ícones discretos. Imagens decorativas, se existirem, devem ser leves, licenciadas, com `alt` adequado e sem marcas da Airbnb.
-- Logos fornecidos pela organização para representar os times podem ser publicados como assets locais após confirmação de autorização; use campos opcionais na fonte de dados, sem imagens remotas.
+- Logos fornecidos pela organização para representar os times podem ser publicados como assets locais após confirmação de autorização; use campos opcionais na fonte de dados, sem imagens remotas. O selo oficial da Copa de 2026 é a exceção de identidade visual: use apenas `public/images/brand/copa-vila-mariana-2026.webp` na página inicial, com fundo transparente e sem duplicá-lo em páginas de dados.
 - Não use o gradiente coral→pink em grandes áreas ou atrás de tabelas; reserve-o para pequenos acentos.
 - Não sacrifique densidade, contraste ou clareza para reproduzir o estilo. Em dúvida, acessibilidade e legibilidade vencem.
 - A fase final deve indicar textualmente a vantagem do empate e quem avançou ou foi campeã em caso de empate; não use apenas cor ou posição na tabela.

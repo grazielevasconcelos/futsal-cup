@@ -24,6 +24,14 @@
   padding-top: var(--space-4);
 }
 
+.home-brand__logo {
+  display: block;
+  width: var(--competition-logo-size);
+  height: var(--competition-logo-size);
+  margin: 0 auto var(--space-3);
+  object-fit: contain;
+}
+
 .page-header__eyebrow {
   margin: 0 0 var(--space-1);
   color: var(--color-accent-strong);
@@ -41,6 +49,27 @@
 
 .page-header .lead {
   margin-bottom: 0;
+}
+
+@media (min-width: 48em) {
+  .page-header--home {
+    display: grid;
+    grid-template-columns: var(--competition-logo-size) minmax(0, 1fr);
+    column-gap: var(--space-3);
+    align-items: center;
+  }
+
+  .page-header--home .home-brand__logo {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    margin: 0;
+  }
+
+  .page-header--home .page-header__eyebrow,
+  .page-header--home h1,
+  .page-header--home .lead {
+    grid-column: 2;
+  }
 }
 
 .section {

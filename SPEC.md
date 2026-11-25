@@ -154,7 +154,7 @@ O nome da instituição **NÃO DEVE** aparecer em interface, título, metadados,
 - Notificações, chat, pagamentos, streaming, ingressos.
 - W.O. automático, detecção de jogadoras em quadra, automação de desistência de time inteiro.
 - Regulamento (FR-10, adiado) e analytics. Impressão/PDF pelo navegador está no escopo conforme a §11.11.
-- Fontes proprietárias, imagens de pessoas e logotipos sem relação com os times. Logos dos times enviados pela organização são opcionais e servidos localmente.
+- Fontes proprietárias e imagens de pessoas. Logos dos times enviados pela organização são opcionais e servidos localmente. O selo oficial da competição é permitido somente no cabeçalho da página inicial, como asset local.
 - Persistência em servidor da preferência de tema: a escolha vive somente no `localStorage` do navegador.
 - `PLAN.md` e `TASKS.md` nesta etapa.
 
@@ -1919,6 +1919,8 @@ Ordem do documento:
 
 O estado é calculado no build por `getHomeState(competition, now)`. Não há contagem regressiva.
 
+Em todos os estados da Início, o selo local da competição acompanha o título público no cabeçalho; é decorativo (`alt=""`) e não substitui o nome em texto HTML.
+
 #### UI-HOME-01 — Antes da copa
 
 Condição: `hoje < primeira data do grupo` e nenhuma partida de grupo `finished`.
@@ -2186,6 +2188,7 @@ Os valores claros abaixo são os aliases padrão. O seletor `:root[data-theme="d
 | `--shortcut-min` | — | `10rem` | Largura mínima de cada atalho no grid `auto-fit`. |
 | `--team-logo-size` | — | `5rem` | Logo nos cards de time e no cabeçalho do time no mobile. |
 | `--team-logo-size-lg` | — | `12rem` | Logo no cabeçalho do time a partir de 768px. |
+| `--competition-logo-size` | — | `7rem` | Selo da competição no cabeçalho da página inicial. |
 | `--accent-bar-width` | — | `8rem` | Comprimento da barra de gradiente decorativa. |
 | `--accent-bar-height` | — | `4px` | Espessura da barra de gradiente decorativa. |
 | `--z-nav-submenu` | — | `5` | Sobreposição do submenu de Times no desktop. |
@@ -2193,7 +2196,7 @@ Os valores claros abaixo são os aliases padrão. O seletor `:root[data-theme="d
 
 A referência agrupa tamanho e entrelinha no mesmo token; o projeto separa cada par em `*-size` e `*-line` para uso direto em `font-size`/`line-height`.
 
-Tokens técnicos adicionais (também em `tokens.css`): `--page-gutter`, `--content-max`, `--measure`, `--tap-target`, `--border-width`, `--focus-width`, `--focus-offset`, `--table-min-width`, `--shortcut-min`, `--team-logo-size`, `--team-logo-size-lg`, `--accent-bar-width`, `--accent-bar-height`, `--z-nav-submenu`, `--gradient-accent`.
+Tokens técnicos adicionais (também em `tokens.css`): `--page-gutter`, `--content-max`, `--measure`, `--tap-target`, `--border-width`, `--focus-width`, `--focus-offset`, `--table-min-width`, `--shortcut-min`, `--team-logo-size`, `--team-logo-size-lg`, `--competition-logo-size`, `--accent-bar-width`, `--accent-bar-height`, `--z-nav-submenu`, `--gradient-accent`.
 
 - Componentes **NÃO DEVEM** conter hexadecimais, `rgb()`, `hsl()`, sombras ou medidas avulsas; devem consumir tokens.
 - `--color-border` é decorativa; não pode ser a única indicação de foco, erro ou estado.
@@ -2326,10 +2329,10 @@ Pares do tema escuro (recalculados pelo teste de tokens):
 | Requisições de terceiros | 0 | Playwright |
 | Lighthouse mobile (Início e partida) | ≥ 90 em Performance, Acessibilidade, Boas práticas e SEO | auditoria manual no checklist |
 
-- Sem fotos de pessoas. A única exceção raster são logos de times em `public/images/times/`, cada um com no máximo 200 KB e referenciado na fonte. Favicon SVG pequeno.
+- Sem fotos de pessoas. Logos de times ficam em `public/images/times/`, cada um com no máximo 200 KB e referenciado na fonte. O selo oficial da competição fica em `public/images/brand/copa-vila-mariana-2026.webp`, com transparência e até 120 KB; não é configurável pela fonte de dados. Favicon SVG pequeno.
 - CSS crítico inline? **NÃO** no MVP; um único CSS externo cacheável é suficiente. Evitar `style` inline.
 - Sem prefetch de rotas, sem service worker, sem fontes.
-- O site deve carregar em 4G com uma única requisição HTML + CSS (e favicon opcional); o script de tema é inline no HTML e não adiciona requisição.
+- O site deve carregar em 4G com uma única requisição HTML + CSS, o selo otimizado da competição na Início e favicon opcional; o script de tema é inline no HTML e não adiciona requisição.
 
 ### 11.10 Conteúdo e privacidade visual
 
