@@ -173,7 +173,7 @@ matches:
     date: "2026-11-24"
     startsAt: "2026-11-24T18:45:00-03:00"
     venue: "7º andar"
-    status: "scheduled"
+    status: "finished"
     walkover: null
     events: 
       - type: "goal"
@@ -196,7 +196,7 @@ matches:
     date: "2026-11-24"
     startsAt: "2026-11-24T19:20:00-03:00"
     venue: "7º andar"
-    status: "scheduled"
+    status: "finished"
     walkover: null
     events:
       - type: "goal"
