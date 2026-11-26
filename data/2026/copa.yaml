@@ -218,7 +218,7 @@ matches:
     date: "2026-11-26"
     startsAt: "2026-11-26T18:45:00-03:00"
     venue: "7º andar"
-    status: "finished"
+    status: "scheduled"
     walkover: null
     events:
       - type: "goal"
