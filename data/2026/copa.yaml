@@ -220,7 +220,17 @@ matches:
     venue: "7º andar"
     status: "scheduled"
     walkover: null
-    events: []
+    events:
+      - type: "goal"
+        playerId: "p-019"
+        assistPlayerId: "p-024"
+        minute: 4
+        penalty: false
+      - type: "goal"
+        playerId: "p-019"
+        assistPlayerId: "p-021"
+        minute: 6
+        penalty: false
 
   - id: "g4"
     stage: "group"
