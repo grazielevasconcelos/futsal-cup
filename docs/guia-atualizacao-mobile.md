@@ -26,6 +26,22 @@ app do GitHub, editando apenas `data/2026/copa.yaml`.
 - `semi`, `final`, `semifinalists` e `finalists` ficam como estão até o fim da
   fase classificatória. Não os edite ao registrar jogos de grupo.
 
+## Qual status usar?
+
+O campo `status` aceita somente estes três valores:
+
+| Status | Use quando | Eventos e W.O. |
+|---|---|---|
+| `scheduled` | A partida ainda vai acontecer ou ainda não foi registrada como realizada. É o status normal antes do jogo. | Não inclua eventos nem W.O. |
+| `finished` | A partida terminou no tempo normal ou foi decidida por W.O. Use este status depois que o jogo acabar. | Para jogo realizado, registre os eventos. Para W.O., registre `walkover` e deixe `events: []`. |
+| `postponed` | A partida foi adiada e ainda não foi remarcada. | Não inclua eventos nem W.O. |
+
+**Regra prática:** mantenha `scheduled` antes do jogo; troque para `finished`
+quando houver resultado definitivo; use `postponed` somente enquanto aguarda
+remarcação. Ao remarcar, atualize `date` e `startsAt` e volte para `scheduled`.
+`date` é obrigatória em todos os status; `startsAt` é obrigatório em
+`finished` e pode ser `null` nos outros dois.
+
 ## Registrando uma partida realizada
 
 No bloco da partida:
