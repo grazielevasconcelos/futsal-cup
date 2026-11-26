@@ -240,9 +240,44 @@ matches:
     date: "2026-11-26"
     startsAt: "2026-11-26T19:20:00-03:00"
     venue: "7º andar"
-    status: "scheduled"
+    status: "finished"
     walkover: null
-    events: []
+    events:
+      - type: "goal"
+        playerId: "p-013"
+        assistPlayerId: ""
+        minute: 6
+        penalty: false
+      - type: "goal"
+        playerId: "p-003"
+        assistPlayerId: "p-005"
+        minute: 9
+        penalty: false
+      - type: "goal"
+        playerId: "p-009"
+        assistPlayerId: "p-010"
+        minute: 13
+        penalty: false
+      - type: "goal"
+        playerId: "p-008"
+        assistPlayerId: "p-004"
+        minute: 16
+        penalty: false
+      - type: "goal"
+        playerId: "p-011"
+        assistPlayerId: "p-013"
+        minute: 17
+        penalty: false
+      - type: "goal"
+        playerId: "p-003"
+        assistPlayerId: "p-002"
+        minute: 17
+        penalty: false
+      - type: "goal"
+        playerId: "p-013"
+        assistPlayerId: "p-11"
+        minute: 19
+        penalty: false
 
   - id: "g5"
     stage: "group"
