@@ -275,7 +275,7 @@ matches:
         penalty: false
       - type: "goal"
         playerId: "p-013"
-        assistPlayerId: "p-11"
+        assistPlayerId: "p-011"
         minute: 19
         penalty: false
 
