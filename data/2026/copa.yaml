@@ -245,7 +245,7 @@ matches:
     events:
       - type: "goal"
         playerId: "p-013"
-        assistPlayerId: ""
+        assistPlayerId: "p-000"
         minute: 6
         penalty: false
       - type: "goal"
