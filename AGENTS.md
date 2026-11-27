@@ -2,13 +2,18 @@
 
 Instruções para agentes de código que trabalham neste repositório.
 
+**Versão:** 2.4
+**Data:** 27/11/2026
+**Status:** Normativo
+**Compatível com:** PRD v2.2 · SPEC v2.3
+
 ## Visão geral
 
 Site público, estático e somente leitura da **Copa de Futsal Feminino Vila Mariana 2026**. A competição tem **3 times**, **6 partidas na fase classificatória em turno e returno**, **1 semifinal** e **1 final**, totalizando **8 partidas oficiais**.
 
 A semifinal é disputada entre o **2º e o 3º colocado**, com **vantagem do empate para o 2º**. A final é disputada entre o **1º colocado** e a **vencedora da semifinal**, com **vantagem do empate para o 1º**. Empates encerram a partida no tempo normal: **não há prorrogação, pênaltis, shootout ou cobranças alternadas**. A 3ª colocada é a perdedora da semifinal; não há disputa de 3º lugar nem 4º lugar. Os dados são mantidos em uma fonte versionada e o site é publicado no GitHub Pages.
 
-**Estado atual:** o repositório contém o PRD v2.1, a SPEC v2.2, o plano de execução e as referências visuais. A stack, o schema, os algoritmos, os temas, o contrato visual e os comandos estão definidos na `SPEC.md`.
+**Estado atual (27/11/2026):** a fase classificatória está em andamento; `g1` a `g4` estão concluídas, e `g5` e `g6` estão previstas para 01/12/2026. A semifinal e a final estão previstas para 03/12/2026. Nomes, resultados, elencos, horários e local são lidos de `data/2026/copa.yaml`; este arquivo não deve duplicar placares nem classificação. A stack, o schema, os algoritmos, os temas, o contrato visual, os testes e os comandos estão definidos na `SPEC.md`.
 
 ## Fontes de verdade
 
@@ -19,11 +24,13 @@ Leia antes de implementar qualquer mudança:
 | `PRD.md` | Fonte de verdade de produto, regras da competição, validações e critérios de aceite. |
 | `SPEC.md` | Especificação técnica normativa: stack, schema, algoritmos, validação, UI, testes, CI e deploy. |
 | `AGENTS.md` | Restrições do repositório, design, acessibilidade, privacidade e testes. |
-| `PLAN.md` / `TASKS.md` | Plano e checklist de execução, subordinados ao PRD, ao AGENTS e à SPEC. |
+| `PLAN.md` / `TASKS.md` | Registros históricos de planejamento e execução; podem estar desatualizados e não definem o estado atual. |
+| `docs/decisoes-v2.3.md` | Decisão de impressão A4/PDF pelo navegador. |
 | `docs/decisoes-v2.2.md` | Registro do passe visual: tipografia, cards clicáveis, placar, times e pódio. |
 | `docs/decisoes-v2.1.md` | Registro da decisão de tema claro/escuro e persistência local. |
 | `docs/decisoes-v2.0.md` | Registro histórico das decisões da v2.0; não é normativo. |
 | `docs/decisoes-v1.1.md` | Registro histórico das decisões da v1.1; não é normativo. |
+| `docs/guia-atualizacao-mobile.md` | Guia operacional para registrar resultados pelo app do GitHub; leia antes de alterar dados. |
 | `context.md` | Contexto original da organização; em caso de conflito, prevalece o PRD. |
 | `README.md` | Visão geral, comandos e publicação. |
 | `airbnb-design-design.md` | Referência visual não oficial (Airbnb DLS): princípios, tipografia, cores, espaçamento, raios, elevação e movimento. |
@@ -39,7 +46,7 @@ Leia antes de implementar qualquer mudança:
 
 - **Nome público:** "Copa de Futsal Feminino Vila Mariana 2026". O nome da instituição (Sesc) **não pode aparecer** na interface pública, títulos, metadados ou textos exibidos ao público. Em documentação interna, é permitido.
 - **Site estático:** publicação no GitHub Pages, sem backend próprio, sem banco de dados e sem login.
-- **JavaScript no cliente:** permitido somente um script inline/local mínimo para inicializar, alternar e salvar a preferência de tema em `localStorage`. Não adicionar frameworks, hidratação, chamadas externas ou outros scripts sem nova decisão documentada.
+- **JavaScript no cliente:** exatamente um `<script>` inline por página, com `data-theme-script`, sem `src`, limitado a 1 KB gzip. Serve somente para ler/gravar `futsal-cup-theme` em `localStorage` e aplicar/alternar `data-theme`. O build falha se houver zero ou mais de um script. São proibidos JavaScript externo, frameworks, hidratação, chamadas de rede, analytics e cookies.
 - **Somente leitura:** não existe área administrativa nem edição pelo site no MVP. A edição ocorre apenas na fonte de dados versionada.
 - **Fonte única de dados:** times, jogadoras, partidas e eventos vêm de um único arquivo versionado. Não duplique dados no HTML nem edite resultados/classificação manualmente.
 - **Identidade estável dos times:** preserve os IDs `ta`, `tb` e `tc`, os nomes-base “Time A/B/C” e as URLs derivadas dos IDs; nomes de exibição e logos são opcionais e editáveis. Exiba somente o nome de exibição quando informado, senão o nome-base.
@@ -70,7 +77,7 @@ Os arquivos `airbnb-design-design.md` e `airbnb-design-tokens.css` são uma refe
 - `Airbnb Cereal` e `Circular` são fontes proprietárias. Não baixe, embuta ou auto-hospede esses arquivos sem licença. O layout deve funcionar com a pilha de fallback (`-apple-system`, `'Helvetica Neue'`, `sans-serif`) ou com uma alternativa aberta definida na SPEC.
 - Use a escala: `display` 48/56, `heading-1` 32/36, `heading-2` 22/26, `body` 16/24 e `small` 14/18 (tamanho/entrelinha).
 - Pesos previstos: 400, 500, 600 e 700. Não use pesos fora dessa faixa nem dependa de variantes que a fonte de fallback não tenha.
-- Não crie passos de texto abaixo de 14px. `display` é para títulos curtos; em telas estreitas, prefira `heading-1` ou `heading-2`.
+- Em telas, não crie passos de texto abaixo de 14px. `display` é para títulos curtos; em telas estreitas, prefira `heading-1` ou `heading-2`. A escala de impressão é definida separadamente pelos tokens de impressão.
 - Preserve o par tamanho/entrelinha dos tokens; não ajuste a entrelinha isoladamente sem testar a leitura em mobile.
 - Use `--tracking-display` (`-0.02em`) em display e `--tracking-heading` (`-0.01em`) em títulos; não aplique tracking negativo no corpo.
 - Use `text-wrap: balance` em títulos e `text-wrap: pretty` em parágrafos. Números de placar, tabelas e estatísticas usam `tabular-nums`.
@@ -83,7 +90,6 @@ Os arquivos `airbnb-design-design.md` e `airbnb-design-tokens.css` são uma refe
 - Acentos coral/pink são para texto grande (≥24px ou ≥19px em negrito), ícones ou elementos não textuais, salvo quando o par exato de tokens for validado para texto normal. Não use o gradiente atrás de texto ou tabelas.
 - `--color-border` é uma hairline decorativa (1,4:1): não use como única indicação de foco, borda de campo ou estado.
 - Não comunique estado (vitória/empate/derrota, classificação, cartão, suspensão, avanço por vantagem do empate) apenas por cor; use também texto, rótulo ou ícone.
-- Todo par de cor usado em texto ou componente interativo deve atender WCAG AA: 4,5:1 para texto normal e 3:1 para texto grande e componentes de interface.
 - A referência visual interna fornece valores de tema claro. O tema escuro usa tokens semânticos do projeto documentados na SPEC; não altere os arquivos de referência.
 
 ### Espaçamento, forma e movimento
@@ -91,7 +97,7 @@ Os arquivos `airbnb-design-design.md` e `airbnb-design-tokens.css` são uma refe
 - Base de 8px: use `--space-1` a `--space-6` (8, 16, 24, 32, 48 e 64px). Evite valores intermediários arbitrários.
 - Raios: `--radius-small` (8px), `--radius-card` (12px) e `--radius-pill` (9999px). Use `--radius-card` em cards de partidas, times, jogadoras e estatísticas.
 - Elevação: `--shadow-card` para cards e `--shadow-floating` para elementos sobrepostos. Não crie sombras fora dos tokens.
-- Movimento: use `--motion-default` (250ms) em transições discretas e respeite `prefers-reduced-motion: reduce`. Não anime conteúdo essencial nem use movimento para transmitir informação. Não adicione animação de `transform`; feedback de toque usa cor/borda. A troca de tema não anima cores de superfície.
+- Movimento: use `--motion-default` (250ms) em transições discretas e respeite `prefers-reduced-motion: reduce`. Não anime conteúdo essencial nem use movimento para transmitir informação. Não adicione novas animações de `transform` em conteúdo ou cards; transformações existentes do skip link e dos chevrons são exceções. Feedback de toque pode usar cor, borda ou sombra, sem `transform`. A troca de tema não anima cores de superfície.
 - Impressão: `src/styles/print.css` é importado por último; use A4 retrato, tema claro e os tokens de impressão. Não adicione `window.print()`, diálogos ou JavaScript de impressão. O guia estático usa `<details>` no rodapé.
 - Cabeçalhos de página usam uma barra de gradiente decorativa de `--accent-bar-width` × `--accent-bar-height`, sem texto sobreposto.
 - Cards de partida e de time são clicáveis na área inteira: o link do título cobre o card com `::after` e o foco aparece no card. Não aninhe outros controles.
@@ -105,7 +111,7 @@ Os arquivos `airbnb-design-design.md` e `airbnb-design-tokens.css` são uma refe
 - O DLS é otimizado para fotografia e produtos de viagem. Este site é orientado a dados e não exibe fotos de jogadoras (privacidade e desempenho em 4G).
 - Adapte a intenção, não clone: aproveite a paleta coral/pink, a tipografia arredondada, o espaçamento generoso e os cards de 12px; priorize a leitura de tabelas, resultados e estatísticas.
 - Não exiba fotos de jogadoras. Evite imagens de pessoas reais; prefira composição tipográfica, cor e ícones discretos. Imagens decorativas, se existirem, devem ser leves, licenciadas, com `alt` adequado e sem marcas da Airbnb.
-- Logos fornecidos pela organização para representar os times podem ser publicados como assets locais após confirmação de autorização; use campos opcionais na fonte de dados, sem imagens remotas. O selo oficial da Copa de 2026 é a exceção de identidade visual: use apenas `public/images/brand/copa-vila-mariana-2026.webp` na página inicial, com fundo transparente e sem duplicá-lo em páginas de dados.
+- Logos fornecidos pela organização para representar os times podem ser publicados como assets locais após confirmação de autorização; use campos opcionais na fonte de dados, sem imagens remotas. Mantenha apenas assets otimizados e referenciados em `public/images/`; originais e screenshots não devem ser adicionados ao repositório. Logos ficam em `/images/times/<slug>.{png,jpg,jpeg,webp}` e têm limite de 200 KB cada; remova metadados EXIF antes de publicar. O selo oficial da Copa de 2026 é a exceção de identidade visual: use apenas `public/images/brand/copa-vila-mariana-2026.webp`, com fundo transparente, limite de 120 KB e sem duplicá-lo em páginas de dados. Não publique fotos de pessoas nem imagens remotas.
 - Não use o gradiente coral→pink em grandes áreas ou atrás de tabelas; reserve-o para pequenos acentos.
 - Não sacrifique densidade, contraste ou clareza para reproduzir o estilo. Em dúvida, acessibilidade e legibilidade vencem.
 - A fase final deve indicar textualmente a vantagem do empate e quem avançou ou foi campeã em caso de empate; não use apenas cor ou posição na tabela.
@@ -155,12 +161,20 @@ Com 3 ou mais times empatados, o confronto direto **não** é aplicado até que 
 
 ### Elenco
 
-- Cada time tem 7 a 9 jogadoras **ativas**; a 10ª ativa é bloqueada e menos de 7 gera aviso visível (sem impedir a publicação).
+- Efeito da quantidade de jogadoras ativas:
+
+  | Situação | Efeito |
+  |---|---|
+  | Mais de 9 ativas | Bloqueia a validação (`VAL-009`). |
+  | Menos de 7 ativas | Aviso de build (`VAL-W01`), sem bloquear a publicação. |
+  | Menos de 5 ativas | Badge público “Elenco em formação”. |
+  | 5 a 6 ativas | Apenas aviso de build; sem badge público. |
+  | 7 a 9 ativas | Faixa alvo. |
+
 - `leftAt` remove a jogadora do elenco ativo, preserva o histórico e libera a vaga; o limite é de 9 ativas simultâneas.
-- Badge público “Elenco em formação” somente com menos de 5 ativas; entre 5 e 6, apenas aviso de build.
 - Apelido obrigatório e único dentro do time; pode repetir entre times.
 - Posição opcional (goleira ou linha); time obrigatório.
-- A mesma jogadora não pode estar em dois times.
+- IDs de jogadora são únicos na edição e não podem ser reutilizados; a mesma jogadora não pode estar em dois times.
 - Inclusão de novas jogadoras é permitida até 9 ativas, antes da partida em que ela atuará; elegibilidade a partir da próxima partida, sem eventos retroativos.
 - Jogadora que já atuou não pode trocar de time nesta edição.
 - Remover jogadora do elenco ativo não apaga seu histórico.
@@ -206,15 +220,15 @@ Com 3 ou mais times empatados, o confronto direto **não** é aplicado até que 
 
 ### Calendário
 
-| Data | Partidas |
+| Data | Horários, local e partidas |
 |---|---|
-| 24/11/2026 | TA x TB (g1) e TC x TA (g2) |
-| 26/11/2026 | TB x TC (g3) e TB x TA (g4) |
-| 01/12/2026 | TA x TC (g5) e TC x TB (g6) |
-| 03/12/2026 | Semifinal: 2º x 3º e Final: 1º x vencedora da semifinal |
+| 24/11/2026 | 18h45 — g1; 19h20 — g2 |
+| 26/11/2026 | 18h45 — g3; 19h20 — g4 |
+| 01/12/2026 | 18h45 — g5; 19h20 — g6 |
+| 03/12/2026 | 18h45 — semifinal; 19h20 — final |
 
 - Cada time joga duas vezes em 24/11, 26/11 e 01/12; os horários devem ser distintos e respeitar a ordem canônica g1 → g2 → g3 → g4 → g5 → g6 → semifinal → final. A semifinal e a final acontecem no mesmo dia (03/12), com horários distintos, a semifinal primeiro.
-- Horários e nomes definitivos dos times ainda não foram definidos; devem vir da fonte de dados, não fixos no código.
+- Os jogos estão previstos para o 7º andar. Nomes de exibição, horários e local devem ser lidos de `data/2026/copa.yaml`, não fixados no código nem duplicados neste documento. A tabela acima resume o calendário confirmado na fonte; alterações e remarcações reais são registradas somente no YAML.
 - Se uma partida for adiada, a organização atualiza `status` para `postponed`, ajusta `date`/`startsAt` e, quando remarcar, volta para `scheduled`.
 
 ### W.O. e retirada de time
@@ -255,6 +269,19 @@ O catálogo completo de códigos `VAL-*` e `VAL-W*` está na `SPEC.md` §8.
 
 ## Diretrizes de implementação
 
+- Antes de alterar `data/2026/copa.yaml`, leia `docs/guia-atualizacao-mobile.md`. Edite somente esse arquivo de dados; faça um jogo por commit, nunca digite placar e registre eventos em ordem cronológica. Use apenas IDs `p-XXX` existentes, sem reutilização. `finished` exige `startsAt`; `postponed` não pode ter eventos nem W.O. Não altere `semi`, `final`, `semifinalists` ou `finalists` antes do fim da fase classificatória. Rode `npm run validate` e exija zero erros. `COPA_DATA_FILE` é exclusivo do build de teste/E2E e nunca deve ser definido no build de produção.
+- O fluxo de publicação usa o workflow `.github/workflows/deploy.yml`: push em `main` executa validação, checagem, testes, build e E2E antes do deploy ao GitHub Pages. A URL pública é `https://grazielevasconcelos.github.io/futsal-cup/`. Falha de validação mantém a versão anterior publicada; rollback é feito com `git revert` e push em `main`. Não há preview de PR, domínio próprio nem deploy fora de `main`.
+- Ambiente normativo: Node 26.x e npm 11.x; instalar dependências com `npm ci`. `SOURCE_DATE_EPOCH` fixa o instante do build; `COPA_DATA_FILE` só pode ser usado nos testes/build E2E; `CI` detecta execução em CI; `GITHUB_STEP_SUMMARY` recebe o resumo do Actions; `PLAYWRIGHT_WEBKIT=1` habilita WebKit localmente.
+- Contrato de build, verificado por `scripts/check-build.ts`:
+  - Rotas obrigatórias: `/`, `/404.html`, `/jogos/`, `/jogos/{g1,g2,g3,g4,g5,g6,semi,final}/`, `/classificacao/`, `/times/`, `/times/{ta,tb,tc}/`, `/estatisticas/` e `/fase-final/`.
+  - A base é `/futsal-cup/`; use `withBase()` de `src/lib/site.ts` para URLs internas. Não fixe links absolutos sem a base. Links internos precisam resolver para arquivos em `dist/`.
+  - Cada página contém exatamente um script inline de tema, conforme as restrições acima; JavaScript externo é proibido.
+  - HTML: até 60 KB gzip por página. CSS: até 30 KB gzip por arquivo.
+  - Imagens raster permitidas no build: `images/times/*.{png,jpg,jpeg,webp}` e `images/brand/copa-vila-mariana-2026.webp`. Cada logo pode ter até 200 KB; a marca, até 120 KB.
+  - Cada página tem título e descrição únicos; a descrição tem 50–160 caracteres. Páginas comuns exigem canonical e metadados Open Graph (`og:title`, `og:description`, `og:url`, `og:type`, `og:site_name`), sem `og:image`. A página 404 exige `noindex` e não pode ter canonical nem Open Graph.
+  - São proibidos no HTML/CSS publicado: `sesc`, `airbnb`, `@font-face`, `amistoso`, `shootout`, `disputa de pênaltis` e `prorrogação`. `regulamento` é proibido no HTML e nas rotas. Também são proibidos fontes proprietárias ou arquivos `.woff`, `.woff2`, `.ttf`, `.otf` e `.eot`, famílias `Cereal`/`Circular`, IDs `p-XXX` no HTML e links `mailto:`/`tel:`.
+  - Rotas proibidas: regulamento, `/jogos/terceiro/` e `/times/td/`.
+- Assets públicos: mantenha somente arquivos otimizados, autorizados e referenciados pela fonte pública; imagens de origem e screenshots não devem ser versionados. Logos adjacentes ao nome do time são decorativos: use `alt=""` e `aria-hidden="true"`.
 - Isole as regras de negócio (pontuação, desempate, cartões, suspensões, placar, artilharia, estatísticas coletivas, semifinalistas, finalistas e pódio) em funções puras e testáveis.
 - Derive classificação e estatísticas sempre a partir dos eventos; nunca as armazene como verdade editável.
 - `buildTeamStats` agrega grupo + semifinal + final; V/E/D usam o tempo normal, uma semifinal ou final empatada conta como empate; não há campanha de pênaltis; o placar e a vantagem do empate são informações separadas.
@@ -265,7 +292,7 @@ O catálogo completo de códigos `VAL-*` e `VAL-W*` está na `SPEC.md` §8.
 - Aplique os tokens de design antes dos estilos de componentes; não codifique cores, tamanhos, espaçamentos ou sombras diretamente.
 - Valide contraste, foco e comportamento em mobile em toda alteração de UI; a referência visual não substitui os testes de acessibilidade.
 - Não inclua o nome da instituição nem marcas da Airbnb em textos ou assets visuais públicos (logotipos, imagens, favicon, metadados, Open Graph); revise títulos, metadados, `alt`, favicon, imagens, Open Graph, rodapé e mensagens. Nomes internos de arquivos e tokens são permitidos.
-- Não adicione JavaScript de cliente, analytics, cookies de terceiros ou chamadas externas.
+- Não adicione JavaScript além do script de tema permitido; não adicione analytics, cookies de terceiros ou chamadas de rede.
 - Use Conventional Commits em todos os commits.
 
 ## Commits
@@ -316,7 +343,7 @@ chore: configura deploy no GitHub Pages
   - 1º colocado sem semifinal, com vermelho no último jogo de grupo cumprido na final;
   - vermelho na semifinal cumprido na final apenas se o time avançar;
   - vermelho na final sem partida seguinte.
-- Gol contra, assistência opcional e pênaltis do tempo normal fora da artilharia.
+- Gol contra, assistência opcional e pênalti no tempo normal contando para placar e artilharia (sem assistência).
 - Estatísticas coletivas: grupo + semifinal + final; empate na semifinal/final conta como empate em V/E/D; GP/GC/SG incluem as 8 partidas; sem colunas de shootout.
 - Simetria dos confrontos: cada par tem um jogo em casa para cada lado; `g4` é `tb x ta`.
 - Semifinal 2º x 3º e vantagem do empate para o 2º.
@@ -338,10 +365,10 @@ chore: configura deploy no GitHub Pages
 - Painel de placar com texto acessível completo e números tabulares.
 - Cabeçalho de time horizontal, logo menor nos cards e estatísticas em 2 colunas.
 - Pódio com a campeã destacada e sem seção duplicada na Início.
-- Nenhuma animação de `transform` adicionada.
+- Nenhuma nova animação de `transform` em conteúdo ou cards; skip link e chevrons existentes são exceções.
 - `airbnb-design-design.md` fora do build e ausência de arquivos das fontes proprietárias `Airbnb Cereal` e `Circular`.
 - Textos e metadados públicos sem o nome da instituição ou marcas da Airbnb.
-- Ausência de JavaScript de cliente no `dist/`.
+- Exatamente um script inline autorizado de tema por página e ausência de JavaScript externo no `dist/`.
 - Card da final antes da semifinal com o 1º colocado e “Vencedora da semifinal”, sem “Confrontos a definir”.
 
 ## Comandos

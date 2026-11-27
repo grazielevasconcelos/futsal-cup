@@ -3,10 +3,10 @@
 **Versão:** 2.3
 **Data:** 24/11/2026
 **Status:** Aceito  
-**Fonte de produto:** `PRD.md` v2.2 + `AGENTS.md` v2.3
+**Fonte de produto:** `PRD.md` v2.2 + `AGENTS.md` v2.4
 **Registro de decisões:** `docs/decisoes-v2.3.md` (impressão); `docs/decisoes-v2.2.md` (passe visual); `docs/decisoes-v2.1.md` (tema); `docs/decisoes-v2.0.md` (formato)
 
-Esta é a especificação técnica normativa do site. Ela está subordinada ao `PRD.md` (produto) e ao `AGENTS.md` (restrições do repositório). Em caso de conflito, prevalecem o PRD e o AGENTS; as interpretações e emendas estão registradas na §15. O alinhamento do PRD/AGENTS com a v2.3 foi aplicado. `PLAN.md` e `TASKS.md` são documentos de execução subordinados a esta SPEC.
+Esta é a especificação técnica normativa do site. Ela está subordinada ao `PRD.md` (produto) e ao `AGENTS.md` (restrições do repositório). Em caso de conflito, prevalecem o PRD e o AGENTS; as interpretações e emendas estão registradas na §15. O alinhamento do PRD/AGENTS com a v2.4 foi aplicado. `PLAN.md` e `TASKS.md` são documentos de execução subordinados a esta SPEC.
 
 > **Mudança de formato na v2.0 (18/11/2026):** a edição 2026 passa a ter **8 partidas oficiais**: 6 classificatórias em turno e returno (`g1`…`g6`), **1 semifinal** (`semi`, 2º x 3º) e **1 final** (`final`, 1º x vencedora da semifinal). O 2º e o 1º colocados têm **vantagem do empate** na semifinal e na final, respectivamente. Empates encerram no tempo normal: **não há prorrogação, pênaltis ou shootout**. A **3ª colocada é a perdedora da semifinal**; não há disputa de 3º lugar nem 4º lugar. O **amistoso do 3º colocado foi removido** e os campos `friendly` e `shootout` são proibidos com mensagem de migração. As emendas estão na §15 e foram refletidas no PRD v2.0 e no AGENTS v2.0.
 >
