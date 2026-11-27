@@ -64,6 +64,11 @@ teams:
         position: "linha"
         joinedAt: "2026-11-17T00:00:00-03:00"
         leftAt: null
+      - id: "p-026"
+        nickname: "Estelinha"
+        position: "linha"
+        joinedAt: "2026-11-17T00:00:00-03:00"
+        leftAt: null
 
   - id: "tb"
     name: "Time B"
