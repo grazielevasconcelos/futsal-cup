@@ -4,6 +4,8 @@ Site público, estático e somente leitura da Copa de Futsal Feminino Vila Maria
 
 A edição de 2026 tem **3 times**, **6 partidas na fase classificatória em turno e returno**, **1 semifinal** e **1 final**, totalizando **8 partidas oficiais**. A semifinal é **2º x 3º**, com **vantagem do empate para o 2º**; a final é **1º x vencedora da semifinal**, com **vantagem do empate para o 1º**. A **3ª colocada é a perdedora da semifinal**; não há disputa de 3º lugar, 4º lugar, amistoso, prorrogação, pênaltis ou shootout.
 
+**Estado em 27/11/2026:** fase classificatória em andamento; `g1` a `g4` concluídas. `g5` e `g6` estão previstas para 01/12, e a semifinal e a final para 03/12. Nomes, resultados, horários, local e elencos são lidos de `data/2026/copa.yaml`; o README não replica placares nem classificação.
+
 - **Site:** https://grazielevasconcelos.github.io/futsal-cup/
 - **Publicação:** GitHub Pages
 - **Idioma:** português do Brasil
@@ -74,7 +76,7 @@ O E2E usa a fixture de temporada concluída `tests/fixtures/valida.yaml`, constr
 
 A fonte única de dados do MVP é `data/2026/copa.yaml`: edição, times, elencos, partidas (`g1`…`g6`, `semi`, `final`), eventos, `semifinalists`, `finalists`, `drawOrder` e avisos. O site não terá dados duplicados no HTML e não permitirá edição pelo navegador.
 
-A fonte pública está no estado pré-competição: nomes dos times, elencos, horários e local ainda serão confirmados pela organização. Não há resultados fictícios publicados. A temporada concluída usada pelos testes fica em `tests/fixtures/valida.yaml` e não vai para o build de produção.
+A fonte pública está em andamento. Os nomes de exibição, horários e local estão registrados no YAML; os resultados das partidas concluídas são derivados dos eventos. A temporada concluída usada pelos testes fica em `tests/fixtures/valida.yaml` e não vai para o build de produção.
 
 Antes de publicar, rode:
 
@@ -113,9 +115,10 @@ O CI valida e republica a versão anterior. Não é necessário mexer no ambient
 | [`PRD.md`](PRD.md) | Produto, regras da competição e critérios de aceite. |
 | [`SPEC.md`](SPEC.md) | Stack, schema, algoritmos, validação, UI, testes e deploy. |
 | [`AGENTS.md`](AGENTS.md) | Restrições do repositório, design, acessibilidade e testes. |
-| [`PLAN.md`](PLAN.md) | Plano de execução por fatias. |
-| [`TASKS.md`](TASKS.md) | Checklist de implementação. |
+| [`PLAN.md`](PLAN.md) | Registro histórico de planejamento; consulte a SPEC para o contrato vigente. |
+| [`TASKS.md`](TASKS.md) | Checklist histórico, não representa o estado atual da competição ou do repositório. |
 | [`docs/guia-atualizacao-mobile.md`](docs/guia-atualizacao-mobile.md) | Guia para registrar resultados pelo app do GitHub no celular. |
+| [`docs/decisoes-v2.3.md`](docs/decisoes-v2.3.md) | Decisão de impressão A4/PDF pelo navegador. |
 | [`docs/decisoes-v2.0.md`](docs/decisoes-v2.0.md) | Registro das decisões da v2.0 (semifinal, vantagem do empate, 3ª colocada e remoções). |
 | [`docs/decisoes-v2.2.md`](docs/decisoes-v2.2.md) | Registro do passe visual: tipografia, cards clicáveis, placar, times e pódio. |
 | [`docs/decisoes-v2.1.md`](docs/decisoes-v2.1.md) | Registro da decisão de tema claro/escuro e persistência local. |

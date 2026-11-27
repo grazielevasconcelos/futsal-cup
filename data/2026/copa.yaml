@@ -5,8 +5,9 @@
 # IDs e nomes-base dos times são estáveis; a UI usa displayName quando preenchido.
 # Logos são opcionais e devem apontar para assets locais em public/images/times/.
 #
-# Estado atual: pré-competição. Elencos definidos em 17/11/2026.
-# Times B e C: "Time B de Bola" e "Sem Horas".
+# Estado em 27/11/2026: fase classificatória em andamento; g1 a g4 concluídas.
+# g5 e g6 estão previstas para 01/12; semifinal e final para 03/12.
+# Times: "De primeira FC", "Time B de Bola" e "Sem Horas".
 # IDs e URLs são estáveis. Horários confirmados:
 # primeiro jogo do dia às 18h45 e segundo às 19h20, no 7º andar. Vi é a única goleira; as demais jogadoras atuam na linha.
 # Não registre resultados fictícios.

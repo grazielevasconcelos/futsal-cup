@@ -1,8 +1,10 @@
 # TASKS — Copa de Futsal Feminino Vila Mariana 2026
 
-Checklist de execução do MVP. Marque apenas o que estiver realmente concluído.
+Checklist histórico de execução do MVP; não use para inferir o estado atual nem continue marcando tarefas sem revisar a SPEC vigente.
 
-> As seções 0–8 registram a implementação histórica da v1.1. A seção 9 acompanha a migração para o formato v2.0 (8 partidas, semifinal, final e vantagem do empate), que substitui as decisões anteriores. A seção 10 registra o tema claro/escuro da v2.1.
+> **Registro histórico:** este checklist reúne o planejamento e a execução de etapas anteriores (v1.1–v2.3). Os itens e caixas refletem registros daquela execução e não são uma descrição confiável do estado atual da competição ou do repositório. Para as regras vigentes, consulte `PRD.md`, `SPEC.md` e `AGENTS.md`; para o estado dos dados, consulte `data/2026/copa.yaml`.
+
+As seções 0–8 registram a implementação histórica da v1.1. A seção 9 acompanha a migração para o formato v2.0 (8 partidas, semifinal, final e vantagem do empate), que substitui as decisões anteriores. A seção 10 registra o tema claro/escuro da v2.1; as seções seguintes registram os passes v2.2 e v2.3.
 
 ## 0. Documentação e alinhamento (histórico v1.1)
 

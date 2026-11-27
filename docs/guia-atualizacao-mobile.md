@@ -11,7 +11,7 @@ app do GitHub, editando apenas `data/2026/copa.yaml`.
 3. Role até o bloco da partida que acabou (`g1`…`g6`) **e não mexa nos demais**.
 4. Preencha os campos conforme a seção abaixo.
 5. Role até o fim e use uma mensagem de commit clara, por exemplo:
-   `dados: registra resultado do jogo 1`.
+   `fix(dados): registra resultado do jogo 1`.
 6. Confirme o commit direto em `main`.
 7. Aguarde o GitHub Actions. Se falhar, o site publicado permanece na versão
    anterior; abra o erro do workflow, corrija no YAML e comite de novo.
